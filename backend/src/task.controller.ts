@@ -1,9 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
+import { dbGetAllTasks } from './db/task';
+import { SelectTask } from './db/schema';
 
 @Controller('tasks')
 export class TasksController {
   @Get()
-  async getAll(): Promise<string[]> {
-    return ['task 1'];
+  async getAll(): Promise<SelectTask[]> {
+    return await dbGetAllTasks();
   }
 }
