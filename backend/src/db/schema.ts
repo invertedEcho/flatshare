@@ -1,15 +1,15 @@
-import { pgTable, text, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text } from 'drizzle-orm/pg-core';
 
 export const userTable = pgTable('user', {
-  id: uuid('id').primaryKey(),
-  userName: text('user_name').unique(),
+  id: serial('id').primaryKey(),
   email: text('email'),
 });
 
 export const taskTable = pgTable('task', {
-  id: uuid('id').primaryKey(),
+  id: serial('id').primaryKey(),
   title: text('title'),
-  description: text('description'),
+  description: text('title'),
 });
+
 export type SelectTask = typeof taskTable.$inferSelect;
 export type InsertTask = typeof taskTable.$inferInsert;
