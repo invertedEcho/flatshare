@@ -16,6 +16,7 @@ export function HomeScreen() {
   const [assignments, setAssignments] = React.useState<Assignment[]>();
   const [isLoading, setIsLoading] = React.useState(false);
 
+  // TODO: Move to useQuery
   React.useEffect(() => {
     setIsLoading(true);
     fetch(`${process.env.EXPO_PUBLIC_API_URL}/assignments`)
@@ -54,7 +55,7 @@ export function HomeScreen() {
   );
 
   return (
-    <SafeAreaView className="text-black flex-1 items-center  bg-slate-700">
+    <SafeAreaView className="text-black flex-1 items-center bg-slate-700">
       <View className="p-4 w-full">
         <StatusBar style="auto" />
         <FlatList

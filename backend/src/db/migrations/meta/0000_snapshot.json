@@ -1,45 +1,9 @@
 {
-  "id": "457b9567-eb11-48b3-bb17-0c50d65ce628",
+  "id": "252c36ac-059c-442b-aee8-5a4ac50d1479",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "assignment_completion": {
-      "name": "assignment_completion",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "assignment_id": {
-          "name": "assignment_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "assignment_completion_assignment_id_assignment_id_fk": {
-          "name": "assignment_completion_assignment_id_assignment_id_fk",
-          "tableFrom": "assignment_completion",
-          "tableTo": "assignment",
-          "columnsFrom": [
-            "assignment_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "assignment": {
       "name": "assignment",
       "schema": "",
@@ -61,6 +25,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "state",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -110,6 +80,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -132,6 +108,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -140,7 +122,15 @@
       "uniqueConstraints": {}
     }
   },
-  "enums": {},
+  "enums": {
+    "state": {
+      "name": "state",
+      "values": {
+        "pending": "pending",
+        "completed": "completed"
+      }
+    }
+  },
   "schemas": {},
   "_meta": {
     "columns": {},

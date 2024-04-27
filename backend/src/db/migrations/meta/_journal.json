@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1714230637195,
-      "tag": "0000_dry_ulik",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1714231103304,
-      "tag": "0001_amusing_daredevil",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1714231402510,
-      "tag": "0002_tiny_risque",
+      "when": 1714251827887,
+      "tag": "0000_mute_doctor_strange",
       "breakpoints": true
     }
   ]

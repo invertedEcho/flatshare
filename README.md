@@ -7,7 +7,7 @@
   - drizzle
 
 - Frontend:
- - React native
+  - React native
 
 ### TODO
 
