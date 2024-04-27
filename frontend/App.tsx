@@ -1,8 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { CreateTaskScreen } from "./src/screens/AssignTask";
-import { HomeScreen } from "./src/screens/Home";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { Assigments } from "./src/screens/home";
+import { CreateTaskScreen } from "./src/screens/assign-task";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -10,29 +10,37 @@ export type RootStackParamList = {
 };
 const Tab = createBottomTabNavigator();
 
+type IconGlyph = keyof typeof Ionicons.glyphMap;
+
+function getIconName(
+  routeName: string,
+  focused: boolean,
+): IconGlyph | undefined {
+  switch (routeName) {
+    case "MyTasks":
+      return focused ? "home" : "home-outline";
+    case "AssignTask":
+      return focused ? "list" : "list-outline";
+    default:
+      return undefined;
+  }
+}
+
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName="MyTasks"
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap = "home";
-
-            if (route.name === "Home") {
-              iconName = focused ? "home" : "home-outline";
-            } else if (route.name === "AssignTask") {
-              iconName = focused ? "list" : "list-outline";
-            }
-
-            // You can return any component that you like here!
+            const iconName = getIconName(route.name, focused);
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: "tomato",
           tabBarInactiveTintColor: "gray",
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="MyTasks" component={Assigments} />
         <Tab.Screen
           name="AssignTask"
           options={{ title: "Assign task" }}
