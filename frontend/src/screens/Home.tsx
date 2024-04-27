@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import SkeletonContent from "react-native-skeleton-content";
 
 const mockAssignments = [
   {
@@ -37,25 +38,62 @@ const mockAssignments = [
   },
 ];
 
+type Assignment = {
+  title: string;
+  description: string;
+  isCompleted: boolean;
+  assigneeId: number;
+  assigneeName: string;
+  id: number;
+};
+
 export function HomeScreen() {
-  const [assignments, setAssignments] = useState(mockAssignments);
+  const [assignments, setAssignments] = useState<Assignment[]>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`${process.env.EXPO_PUBLIC_API_URL}/assignments`)
+      .then((res) => res.json())
+      .then((json) => {
+        setAssignments(json);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   function handleListItemPress(id: number) {
     setAssignments((prev) =>
       prev.map((assignment) =>
         assignment.id === id
-          ? { ...assignment, isCompleted: !assignment.isCompleted }
+          ? {
+              ...assignment,
+              isCompleted: !assignment.isCompleted,
+            }
           : assignment
       )
     );
   }
+
+  if (!assignments || isLoading) {
+    return (
+      <View>
+        <Text>Loading</Text>
+      </View>
+    );
+  }
+
+  const sortedAssignments = assignments.sort((a, b) =>
+    a.isCompleted == b.isCompleted ? 0 : a.isCompleted ? 1 : -1
+  );
+
   return (
     <SafeAreaView className="text-black flex-1 items-center  bg-slate-700">
       <View className="p-4 w-full">
         <StatusBar style="auto" />
         <FlatList
           contentContainerStyle={{ gap: 12 }}
-          data={assignments.sort((a, b) => (a == b ? 0 : a ? 1 : -1))}
+          data={sortedAssignments}
           renderItem={({ item }) => (
             <ListItem
               title={item.title}
