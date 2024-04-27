@@ -8,8 +8,7 @@ const connectionString = process.env.DATABASE_URL;
 if (connectionString === undefined) {
   throw new Error('DATABASE_URL is undefined');
 }
-console.log({ connectionString });
+
 const client = postgres(connectionString);
-console.log({ client });
 
 export const db = drizzle(client);
