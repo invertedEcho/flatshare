@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
+    "module": "es2021",
     "moduleResolution": "bundler",
     "declaration": true,
     "removeComments": true,
