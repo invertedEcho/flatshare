@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import * as React from "react";
 import { FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
@@ -13,10 +13,10 @@ type Assignment = {
 };
 
 export function HomeScreen() {
-  const [assignments, setAssignments] = useState<Assignment[]>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [assignments, setAssignments] = React.useState<Assignment[]>();
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     setIsLoading(true);
     fetch(`${process.env.EXPO_PUBLIC_API_URL}/assignments`)
       .then((res) => res.json())
@@ -28,15 +28,16 @@ export function HomeScreen() {
   }, []);
 
   function handleListItemPress(id: number) {
-    setAssignments((prev) =>
-      prev.map((assignment) =>
-        assignment.id === id
-          ? {
-              ...assignment,
-              isCompleted: !assignment.isCompleted,
-            }
-          : assignment,
-      ),
+    setAssignments(
+      (prev) =>
+        prev?.map((assignment) =>
+          assignment.id === id
+            ? {
+                ...assignment,
+                isCompleted: !assignment.isCompleted,
+              }
+            : assignment,
+        ),
     );
   }
 
