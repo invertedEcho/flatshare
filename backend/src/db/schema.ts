@@ -5,3 +5,11 @@ export const userTable = pgTable('user', {
   userName: text('user_name').unique(),
   email: text('email'),
 });
+
+export const taskTable = pgTable('task', {
+  id: uuid('id').primaryKey(),
+  title: text('title'),
+  description: text('description'),
+});
+export type SelectTask = typeof taskTable.$inferSelect;
+export type InsertTask = typeof taskTable.$inferInsert;
