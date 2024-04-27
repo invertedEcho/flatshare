@@ -6,11 +6,10 @@ export async function dbGetAllTasks(): Promise<SelectTask[]> {
   return await db.select().from(taskTable);
 }
 
-export async function dbGetTaskById(taskId: string): Promise<SelectTask> {
-  const result = await db
+export async function dbGetTaskById(taskId: number): Promise<SelectTask> {
+  return await db
     .select()
     .from(taskTable)
     .where(eq(taskTable.id, taskId))
-    .limit(1);
-  return result[0];
+    .limit(1)[0];
 }
