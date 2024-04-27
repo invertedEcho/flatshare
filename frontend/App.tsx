@@ -1,20 +1,24 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>WG App</Text>
+    <SafeAreaView className="text-black flex-1 items-center justify-center bg-red-50">
+      <Text>WG App 123</Text>
       <StatusBar style="auto" />
-    </View>
+      <FlatList
+        data={["Test", "test2"]}
+        renderItem={({ item }) => <ListItem title={item} />}
+        className="flex-grow-0"
+      ></FlatList>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+function ListItem({ title }: { title: string }) {
+  return (
+    <View>
+      <Text>{title}</Text>
+    </View>
+  );
+}
