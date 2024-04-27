@@ -1,4 +1,6 @@
-import { integer, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, pgTable, serial, text } from 'drizzle-orm/pg-core';
+
+const assigmentState = pgEnum('assigment_state', ['pending', 'completed']);
 
 export const userTable = pgTable('user', {
   id: serial('id').primaryKey(),
@@ -20,11 +22,6 @@ export const assignmentTable = pgTable('assignment', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
-});
-
-export const assignmentCompletionTable = pgTable('assignment_completion', {
-  id: serial('id').primaryKey(),
-  assignmentId: integer('assignment_id').references(() => assignmentTable.id),
 });
 
 export type SelectTask = typeof taskTable.$inferSelect;

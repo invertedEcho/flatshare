@@ -1,42 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  FlatList,
-  Pressable,
-  SafeAreaView,
-  Text,
-  View,
-} from "react-native";
+import { FlatList, Pressable, SafeAreaView, Text, View } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import SkeletonContent from "react-native-skeleton-content";
-
-const mockAssignments = [
-  {
-    title: "Staubsaugen",
-    description: "Sauge den Boden in Flur, Kuche und Bad.",
-    isCompleted: false,
-    assigneeId: 0,
-    assigneeName: "Julian",
-    id: 0,
-  },
-  {
-    title: "Boden Wischen",
-    description: "Wische den Boden in Flur, Kuche und Bad.",
-    isCompleted: false,
-    assigneeId: 1,
-    assigneeName: "Felix",
-    id: 1,
-  },
-  {
-    title: "Klo Putzen",
-    description: "Putze das Klo.",
-    isCompleted: false,
-    assigneeId: 1,
-    assigneeName: "Felix",
-    id: 2,
-  },
-];
 
 type Assignment = {
   title: string;
@@ -70,8 +35,8 @@ export function HomeScreen() {
               ...assignment,
               isCompleted: !assignment.isCompleted,
             }
-          : assignment
-      )
+          : assignment,
+      ),
     );
   }
 
@@ -84,7 +49,7 @@ export function HomeScreen() {
   }
 
   const sortedAssignments = assignments.sort((a, b) =>
-    a.isCompleted == b.isCompleted ? 0 : a.isCompleted ? 1 : -1
+    a.isCompleted == b.isCompleted ? 0 : a.isCompleted ? 1 : -1,
   );
 
   return (
