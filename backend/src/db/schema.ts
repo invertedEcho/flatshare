@@ -1,6 +1,9 @@
 import { integer, pgEnum, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { z } from 'zod';
 
-export const assigmentStateEnum = pgEnum('state', ['pending', 'completed']);
+export const assignmenState = z.enum(['pending', 'completed']);
+export const assigmentStateEnum = pgEnum('state', assignmenState.options);
+export type AssignmentState = z.infer<typeof assignmenState>;
 
 export const userTable = pgTable('user', {
   id: serial('id').primaryKey(),
