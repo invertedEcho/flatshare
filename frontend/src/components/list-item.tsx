@@ -1,7 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 
-// wtf?
-import BouncyCheckbox from "react-native-bouncy-checkbox/build/dist/BouncyCheckbox";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 type ListItemProps = {
   title: string;
@@ -15,7 +14,6 @@ type ListItemProps = {
 export function ListItem({
   title,
   description,
-  assignee,
   isCompleted,
   id,
   onPress,
@@ -33,7 +31,7 @@ export function ListItem({
         >
           {title}
         </Text>
-        <Text className="text-gray-100">{description}</Text>
+        <Text className="text-gray-100 text-lg">{description}</Text>
       </View>
       <BouncyCheckbox
         size={25}

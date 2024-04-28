@@ -3,51 +3,52 @@ import * as React from "react";
 import { FlatList, SafeAreaView, Text, View } from "react-native";
 import { ListItem } from "../components/list-item";
 import { TailSpin } from "react-loader-spinner";
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { z } from "zod";
 
-type Assignment = {
-  title: string;
-  description: string;
-  isCompleted: boolean;
-  assigneeId: number;
-  assigneeName: string;
-  id: number;
-};
+const assignmentSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string(),
+  isCompleted: z.boolean(),
+  assigneeId: z.number(),
+  assigneeName: z.string(),
+});
+
+type AssignmentState = "pending" | "completed";
+
+const assignmentsResponse = z.array(assignmentSchema);
 
 async function getAssigments() {
-  const response = await fetch("http://localhost:3000/assigments");
-  if (!response.ok) {
-    return undefined;
-  }
-  // TODO: validate with zod
+  const response = await fetch("http://localhost:3000/assignments");
   const json = await response.json();
-  return json;
+  return assignmentsResponse.parse(json);
 }
 
-const queryClient = new QueryClient();
+async function updateAssignmentStatus(
+  assignmentId: number,
+  state: AssignmentState,
+) {
+  await fetch(`http://localhost:3000/assignments/${assignmentId}/${state}`, {
+    method: "POST",
+  });
+}
 
 export function Assigments() {
-  const queryClient = useQueryClient();
-
   const { data: assignments, isLoading } = useQuery({
     queryKey: ["todos"],
     queryFn: getAssigments,
   });
-  console.log({ assignments });
 
-  // function handleListItemPress(id: number) {
-  //   setAssignments(
-  //     (prev) =>
-  //       prev?.map((assignment) =>
-  //         assignment.id === id
-  //           ? {
-  //               ...assignment,
-  //               isCompleted: !assignment.isCompleted,
-  //             }
-  //           : assignment,
-  //       ),
-  //   );
-  // }
+  const { mutate } = useMutation({
+    mutationFn: ({
+      assignmentId,
+      state,
+    }: {
+      assignmentId: number;
+      state: AssignmentState;
+    }) => updateAssignmentStatus(assignmentId, state),
+  });
 
   if (assignments === undefined || isLoading) {
     return (
@@ -76,10 +77,15 @@ export function Assigments() {
               description={item.description}
               isCompleted={item.isCompleted}
               id={item.id}
-              onPress={() => {}}
+              onPress={() =>
+                mutate({
+                  assignmentId: item.id,
+                  state: item.isCompleted ? "pending" : "completed",
+                })
+              }
             />
           )}
-          className="flex-grow-0 w-full  p-2 h-full"
+          className="flex-grow-0 w-full p-2 h-full"
         />
       </View>
     </SafeAreaView>

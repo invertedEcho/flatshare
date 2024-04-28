@@ -1,6 +1,11 @@
 import { AssignmentResponse } from 'src/types';
 import { db } from '.';
-import { assignmentTable, taskTable, userTable } from './schema';
+import {
+  AssignmentState,
+  assignmentTable,
+  taskTable,
+  userTable,
+} from './schema';
 import { eq } from 'drizzle-orm';
 
 export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
@@ -17,7 +22,17 @@ export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
       id: query.assignment.id,
       assigneeId: query.assignment.userId,
       assigneeName: query.user.email,
-      isCompleted: false,
+      isCompleted: query.assignment.state === 'completed',
     } satisfies AssignmentResponse;
   });
+}
+
+export async function dbChangeAssignmentState(
+  assignmentId: number,
+  state: AssignmentState,
+) {
+  await db
+    .update(assignmentTable)
+    .set({ state })
+    .where(eq(assignmentTable.id, assignmentId));
 }
