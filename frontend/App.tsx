@@ -2,7 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Assigments } from "./src/screens/assignments";
-import { CreateTaskScreen } from "./src/screens/assign-task";
+import { CreateTaskScreen } from "./src/screens/create-task";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export type RootStackParamList = {
@@ -20,7 +20,7 @@ function getIconName(
   switch (routeName) {
     case "MyTasks":
       return focused ? "home" : "home-outline";
-    case "AssignTask":
+    case "CreateTask":
       return focused ? "list" : "list-outline";
     default:
       return undefined;
@@ -50,8 +50,8 @@ export default function App() {
             component={Assigments}
           />
           <Tab.Screen
-            name="AssignTask"
-            options={{ title: "Assign task" }}
+            name="CreateTask"
+            options={{ title: "Create a task" }}
             component={CreateTaskScreen}
           />
         </Tab.Navigator>

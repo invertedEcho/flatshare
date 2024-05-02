@@ -1,5 +1,21 @@
 # unnamed
 
+## setup
+
+- Install all dependencies
+
+
+```bash
+cd backend && pnpm i
+cd ..
+cd frontend && pnpm i
+```
+
+- create .env files
+
+cd backend 
+
+
 ### The Stack:
 
 - Backend:
@@ -8,8 +24,8 @@
 
 - Frontend:
   - React native
+  - Tanstack usequery
 
 ### TODO
 
 - Use pnpm workspaces to manage each project more efficient
-- Think about using tanstack usequery for state management and data fetching

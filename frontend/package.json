@@ -30,7 +30,8 @@
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
     "react-native-web": "~0.19.6",
-    "zod": "^3.23.4"
+    "zod": "^3.23.4",
+    "common": "workspace:*"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
