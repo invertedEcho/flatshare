@@ -4,6 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Assigments } from "./src/screens/assignments";
 import { CreateTaskScreen } from "./src/screens/create-task";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./public/tailwind.css";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -15,7 +16,7 @@ type IconGlyph = keyof typeof Ionicons.glyphMap;
 
 function getIconName(
   routeName: string,
-  focused: boolean,
+  focused: boolean
 ): IconGlyph | undefined {
   switch (routeName) {
     case "MyTasks":
