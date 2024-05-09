@@ -1,4 +1,11 @@
-import { integer, pgEnum, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  interval,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+} from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
 export const assignmenState = z.enum(['pending', 'completed']);
@@ -14,7 +21,8 @@ export const userTable = pgTable('user', {
 export const taskTable = pgTable('task', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
-  description: text('description').notNull(),
+  description: text('description'),
+  interval: interval('interval'),
 });
 
 export const assignmentTable = pgTable('assignment', {

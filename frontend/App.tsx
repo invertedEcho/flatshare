@@ -16,10 +16,10 @@ type IconGlyph = keyof typeof Ionicons.glyphMap;
 
 function getIconName(
   routeName: string,
-  focused: boolean
+  focused: boolean,
 ): IconGlyph | undefined {
   switch (routeName) {
-    case "MyTasks":
+    case "MyAssignments":
       return focused ? "home" : "home-outline";
     case "CreateTask":
       return focused ? "list" : "list-outline";
@@ -35,7 +35,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <Tab.Navigator
-          initialRouteName="MyTasks"
+          initialRouteName="CreateTask"
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = getIconName(route.name, focused);
@@ -46,8 +46,8 @@ export default function App() {
           })}
         >
           <Tab.Screen
-            name="MyTasks"
-            options={{ title: "My Tasks" }}
+            name="MyAssignments"
+            options={{ title: "My Assignments" }}
             component={Assigments}
           />
           <Tab.Screen

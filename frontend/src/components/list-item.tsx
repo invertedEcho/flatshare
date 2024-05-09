@@ -19,11 +19,11 @@ export function ListItem({
   onPress,
 }: ListItemProps) {
   return (
-    <Pressable
-      className="p-2  bg-slate-900 flex-row items-center justify-between rounded-lg"
-      onPress={() => onPress(id)}
-    >
-      <View>
+    <View>
+      <Pressable
+        className="p-2  bg-slate-900 flex-row items-center justify-between rounded-lg"
+        onPress={() => onPress(id)}
+      >
         <Text
           className={`font-semibold text-lg text-gray-200 ${
             isCompleted && "line-through"
@@ -32,15 +32,15 @@ export function ListItem({
           {title}
         </Text>
         <Text className="text-gray-100 text-lg">{description}</Text>
-      </View>
-      <BouncyCheckbox
-        size={25}
-        unFillColor="#FFFFFF"
-        iconStyle={{ borderColor: "black" }}
-        innerIconStyle={{ borderWidth: 2 }}
-        isChecked={isCompleted}
-        onPress={() => onPress(id)}
-      />
-    </Pressable>
+        <BouncyCheckbox
+          size={25}
+          unFillColor="#FFFFFF"
+          iconStyle={{ borderColor: "black" }}
+          innerIconStyle={{ borderWidth: 2 }}
+          isChecked={isCompleted}
+          onPress={() => onPress(id)}
+        />
+      </Pressable>
+    </View>
   );
 }
