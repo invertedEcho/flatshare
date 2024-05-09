@@ -9,6 +9,7 @@ export const userTable = pgTable('user', {
   id: serial('id').primaryKey(),
   email: text('email').notNull(),
   username: text('username').notNull(),
+  password: text('password').notNull(),
 });
 
 export const taskTable = pgTable('task', {

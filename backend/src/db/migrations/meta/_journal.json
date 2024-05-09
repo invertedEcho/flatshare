@@ -8,6 +8,13 @@
       "when": 1714251827887,
       "tag": "0000_mute_doctor_strange",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1715265567258,
+      "tag": "0001_crazy_chamber",
+      "breakpoints": true
     }
   ]
 }

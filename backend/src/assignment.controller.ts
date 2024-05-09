@@ -1,5 +1,8 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
-import { dbChangeAssignmentState, dbGetAllAssignments } from './db/assignment';
+import {
+  dbChangeAssignmentState,
+  dbGetAllAssignments,
+} from './db/functions/assignment';
 import { AssignmentResponse } from './types';
 import { AssignmentState } from './db/schema';
 

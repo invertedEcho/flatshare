@@ -27,7 +27,7 @@ async function getAssigments() {
 
 async function updateAssignmentStatus(
   assignmentId: number,
-  state: AssignmentState,
+  state: AssignmentState
 ) {
   await fetch(`http://localhost:3000/assignments/${assignmentId}/${state}`, {
     method: "POST",
@@ -60,7 +60,7 @@ export function Assigments() {
   }
 
   const sortedAssignments = assignments.sort((a, b) =>
-    a.isCompleted == b.isCompleted ? 0 : a.isCompleted ? 1 : -1,
+    a.isCompleted == b.isCompleted ? 0 : a.isCompleted ? 1 : -1
   );
 
   return (
