@@ -5,6 +5,7 @@ import {
   pgTable,
   serial,
   text,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
@@ -16,6 +17,7 @@ export const userTable = pgTable('user', {
   id: serial('id').primaryKey(),
   email: text('email').notNull(),
   username: text('username').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const taskTable = pgTable('task', {
@@ -23,6 +25,7 @@ export const taskTable = pgTable('task', {
   title: text('title').notNull(),
   description: text('description'),
   interval: interval('interval'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const assignmentTable = pgTable('assignment', {
@@ -34,6 +37,7 @@ export const assignmentTable = pgTable('assignment', {
     .references(() => userTable.id)
     .notNull(),
   state: assigmentStateEnum('state'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type SelectTask = typeof taskTable.$inferSelect;

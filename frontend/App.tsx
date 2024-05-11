@@ -5,6 +5,7 @@ import { Assigments } from "./src/screens/assignments";
 import { CreateTaskScreen } from "./src/screens/create-task";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
+import Toast from "react-native-toast-message";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -56,6 +57,7 @@ export default function App() {
             component={CreateTaskScreen}
           />
         </Tab.Navigator>
+        <Toast />
       </NavigationContainer>
     </QueryClientProvider>
   );
