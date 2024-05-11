@@ -7,14 +7,29 @@
 
 ```bash
 cd backend && pnpm i
-cd ..
 cd frontend && pnpm i
 ```
 
-- create .env files
+- setup environment variables
 
-cd backend 
+```bash
+touch frontend/.env
 
+# file content
+EXPO_PUBLIC_API_URL=http://localhost:3000
+
+touch backend/.env
+
+# file content
+DATABASE_URL=****
+```
+
+## start the apps
+
+```bash
+cd backend && pnpm dev
+cd frontend && pnpm start
+```
 
 ### The Stack:
 
