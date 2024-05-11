@@ -34,7 +34,7 @@ async function updateAssignmentStatus(
   });
 }
 
-export function Assigments() {
+export function AssigmentsScreen() {
   const { data: assignments, isLoading } = useQuery({
     queryKey: ["todos"],
     queryFn: getAssigments,
