@@ -4,7 +4,7 @@ import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { Dropdown } from "react-native-element-dropdown";
 import { intervalItems } from "../utils/interval";
@@ -46,6 +46,7 @@ const defaultValues = {
 };
 
 export function CreateTaskScreen() {
+  const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
@@ -73,12 +74,14 @@ export function CreateTaskScreen() {
     onError: () => {
       Toast.show({ type: "error", text1: "Failed creating task" });
     },
+    mutationKey: ["tasks"],
   });
 
   function onSubmit(data: CreateTask) {
     mutate({
       ...data,
     });
+    queryClient.refetchQueries({ queryKey: ["tasks"] });
   }
 
   return (

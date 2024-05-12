@@ -1,19 +1,32 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Assigments } from "./src/screens/assignments";
+import { AssigmentsScreen } from "./src/screens/assignments";
 import { CreateTaskScreen } from "./src/screens/create-task";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
+import AllTasksScreen from "./src/screens/all-tasks";
 
-export type RootStackParamList = {
-  Home: undefined;
-  AssignTask: undefined;
-};
-const Tab = createBottomTabNavigator();
+const BottomTabNavigator = createBottomTabNavigator();
 
 type IconGlyph = keyof typeof Ionicons.glyphMap;
+
+type Screen = { name: string; title: string; component(): React.JSX.Element };
+
+const SCREENS = [
+  {
+    name: "MyAssignments",
+    title: "My Assignments",
+    component: AssigmentsScreen,
+  },
+  {
+    name: "CreateTask",
+    title: "Create a task",
+    component: CreateTaskScreen,
+  },
+  { name: "AllTasks", title: "All tasks", component: AllTasksScreen },
+] satisfies Screen[];
 
 function getIconName(
   routeName: string,
@@ -22,8 +35,10 @@ function getIconName(
   switch (routeName) {
     case "MyAssignments":
       return focused ? "home" : "home-outline";
-    case "CreateTask":
+    case "AllTasks":
       return focused ? "list" : "list-outline";
+    case "CreateTask":
+      return focused ? "add" : "add-outline";
     default:
       return undefined;
   }
@@ -35,8 +50,8 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
-        <Tab.Navigator
-          initialRouteName="CreateTask"
+        <BottomTabNavigator.Navigator
+          initialRouteName="AllTasks"
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = getIconName(route.name, focused);
@@ -46,17 +61,17 @@ export default function App() {
             tabBarInactiveTintColor: "gray",
           })}
         >
-          <Tab.Screen
-            name="MyAssignments"
-            options={{ title: "My Assignments" }}
-            component={Assigments}
-          />
-          <Tab.Screen
-            name="CreateTask"
-            options={{ title: "Create a task" }}
-            component={CreateTaskScreen}
-          />
-        </Tab.Navigator>
+          {SCREENS.map((screen) => {
+            return (
+              <BottomTabNavigator.Screen
+                name={screen.name}
+                options={{ title: screen.title }}
+                component={screen.component}
+                key={screen.name}
+              />
+            );
+          })}
+        </BottomTabNavigator.Navigator>
         <Toast />
       </NavigationContainer>
     </QueryClientProvider>
