@@ -12,10 +12,10 @@ if (databaseUrl === undefined) {
 const config = {
   out: './src/db/migrations',
   schema: './src/db/schema.ts',
-  driver: 'pg',
   dbCredentials: {
-    connectionString: databaseUrl,
+    url: databaseUrl,
   },
+  dialect: 'postgresql',
 } satisfies Config;
 
 export default config;
