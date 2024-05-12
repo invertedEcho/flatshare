@@ -1,11 +1,13 @@
-# unnamed
+# wg-app WIP
 
 ## setup
 
 - Install all dependencies
 
+
 ```bash
-pnpm i
+cd backend && pnpm i
+cd frontend && pnpm i
 ```
 
 - setup environment variables
@@ -25,19 +27,11 @@ DATABASE_URL=****
 ## start the apps
 
 ```bash
-pnpm app
-```
-
-alternatively, you can also start the frontend and backend individually:
-```bash
-pnpm app:frontend
-pnpm app:backend
+cd backend && pnpm dev
+cd frontend && pnpm start
 ```
 
 ### The Stack:
-
-- Root:
-  - pnpm as package manager with workspaces feature
 
 - Backend:
   - NestJS
@@ -46,3 +40,7 @@ pnpm app:backend
 - Frontend:
   - React native
   - Tanstack usequery
+
+### TODO
+
+- Use pnpm workspaces to manage each project more efficient
