@@ -1,4 +1,6 @@
 {
+  "id": "d35a7ea2-4b59-4865-b003-7998fd945e80",
+  "prevId": "a75639ad-dbd7-4c2d-a523-4a1b3db23359",
   "version": "6",
   "dialect": "postgresql",
   "tables": {
@@ -27,8 +29,16 @@
         "state": {
           "name": "state",
           "type": "state",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -36,20 +46,28 @@
         "assignment_task_id_task_id_fk": {
           "name": "assignment_task_id_task_id_fk",
           "tableFrom": "assignment",
-          "columnsFrom": ["task_id"],
           "tableTo": "task",
-          "columnsTo": ["id"],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "columnsFrom": [
+            "task_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         },
         "assignment_user_id_user_id_fk": {
           "name": "assignment_user_id_user_id_fk",
           "tableFrom": "assignment",
-          "columnsFrom": ["user_id"],
           "tableTo": "user",
-          "columnsTo": ["id"],
-          "onUpdate": "no action",
-          "onDelete": "no action"
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -76,6 +94,19 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "interval": {
+          "name": "interval",
+          "type": "interval",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -104,6 +135,19 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -116,15 +160,16 @@
     "public.state": {
       "name": "state",
       "schema": "public",
-      "values": ["pending", "completed"]
+      "values": [
+        "pending",
+        "completed"
+      ]
     }
   },
   "schemas": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "id": "ec855937-3c1d-4f3a-8f14-c9b187332b69",
-  "prevId": "252c36ac-059c-442b-aee8-5a4ac50d1479"
+    "tables": {}
+  }
 }

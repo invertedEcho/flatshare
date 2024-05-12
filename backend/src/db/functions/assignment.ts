@@ -1,11 +1,11 @@
 import { AssignmentResponse } from 'src/types';
-import { db } from '.';
+import { db } from '..';
 import {
   AssignmentState,
   assignmentTable,
   taskTable,
   userTable,
-} from './schema';
+} from '../schema';
 import { eq } from 'drizzle-orm';
 
 export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {

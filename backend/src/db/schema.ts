@@ -17,6 +17,7 @@ export const userTable = pgTable('user', {
   id: serial('id').primaryKey(),
   email: text('email').notNull(),
   username: text('username').notNull(),
+  password: text('password').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -42,3 +43,4 @@ export const assignmentTable = pgTable('assignment', {
 
 export type SelectTask = typeof taskTable.$inferSelect;
 export type InsertTask = typeof taskTable.$inferInsert;
+export type SelectUser = typeof userTable.$inferSelect;

@@ -5,6 +5,7 @@ import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
+import { fetchWrapper } from "../utils/fetchWrapper";
 
 type TaskItemProps = Task & {
   interval?: string | null;
@@ -19,20 +20,11 @@ type Task = {
 };
 
 async function updateTask(task: Task) {
-  const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
-    method: "PUT",
-    body: JSON.stringify({
-      taskId: task.id,
-      title: task.title,
-      description: task.description,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
+  const response = await fetchWrapper.put(`tasks/${task.id}`, {
+    taskId: task.id,
+    title: task.title,
+    description: task.description,
   });
-  if (!response.ok) {
-    throw new Error(`Failed updating task ${await response.text()}`);
-  }
 }
 
 export function TaskItem({

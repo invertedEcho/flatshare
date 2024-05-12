@@ -1,9 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import { FlatList, SafeAreaView, View } from "react-native";
+import { FlatList, SafeAreaView, ScrollView, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import Loading from "../components/loading";
 import { TaskItem } from "../components/task-item";
+import { fetchWrapper } from "../utils/fetchWrapper";
 
 const taskSchema = z.object({
   title: z.string(),
@@ -14,7 +15,7 @@ const taskSchema = z.object({
 });
 
 async function getAllTasks() {
-  const response = await fetch("http://localhost:3000/tasks");
+  const response = await fetchWrapper.get("tasks");
   const body = await response.json();
   const parsed = z.array(taskSchema).safeParse(body);
   if (!parsed.success) {
@@ -36,7 +37,7 @@ export default function AllTasksScreen() {
 
   return (
     <SafeAreaView className="text-black flex-1 items-center bg-slate-700">
-      <View className="p-4 w-full">
+      <ScrollView className="p-4 w-full">
         <StatusBar style="auto" />
         <FlatList
           contentContainerStyle={{ gap: 12 }}
@@ -51,7 +52,7 @@ export default function AllTasksScreen() {
             />
           )}
         />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
