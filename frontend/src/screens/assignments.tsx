@@ -10,7 +10,7 @@ import Loading from "../components/loading";
 const assignmentSchema = z.object({
   id: z.number(),
   title: z.string(),
-  description: z.string(),
+  description: z.string().nullable(),
   isCompleted: z.boolean(),
   assigneeId: z.number(),
   assigneeName: z.string(),
