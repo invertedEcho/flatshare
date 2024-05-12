@@ -1,4 +1,4 @@
-# unnamed
+# wg-app WIP
 
 ## setup
 
