@@ -4,7 +4,7 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 type ListItemProps = {
   title: string;
-  description: string;
+  description: string | null;
   interval?: string | null;
   isCompleted: boolean;
   onPress(id: number): void;
