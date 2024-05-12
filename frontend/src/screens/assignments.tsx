@@ -92,20 +92,22 @@ export function AssigmentsScreen() {
 
   return (
     <SafeAreaView className="text-black flex-1 bg-slate-700">
-      <View className="p-4 w-full">
-        <Text className="text-white" style={{ fontSize: 16 }}>
-          From user
-        </Text>
-        <UserDropdown
-          data={users.map((user) => ({
-            label: user.username,
-            value: String(user.id),
-          }))}
-          onChange={(id: number) => {
-            setSelectedUserId(id);
-          }}
-          selectedUserId={selectedUserId}
-        />
+      <View className="p-4 w-full" style={{ gap: 20 }}>
+        <View>
+          <Text className="text-white" style={{ fontSize: 16 }}>
+            From user
+          </Text>
+          <UserDropdown
+            data={users.map((user) => ({
+              label: user.username,
+              value: String(user.id),
+            }))}
+            onChange={(id: number) => {
+              setSelectedUserId(id);
+            }}
+            selectedUserId={selectedUserId}
+          />
+        </View>
         <StatusBar style="auto" />
         <FlatList
           contentContainerStyle={{ gap: 12 }}
@@ -116,11 +118,13 @@ export function AssigmentsScreen() {
               description={item.description}
               isCompleted={item.isCompleted}
               id={item.id}
+              disabled={item.assigneeId !== userId}
               onPress={() => {
                 mutate({
                   assignmentId: item.id,
                   state: item.isCompleted ? "pending" : "completed",
                 });
+                queryClient.refetchQueries({ queryKey: ["todos"] });
               }}
             />
           )}
