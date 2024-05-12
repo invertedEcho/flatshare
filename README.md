@@ -4,10 +4,8 @@
 
 - Install all dependencies
 
-
 ```bash
-cd backend && pnpm i
-cd frontend && pnpm i
+pnpm i
 ```
 
 - setup environment variables
@@ -27,11 +25,19 @@ DATABASE_URL=****
 ## start the apps
 
 ```bash
-cd backend && pnpm dev
-cd frontend && pnpm start
+pnpm app
+```
+
+alternatively, you can also start the frontend and backend individually:
+```bash
+pnpm app:frontend
+pnpm app:backend
 ```
 
 ### The Stack:
+
+- Root:
+  - pnpm as package manager with workspaces feature
 
 - Backend:
   - NestJS
@@ -40,7 +46,3 @@ cd frontend && pnpm start
 - Frontend:
   - React native
   - Tanstack usequery
-
-### TODO
-
-- Use pnpm workspaces to manage each project more efficient
