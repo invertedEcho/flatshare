@@ -7,4 +7,5 @@ export type AssignmentResponse = {
   assigneeId: number;
   assigneeName: string;
   isCompleted: boolean;
+  createdAt: Date;
 };

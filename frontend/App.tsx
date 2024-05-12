@@ -1,6 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
 import "./public/tailwind.css";
 import StorageWrapper from "./src/utils/StorageWrapper";
@@ -26,6 +25,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
 import AllTasksScreen from "./src/screens/all-tasks";
+import { NavigationContainer } from "@react-navigation/native";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
@@ -55,6 +55,7 @@ const queryClient = new QueryClient();
 
 export default function App() {
   const [isAuthorized, setIsAuthorized] = React.useState(false);
+  const [userId, setUserId] = React.useState<number>();
 
   React.useEffect(() => {
     (async () => {
@@ -63,7 +64,9 @@ export default function App() {
         setIsAuthorized(false);
       } else {
         try {
-          await fetchWrapper.get("profile");
+          const res = await fetchWrapper.get("profile");
+          const user = await res.json();
+          setUserId(user.userId);
           setIsAuthorized(true);
         } catch {
           setIsAuthorized(false);
@@ -73,7 +76,7 @@ export default function App() {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthorized, setIsAuthorized }}>
+    <AuthContext.Provider value={{ isAuthorized, setIsAuthorized, userId }}>
       <QueryClientProvider client={queryClient}>
         <NavigationContainer>
           <BottomTabNavigator.Navigator

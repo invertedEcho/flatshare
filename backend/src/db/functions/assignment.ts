@@ -29,6 +29,7 @@ export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
         assigneeId: query.user.id,
         assigneeName: query.user.email,
         isCompleted: query.assignment.state === 'completed',
+        createdAt: query.assignment.createdAt,
       } satisfies AssignmentResponse;
     });
   } catch (error) {

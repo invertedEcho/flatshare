@@ -46,4 +46,14 @@ export class AuthController {
   getProfile(@Request() req: { user: any }) {
     return req.user;
   }
+
+  @Get('users')
+  async getUsers() {
+    const users = await db.select().from(userTable);
+    return users.map((user) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...rest } = user;
+      return rest;
+    });
+  }
 }
