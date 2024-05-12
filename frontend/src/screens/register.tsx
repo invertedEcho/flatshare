@@ -10,25 +10,25 @@ import { Dropdown } from "react-native-element-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { AuthContext } from "../auth-context";
 import StorageWrapper from "../utils/StorageWrapper";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-const loginFormSchema = z.object({
+const registerFormSchema = z.object({
   username: z.string(),
   password: z.string(),
+  email: z.string(),
 });
 
-type LoginFormData = z.infer<typeof loginFormSchema>;
+type RegisterFormData = z.infer<typeof registerFormSchema>;
 
-async function login({ username, password }: LoginFormData) {
-  const res = await fetchWrapper.post("login", {
-    username,
-    password,
-  });
-  const json = await res.json();
-  console.debug({ token: json["access_token"] });
-  return json["access_token"];
+async function register({ username, password, email }: RegisterFormData) {
+  try {
+    await fetchWrapper.post("register", {
+      username,
+      password,
+      email,
+    });
+  } catch {}
 }
 
 const defaultValues = {
@@ -36,42 +36,38 @@ const defaultValues = {
   password: "",
 };
 
-export function LoginScreen({
+export function RegisterScreen({
   navigation,
-}: NativeStackScreenProps<RootStackParamList, "Login">) {
+}: NativeStackScreenProps<RootStackParamList, "Register">) {
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset: resetForm,
-  } = useForm<LoginFormData>({
+  } = useForm<RegisterFormData>({
     defaultValues,
-    resolver: zodResolver(loginFormSchema),
+    resolver: zodResolver(registerFormSchema),
   });
 
-  const { isAuthorized, setIsAuthorized } = React.useContext(AuthContext);
-
   const { mutate, data } = useMutation({
-    mutationFn: ({ ...args }: LoginFormData) =>
-      login({
+    mutationFn: ({ ...args }: RegisterFormData) =>
+      register({
         username: args.username,
         password: args.password,
+        email: args.email,
       }),
-    onSuccess: (res) => {
-      console.debug("success", res);
-      Toast.show({ type: "success", text1: "Succcessfully logged in" });
+    onSuccess: () => {
+      Toast.show({ type: "success", text1: "Succcessfully register" });
       resetForm({ ...defaultValues });
-      setIsAuthorized(true);
-      StorageWrapper.setItem("jwt-token", res);
+      navigation.navigate("Login");
     },
     onError: (err) => {
       console.error(err);
-      Toast.show({ type: "error", text1: "Failed to log in" });
-      setIsAuthorized(false);
+      Toast.show({ type: "error", text1: "Failed to register" });
     },
   });
 
-  function onSubmit(data: LoginFormData) {
+  function onSubmit(data: RegisterFormData) {
     mutate({
       ...data,
     });
@@ -80,7 +76,7 @@ export function LoginScreen({
   return (
     <SafeAreaView className="bg-slate-700 flex p-4 h-full">
       <View className="p-4 w-full bg-slate-900 rounded-lg h-full">
-        <Text className="text-white">Username</Text>
+        <Text className="text-white">Username *</Text>
         <Controller
           control={control}
           rules={{
@@ -123,6 +119,30 @@ export function LoginScreen({
         />
         {errors.password && (
           <Text className="text-red-300">Password is required</Text>
+        )}
+
+        <Text className="text-white">Email</Text>
+        <Controller
+          control={control}
+          rules={{
+            required: true,
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              style={{
+                color: "white",
+              }}
+              placeholder="Email"
+              onChangeText={onChange}
+              value={value}
+              textContentType="emailAddress"
+              className="p-4 text-white"
+            />
+          )}
+          name="email"
+        />
+        {errors.email && (
+          <Text className="text-red-300">Email is required</Text>
         )}
 
         <Pressable

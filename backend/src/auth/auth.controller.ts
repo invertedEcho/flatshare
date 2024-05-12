@@ -39,6 +39,7 @@ export class AuthController {
     const { username, email, password } = registerDto;
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
     await db.insert(userTable).values({ email, username, password: hash });
+    return { username, email };
   }
 
   @Get('profile')

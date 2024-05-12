@@ -35,6 +35,18 @@ class StorageWrapper {
       );
     }
   }
+
+  static async deleteItem(key: string): Promise<void> {
+    if (Platform.OS === "web") {
+      return await (StorageWrapper.storage as AsyncStorageStatic).removeItem(
+        key
+      );
+    } else {
+      return await (
+        StorageWrapper.storage as typeof SecureStore
+      ).deleteItemAsync(key);
+    }
+  }
 }
 
 export default StorageWrapper;
