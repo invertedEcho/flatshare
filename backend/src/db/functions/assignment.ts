@@ -5,6 +5,7 @@ import {
   assignmentTable,
   taskTable,
   userTable,
+  userTaskTable,
 } from '../schema';
 import { eq } from 'drizzle-orm';
 
@@ -13,15 +14,19 @@ export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
     const queryResult = await db
       .select()
       .from(assignmentTable)
-      .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
-      .innerJoin(userTable, eq(assignmentTable.userId, userTable.id));
+      .innerJoin(
+        userTaskTable,
+        eq(assignmentTable.userTaskId, userTaskTable.id),
+      )
+      .innerJoin(userTable, eq(userTaskTable.userId, userTable.id))
+      .innerJoin(taskTable, eq(userTaskTable.taskId, taskTable.id));
 
     return queryResult.map((query) => {
       return {
         title: query.task.title,
         description: query.task.description,
         id: query.assignment.id,
-        assigneeId: query.assignment.userId,
+        assigneeId: query.user.id,
         assigneeName: query.user.email,
         isCompleted: query.assignment.state === 'completed',
       } satisfies AssignmentResponse;
