@@ -22,13 +22,11 @@ const registerFormSchema = z.object({
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
 async function register({ username, password, email }: RegisterFormData) {
-  try {
-    await fetchWrapper.post("register", {
-      username,
-      password,
-      email,
-    });
-  } catch {}
+  await fetchWrapper.post("register", {
+    username,
+    password,
+    email,
+  });
 }
 
 const defaultValues = {
