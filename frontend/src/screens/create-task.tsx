@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { Dropdown } from "react-native-element-dropdown";
 import { intervalItems } from "../utils/interval";
+import { fetchWrapper } from "../utils/fetchWrapper";
 
 const intervalType = z.enum(["hours", "days", "weeks"]);
 export type IntervalType = z.infer<typeof intervalType>;
@@ -26,17 +27,12 @@ async function createTask({
   intervalValue,
   intervalType,
 }: CreateTask & { intervalType: IntervalType }) {
-  const response = await fetch("http://localhost:3000/tasks", {
-    method: "POST",
-    body: JSON.stringify({ title, description, intervalValue, intervalType }),
-    headers: {
-      "Content-Type": "application/json",
-    },
+  await fetchWrapper.post("tasks", {
+    title,
+    description,
+    intervalValue,
+    intervalType,
   });
-  if (!response.ok) {
-    console.error({ loc: "response was not ok", response });
-    throw new Error(`Failed request ${response}`);
-  }
 }
 
 const defaultValues = {
@@ -70,7 +66,8 @@ export function CreateTaskScreen() {
       Toast.show({ type: "success", text1: "Succcessfully created task" });
       resetForm({ ...defaultValues });
     },
-    onError: () => {
+    onError: (err) => {
+      console.error(err);
       Toast.show({ type: "error", text1: "Failed creating task" });
     },
   });

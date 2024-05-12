@@ -5,6 +5,7 @@ import { ListItem } from "../components/list-item";
 import { TailSpin } from "react-loader-spinner";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
+import { fetchWrapper } from "../utils/fetchWrapper";
 
 const assignmentSchema = z.object({
   id: z.number(),
@@ -20,18 +21,16 @@ type AssignmentState = "pending" | "completed";
 const assignmentsResponse = z.array(assignmentSchema);
 
 async function getAssigments() {
-  const response = await fetch("http://localhost:3000/assignments");
-  const json = await response.json();
-  return assignmentsResponse.parse(json);
+  const res = await fetchWrapper.get("assignments");
+  const assignments = await res.json();
+  return assignmentsResponse.parse(assignments);
 }
 
 async function updateAssignmentStatus(
   assignmentId: number,
   state: AssignmentState
 ) {
-  await fetch(`http://localhost:3000/assignments/${assignmentId}/${state}`, {
-    method: "POST",
-  });
+  await fetchWrapper.post(`assignments/${assignmentId}/${state}`);
 }
 
 export function Assigments() {
