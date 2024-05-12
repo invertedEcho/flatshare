@@ -29,6 +29,13 @@
           "type": "state",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -83,7 +90,20 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "interval": {
+          "name": "interval",
+          "type": "interval",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -112,6 +132,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -136,6 +163,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "252c36ac-059c-442b-aee8-5a4ac50d1479",
-  "prevId": "00000000-0000-0000-0000-000000000000"
+  "id": "a75639ad-dbd7-4c2d-a523-4a1b3db23359",
+  "prevId": "ec855937-3c1d-4f3a-8f14-c9b187332b69"
 }

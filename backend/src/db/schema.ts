@@ -1,4 +1,12 @@
-import { integer, pgEnum, pgTable, serial, text } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  interval,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
 export const assignmenState = z.enum(['pending', 'completed']);
@@ -10,12 +18,15 @@ export const userTable = pgTable('user', {
   email: text('email').notNull(),
   username: text('username').notNull(),
   password: text('password').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const taskTable = pgTable('task', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
-  description: text('description').notNull(),
+  description: text('description'),
+  interval: interval('interval'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const assignmentTable = pgTable('assignment', {
@@ -27,6 +38,7 @@ export const assignmentTable = pgTable('assignment', {
     .references(() => userTable.id)
     .notNull(),
   state: assigmentStateEnum('state'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export type SelectTask = typeof taskTable.$inferSelect;

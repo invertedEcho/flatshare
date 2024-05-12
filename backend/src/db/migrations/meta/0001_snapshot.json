@@ -1,10 +1,8 @@
 {
-  "id": "dc2834c3-3358-4d29-9f16-aac01d776c55",
-  "prevId": "252c36ac-059c-442b-aee8-5a4ac50d1479",
-  "version": "5",
-  "dialect": "pg",
+  "version": "6",
+  "dialect": "postgresql",
   "tables": {
-    "assignment": {
+    "public.assignment": {
       "name": "assignment",
       "schema": "",
       "columns": {
@@ -38,34 +36,26 @@
         "assignment_task_id_task_id_fk": {
           "name": "assignment_task_id_task_id_fk",
           "tableFrom": "assignment",
+          "columnsFrom": ["task_id"],
           "tableTo": "task",
-          "columnsFrom": [
-            "task_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "columnsTo": ["id"],
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "assignment_user_id_user_id_fk": {
           "name": "assignment_user_id_user_id_fk",
           "tableFrom": "assignment",
+          "columnsFrom": ["user_id"],
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "columnsTo": ["id"],
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "task": {
+    "public.task": {
       "name": "task",
       "schema": "",
       "columns": {
@@ -85,7 +75,7 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -93,7 +83,7 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "user": {
+    "public.user": {
       "name": "user",
       "schema": "",
       "columns": {
@@ -114,12 +104,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "password": {
-          "name": "password",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
@@ -129,18 +113,18 @@
     }
   },
   "enums": {
-    "state": {
+    "public.state": {
       "name": "state",
-      "values": {
-        "pending": "pending",
-        "completed": "completed"
-      }
+      "schema": "public",
+      "values": ["pending", "completed"]
     }
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "ec855937-3c1d-4f3a-8f14-c9b187332b69",
+  "prevId": "252c36ac-059c-442b-aee8-5a4ac50d1479"
 }
