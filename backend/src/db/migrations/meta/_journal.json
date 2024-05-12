@@ -29,6 +29,13 @@
       "when": 1715511857548,
       "tag": "0003_funny_proteus",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1715533893542,
+      "tag": "0004_narrow_bug",
+      "breakpoints": true
     }
   ]
 }
