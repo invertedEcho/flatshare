@@ -6,11 +6,7 @@ import { CreateTaskScreen } from "./src/screens/create-task";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
-
-export type RootStackParamList = {
-  Home: undefined;
-  AssignTask: undefined;
-};
+import AllTasksScreen from "./src/screens/all-tasks";
 
 const BottomTabNavigator = createBottomTabNavigator();
 
@@ -29,7 +25,7 @@ const SCREENS = [
     title: "Create a task",
     component: CreateTaskScreen,
   },
-  { name: "AllTasks", title: "All tasks", component: CreateTaskScreen },
+  { name: "AllTasks", title: "All tasks", component: AllTasksScreen },
 ] satisfies Screen[];
 
 function getIconName(
@@ -55,7 +51,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
         <BottomTabNavigator.Navigator
-          initialRouteName="CreateTask"
+          initialRouteName="AllTasks"
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               const iconName = getIconName(route.name, focused);
@@ -71,6 +67,7 @@ export default function App() {
                 name={screen.name}
                 options={{ title: screen.title }}
                 component={screen.component}
+                key={screen.name}
               />
             );
           })}

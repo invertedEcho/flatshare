@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '.';
 import { SelectTask, taskTable } from './schema';
-import { CreateTask } from 'src/task.controller';
+import { CreateTask, UpdateTask } from 'src/task.controller';
 
 export async function dbGetAllTasks(): Promise<SelectTask[]> {
   return await db.select().from(taskTable);
@@ -29,6 +29,18 @@ export async function dbCreateTask(task: CreateTask) {
       // i dont like this
       interval: `${task.intervalValue} ${task.intervalType}`,
     });
+  } catch (error) {
+    console.error({ error });
+    throw error;
+  }
+}
+
+export async function dbUpdateTask(task: UpdateTask & { id: number }) {
+  try {
+    await db
+      .update(taskTable)
+      .set({ title: task.title, description: task.description })
+      .where(eq(taskTable.id, task.id));
   } catch (error) {
     console.error({ error });
     throw error;
