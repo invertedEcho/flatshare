@@ -25,6 +25,7 @@ export function AssignmentItem({
       <Pressable
         className="bg-slate-900 flex-col items-start rounded-lg"
         onPress={() => onPress(id)}
+        disabled={disabled}
       >
         <Text
           className={`font-semibold text-lg text-gray-200 ${
