@@ -1,12 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
-import Toast from "react-native-toast-message";
 import "./public/tailwind.css";
-import { Assigments } from "./src/screens/assignments";
-import { CreateTaskScreen } from "./src/screens/create-task";
 import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
@@ -21,9 +17,17 @@ export type RootStackParamList = {
   Register: undefined;
   Login: undefined;
   MyAssignments: undefined;
+  AllTasks: undefined;
 };
 
-const Tab = createBottomTabNavigator<RootStackParamList>();
+import { AssigmentsScreen } from "./src/screens/assignments";
+import { CreateTaskScreen } from "./src/screens/create-task";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./public/tailwind.css";
+import Toast from "react-native-toast-message";
+import AllTasksScreen from "./src/screens/all-tasks";
+
+const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
 type IconGlyph = keyof typeof Ionicons.glyphMap;
 
@@ -34,12 +38,14 @@ function getIconName(
   switch (routeName) {
     case "MyAssignments":
       return focused ? "home" : "home-outline";
-    case "CreateTask":
+    case "AllTasks":
       return focused ? "list" : "list-outline";
     case "Login":
       return focused ? "log-in" : "log-in-outline";
     case "Register":
       return focused ? "create" : "create-outline";
+    case "CreateTask":
+      return focused ? "add" : "add-outline";
     default:
       return undefined;
   }
@@ -70,7 +76,7 @@ export default function App() {
     <AuthContext.Provider value={{ isAuthorized, setIsAuthorized }}>
       <QueryClientProvider client={queryClient}>
         <NavigationContainer>
-          <Tab.Navigator
+          <BottomTabNavigator.Navigator
             initialRouteName="CreateTask"
             screenOptions={({ route }) => ({
               tabBarIcon: ({ focused, color, size }) => {
@@ -96,25 +102,36 @@ export default function App() {
           >
             {!isAuthorized && (
               <>
-                <Tab.Screen name="Login" component={LoginScreen} />
-                <Tab.Screen name="Register" component={RegisterScreen} />
+                <BottomTabNavigator.Screen
+                  name="Login"
+                  component={LoginScreen}
+                />
+                <BottomTabNavigator.Screen
+                  name="Register"
+                  component={RegisterScreen}
+                />
               </>
             )}
             {isAuthorized && (
               <>
-                <Tab.Screen
+                <BottomTabNavigator.Screen
                   name="MyAssignments"
                   options={{ title: "My Assignments" }}
-                  component={Assigments}
+                  component={AssigmentsScreen}
                 />
-                <Tab.Screen
+                <BottomTabNavigator.Screen
                   name="CreateTask"
                   options={{ title: "Create a task" }}
                   component={CreateTaskScreen}
                 />
+                <BottomTabNavigator.Screen
+                  name="AllTasks"
+                  component={AllTasksScreen}
+                  options={{ title: "All Tasks" }}
+                />
               </>
             )}
-          </Tab.Navigator>
+          </BottomTabNavigator.Navigator>
           <Toast />
         </NavigationContainer>
       </QueryClientProvider>

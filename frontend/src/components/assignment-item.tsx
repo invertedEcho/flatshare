@@ -5,13 +5,13 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 type ListItemProps = {
   title: string;
   description: string;
-  assignee: string;
+  interval?: string | null;
   isCompleted: boolean;
-  id: number;
   onPress(id: number): void;
+  id: number;
 };
 
-export function ListItem({
+export function AssignmentItem({
   title,
   description,
   isCompleted,
@@ -19,9 +19,9 @@ export function ListItem({
   onPress,
 }: ListItemProps) {
   return (
-    <View>
+    <View className="p-2 bg-slate-900 flex-row justify-between items-start rounded-lg">
       <Pressable
-        className="p-2  bg-slate-900 flex-row items-center justify-between rounded-lg"
+        className="bg-slate-900 flex-col items-start rounded-lg"
         onPress={() => onPress(id)}
       >
         <Text
@@ -32,15 +32,16 @@ export function ListItem({
           {title}
         </Text>
         <Text className="text-gray-100 text-lg">{description}</Text>
-        <BouncyCheckbox
-          size={25}
-          unFillColor="#FFFFFF"
-          iconStyle={{ borderColor: "black" }}
-          innerIconStyle={{ borderWidth: 2 }}
-          isChecked={isCompleted}
-          onPress={() => onPress(id)}
-        />
       </Pressable>
+      <BouncyCheckbox
+        size={25}
+        unFillColor="#FFFFFF"
+        iconStyle={{ borderColor: "black" }}
+        innerIconStyle={{ borderWidth: 2 }}
+        isChecked={isCompleted}
+        onPress={() => onPress(id)}
+        className="justify-center"
+      />
     </View>
   );
 }
