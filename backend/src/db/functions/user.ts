@@ -6,6 +6,7 @@ export async function findUserByName(username: string) {
   const res = await db
     .select()
     .from(userTable)
-    .where(eq(userTable.username, username));
+    .where(eq(userTable.username, username))
+    .limit(1);
   return res[0];
 }
