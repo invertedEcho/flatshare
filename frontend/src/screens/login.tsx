@@ -27,7 +27,6 @@ async function login({ username, password }: LoginFormData) {
     password,
   });
   const json = await res.json();
-  console.debug({ token: json["access_token"] });
   return json["access_token"];
 }
 
@@ -58,7 +57,6 @@ export function LoginScreen({
         password: args.password,
       }),
     onSuccess: (res) => {
-      console.debug("success", res);
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ ...defaultValues });
       setIsAuthorized(true);

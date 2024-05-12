@@ -13,7 +13,6 @@ function getAuthorizedFetcher(
 ) {
   return async (endpoint: string, data?: any, options?: RequestInit) => {
     const jwtToken = await StorageWrapper.getItem("jwt-token");
-    console.debug({ data });
     return fetch(`${process.env.EXPO_PUBLIC_API_URL}/${endpoint}`, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
