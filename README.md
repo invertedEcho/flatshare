@@ -4,7 +4,6 @@
 
 - Install all dependencies
 
-
 ```bash
 cd backend && pnpm i
 cd frontend && pnpm i
@@ -34,6 +33,7 @@ cd frontend && pnpm start
 ### The Stack:
 
 - Backend:
+
   - NestJS
   - drizzle
 
@@ -44,3 +44,15 @@ cd frontend && pnpm start
 ### TODO
 
 - Use pnpm workspaces to manage each project more efficient
+
+## Task grouping
+
+The user flow should be the following
+
+- user creates a group
+- user creates tasks
+- user can add tasks to a specific group
+- a group can have multiple tasks, a frequency, and users that can be assigned to the tasks from that group
+- all tasks in the group will be assigned to the same user in one period
+
+This means we will remove the frequency column from the task table and add it to the task_group table.
