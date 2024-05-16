@@ -26,6 +26,9 @@ export const taskTable = pgTable('task', {
   title: text('title').notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
+  taskGroupId: integer('task_id')
+    .references(() => taskGroupTable.id)
+    .notNull(),
 });
 
 export const taskGroupTable = pgTable('task_group', {
@@ -33,17 +36,6 @@ export const taskGroupTable = pgTable('task_group', {
   title: text('title').notNull(),
   description: text('description'),
   interval: interval('interval'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
-
-export const taskToGroupTable = pgTable('task_to_group', {
-  id: serial('id').primaryKey(),
-  taskId: integer('task_id')
-    .references(() => taskTable.id)
-    .notNull(),
-  taskGroupId: integer('task_group_id')
-    .references(() => taskGroupTable.id)
-    .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -55,6 +47,7 @@ export const userTaskGroupTable = pgTable('user_task_group', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
+  initialStartDate: timestamp('initial_start_date').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
