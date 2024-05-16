@@ -33,7 +33,7 @@ export const taskGroupTable = pgTable('task_group', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description'),
-  interval: interval('interval'),
+  interval: interval('interval').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
