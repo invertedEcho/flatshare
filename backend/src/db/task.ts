@@ -20,14 +20,16 @@ export async function dbGetTaskById(taskId: number) {
   }
 }
 
-export async function dbCreateTask(task: CreateTask) {
+export async function dbCreateTask({
+  title,
+  description,
+  taskGroupId,
+}: CreateTask) {
   try {
     await db.insert(taskTable).values({
-      title: task.title,
-      // default to null if empty string -> should handle this in another place
-      description: task.description || null,
-      // i dont like this
-      interval: `${task.intervalValue} ${task.intervalType}`,
+      title,
+      description,
+      taskGroupId,
     });
   } catch (error) {
     console.error({ error });
@@ -35,12 +37,17 @@ export async function dbCreateTask(task: CreateTask) {
   }
 }
 
-export async function dbUpdateTask(task: UpdateTask & { id: number }) {
+export async function dbUpdateTask({
+  description,
+  taskGroupId,
+  title,
+  id,
+}: UpdateTask & { id: number }) {
   try {
     await db
       .update(taskTable)
-      .set({ title: task.title, description: task.description })
-      .where(eq(taskTable.id, task.id));
+      .set({ title, description, taskGroupId })
+      .where(eq(taskTable.id, id));
   } catch (error) {
     console.error({ error });
     throw error;

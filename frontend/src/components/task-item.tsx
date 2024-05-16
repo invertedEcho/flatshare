@@ -1,14 +1,11 @@
-import { Pressable, Text, TextInput, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { useMutation } from "@tanstack/react-query";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { Pressable, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { fetchWrapper } from "../utils/fetchWrapper";
-
 type TaskItemProps = Task & {
-  interval?: string | null;
   createdAt: Date;
 };
 
@@ -27,13 +24,7 @@ async function updateTask(task: Task) {
   });
 }
 
-export function TaskItem({
-  id,
-  title,
-  description,
-  interval,
-  createdAt,
-}: TaskItemProps) {
+export function TaskItem({ id, title, description, createdAt }: TaskItemProps) {
   const [isEditing, setIsEditing] = React.useState(false);
   const { mutate } = useMutation({
     mutationFn: updateTask,
@@ -96,12 +87,12 @@ export function TaskItem({
             name="description"
           />
         )}
-        {interval !== null && (
+        {/* {interval !== null && (
           <View className="flex-row flex items-center" style={{ gap: 4 }}>
             <Ionicons name="time-outline" color="white" size={22} />
             <Text className="text-gray-100 text-xs">Every {interval}</Text>
           </View>
-        )}
+        )} */}
         <Text className="text-gray-100 text-xs">
           Created at {createdAt.toLocaleString()}
         </Text>

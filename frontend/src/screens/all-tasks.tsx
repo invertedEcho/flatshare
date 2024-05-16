@@ -1,6 +1,6 @@
-import { StatusBar } from "expo-status-bar";
-import { FlatList, SafeAreaView, ScrollView, View } from "react-native";
 import { useQuery } from "@tanstack/react-query";
+import { StatusBar } from "expo-status-bar";
+import { FlatList, SafeAreaView, ScrollView } from "react-native";
 import { z } from "zod";
 import Loading from "../components/loading";
 import { TaskItem } from "../components/task-item";
@@ -9,9 +9,9 @@ import { fetchWrapper } from "../utils/fetchWrapper";
 const taskSchema = z.object({
   title: z.string(),
   description: z.string().nullable(),
-  interval: z.string().nullable(),
-  id: z.number(),
   createdAt: z.coerce.date(),
+  taskGroupId: z.number().nullable(),
+  id: z.number(),
 });
 
 async function getAllTasks() {
@@ -46,7 +46,6 @@ export default function AllTasksScreen() {
             <TaskItem
               title={task.title}
               description={task.description}
-              interval={task.interval}
               createdAt={task.createdAt}
               id={task.id}
             />

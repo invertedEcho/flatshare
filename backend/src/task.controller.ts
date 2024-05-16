@@ -5,14 +5,16 @@ import { SelectTask } from './db/schema';
 export type CreateTask = {
   title: string;
   description?: string;
-  intervalType: 'hours' | 'days' | 'weeks';
-  intervalValue: number;
+  taskGroupId?: number;
+  // intervalType: 'hours' | 'days' | 'weeks';
+  // intervalValue: number;
 };
 
 // todo: this shouldnt be a seperate type
 export type UpdateTask = {
   title: string;
   description: string;
+  taskGroupId?: number;
 };
 
 @Controller('tasks')

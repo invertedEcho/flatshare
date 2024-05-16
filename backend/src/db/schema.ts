@@ -25,20 +25,31 @@ export const taskTable = pgTable('task', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description'),
-  interval: interval('interval'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  taskGroupId: integer('task_id').references(() => taskGroupTable.id),
+});
+
+export const taskGroupTable = pgTable('task_group', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  interval: interval('interval').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const userTaskGroupTable = pgTable('user_task_group', {
+  id: serial('id').primaryKey(),
+  taskGroupId: integer('task_group_id')
+    .references(() => taskGroupTable.id)
+    .notNull(),
+  userId: integer('user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  initialStartDate: timestamp('initial_start_date').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 export const assignmentTable = pgTable('assignment', {
-  id: serial('id').primaryKey(),
-  userTaskId: integer('user_task_id')
-    .references(() => userTaskTable.id)
-    .notNull(),
-  state: assigmentStateEnum('state'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
-
-export const userTaskTable = pgTable('user_task', {
   id: serial('id').primaryKey(),
   taskId: integer('task_id')
     .references(() => taskTable.id)
@@ -46,6 +57,7 @@ export const userTaskTable = pgTable('user_task', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
+  state: assigmentStateEnum('state'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
