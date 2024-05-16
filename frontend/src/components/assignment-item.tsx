@@ -7,8 +7,9 @@ type ListItemProps = {
   description: string | null;
   interval?: string | null;
   isCompleted: boolean;
-  onPress(id: number): void;
   id: number;
+  disabled?: boolean;
+  onPress(id: number): void;
 };
 
 export function AssignmentItem({
@@ -16,6 +17,7 @@ export function AssignmentItem({
   description,
   isCompleted,
   id,
+  disabled = false,
   onPress,
 }: ListItemProps) {
   return (
@@ -23,6 +25,7 @@ export function AssignmentItem({
       <Pressable
         className="bg-slate-900 flex-col items-start rounded-lg"
         onPress={() => onPress(id)}
+        disabled={disabled}
       >
         <Text
           className={`font-semibold text-lg text-gray-200 ${
@@ -39,6 +42,7 @@ export function AssignmentItem({
         iconStyle={{ borderColor: "black" }}
         innerIconStyle={{ borderWidth: 2 }}
         isChecked={isCompleted}
+        disabled={disabled}
         onPress={() => onPress(id)}
         className="justify-center"
       />

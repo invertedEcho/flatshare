@@ -19,8 +19,7 @@ export class AuthService {
 
   // TODO: fix typing
   async login(user: any) {
-    console.debug({ user });
-    const payload = { username: user.username, sub: user.userId };
+    const payload = { username: user.username, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };

@@ -1,11 +1,13 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { FlatList, SafeAreaView, View } from "react-native";
-import { AssignmentItem } from "../components/assignment-item";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FlatList, SafeAreaView, Text, View } from "react-native";
 import { z } from "zod";
-import { fetchWrapper } from "../utils/fetchWrapper";
+import { AuthContext } from "../auth-context";
+import { AssignmentItem } from "../components/assignment-item";
 import Loading from "../components/loading";
+import UserDropdown from "../components/user-dropdown";
+import { fetchWrapper } from "../utils/fetchWrapper";
 
 const assignmentSchema = z.object({
   id: z.number(),
@@ -14,16 +16,31 @@ const assignmentSchema = z.object({
   isCompleted: z.boolean(),
   assigneeId: z.number(),
   assigneeName: z.string(),
+  createdAt: z.coerce.date(),
+});
+
+const userSchema = z.object({
+  id: z.number(),
+  username: z.string(),
+  email: z.string(),
+  createdAt: z.coerce.date(),
 });
 
 type AssignmentState = "pending" | "completed";
 
 const assignmentsResponse = z.array(assignmentSchema);
+const usersResponse = z.array(userSchema);
 
 async function getAssigments() {
   const res = await fetchWrapper.get("assignments");
   const assignments = await res.json();
   return assignmentsResponse.parse(assignments);
+}
+
+async function getUsers() {
+  const res = await fetchWrapper.get("users");
+  const users = await res.json();
+  return usersResponse.parse(users);
 }
 
 async function updateAssignmentStatus(
@@ -39,6 +56,14 @@ export function AssigmentsScreen() {
     queryKey: ["todos"],
     queryFn: getAssigments,
   });
+  const { userId } = React.useContext(AuthContext);
+
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
+
+  const [selectedUserId, setSelectedUserId] = React.useState(userId);
 
   const { mutate } = useMutation({
     mutationFn: ({
@@ -53,28 +78,53 @@ export function AssigmentsScreen() {
     },
   });
 
-  if (assignments === undefined || isLoading) {
+  if (assignments === undefined || users === undefined || isLoading) {
     return <Loading message="Loading your assignments..." />;
   }
 
+  const sortedAssignments = assignments.sort(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+  );
+
+  const filteredAssignments = sortedAssignments.filter(
+    (assignment) => assignment.assigneeId === selectedUserId
+  );
+
   return (
     <SafeAreaView className="text-black flex-1 bg-slate-700">
-      <View className="p-4 w-full">
+      <View className="p-4 w-full" style={{ gap: 20 }}>
+        <View>
+          <Text className="text-white" style={{ fontSize: 16 }}>
+            From user
+          </Text>
+          <UserDropdown
+            data={users.map((user) => ({
+              label: user.username,
+              value: String(user.id),
+            }))}
+            onChange={(id: number) => {
+              setSelectedUserId(id);
+            }}
+            selectedUserId={selectedUserId}
+          />
+        </View>
         <StatusBar style="auto" />
         <FlatList
           contentContainerStyle={{ gap: 12 }}
-          data={assignments}
+          data={filteredAssignments}
           renderItem={({ item }) => (
             <AssignmentItem
               title={item.title}
               description={item.description}
               isCompleted={item.isCompleted}
               id={item.id}
+              disabled={item.assigneeId !== userId}
               onPress={() => {
                 mutate({
                   assignmentId: item.id,
                   state: item.isCompleted ? "pending" : "completed",
                 });
+                queryClient.refetchQueries({ queryKey: ["todos"] });
               }}
             />
           )}
