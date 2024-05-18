@@ -9,7 +9,7 @@ import Loading from "../components/loading";
 import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 
-const assignmentSchema = z.object({
+export const assignmentSchema = z.object({
   id: z.number(),
   title: z.string(),
   description: z.string().nullable(),
@@ -19,12 +19,14 @@ const assignmentSchema = z.object({
   createdAt: z.coerce.date(),
 });
 
-const userSchema = z.object({
+export const userSchema = z.object({
   id: z.number(),
   username: z.string(),
   email: z.string(),
   createdAt: z.coerce.date(),
 });
+
+export type User = z.infer<typeof userSchema>;
 
 type AssignmentState = "pending" | "completed";
 
@@ -37,7 +39,7 @@ async function getAssigments() {
   return assignmentsResponse.parse(assignments);
 }
 
-async function getUsers() {
+export async function getUsers() {
   const res = await fetchWrapper.get("users");
   const users = await res.json();
   return usersResponse.parse(users);
