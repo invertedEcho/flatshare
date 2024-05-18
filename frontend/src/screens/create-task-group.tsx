@@ -153,6 +153,7 @@ export function CreateTaskGroupScreen() {
                 value={value}
                 className="p-2 rounded-lg bg-white mb-2"
                 keyboardType="numeric"
+                returnKeyType="done"
               />
             )}
             name="intervalDays"
