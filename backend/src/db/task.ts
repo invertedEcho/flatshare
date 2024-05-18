@@ -56,7 +56,6 @@ export async function dbCreateTaskGroup({
         title,
         description,
         interval: `${intervalDays} days`,
-        // Todo: add calendar input to frontend and get input from there
         initialStartDate: new Date(initialStartDate),
       })
       .returning({ taskGroupId: taskGroupTable.id });
