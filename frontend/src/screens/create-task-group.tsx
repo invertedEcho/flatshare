@@ -2,16 +2,16 @@ import * as React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { Platform, Pressable, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import Loading from "../components/loading";
-import UserMultiSelect from "../components/user-multi-select";
 import WebDateTimerPicker from "../components/web-date-picker";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
+import CustomMultiSelect from "../components/user-multi-select";
 
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -44,7 +44,6 @@ const defaultValues = {
 };
 
 export function CreateTaskGroupScreen() {
-  const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
@@ -100,6 +99,13 @@ export function CreateTaskGroupScreen() {
   if (users === undefined || isLoading) {
     return <Loading message="Loading Users ..." />;
   }
+
+  const hydratedUsers = users.map((user) => {
+    return {
+      value: user.username,
+      id: user.id,
+    };
+  });
 
   return (
     <View className=" bg-slate-900 p-4   flex-1 justify-between">
@@ -162,10 +168,11 @@ export function CreateTaskGroupScreen() {
             <Text className="text-red-300">Interval is required</Text>
           )}
         </View>
-        <UserMultiSelect
-          users={users}
-          selectedUserIds={selectedUserIds}
-          setSelectedUserIds={setSelectedUserIds}
+        <CustomMultiSelect
+          values={hydratedUsers}
+          selectedValues={selectedUserIds}
+          setSelectedValues={setSelectedUserIds}
+          header="Select Users"
         />
         {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db 
         Probably some timezone issues, investigate how to do this correctly */}

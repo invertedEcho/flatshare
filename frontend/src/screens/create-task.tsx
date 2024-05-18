@@ -14,6 +14,7 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { fetchWrapper } from "../utils/fetchWrapper";
+import CustomMultiSelect from "../components/user-multi-select";
 
 const createTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -21,6 +22,11 @@ const createTaskSchema = z.object({
 });
 
 type CreateTask = z.infer<typeof createTaskSchema>;
+
+const taskGroupSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+});
 
 async function createTask({ title, description }: CreateTask) {
   await fetchWrapper.post("tasks", {
@@ -33,7 +39,8 @@ async function getTaskGroups() {
   const response = await fetchWrapper.get("task-group");
   const json = await response.json();
   console.log({ json });
-  return json;
+  const parsed = z.array(taskGroupSchema).parse(json);
+  return parsed;
 }
 
 const defaultValues = {
@@ -42,6 +49,10 @@ const defaultValues = {
 };
 
 export function CreateTaskScreen() {
+  const [selectedTaskGroups, setSelectedTaskGroups] = React.useState<string[]>(
+    [],
+  );
+
   const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
     "recurring",
   );
@@ -73,10 +84,11 @@ export function CreateTaskScreen() {
     mutationKey: ["tasks"],
   });
 
-  const { data: taskGroups } = useQuery({
+  const { data: taskGroups, isLoading } = useQuery({
     queryKey: ["taskGroup"],
     queryFn: getTaskGroups,
   });
+
   console.log({ taskGroups });
 
   function onSubmit(data: CreateTask) {
@@ -85,6 +97,17 @@ export function CreateTaskScreen() {
     });
     queryClient.refetchQueries({ queryKey: ["tasks"] });
   }
+
+  if (isLoading || taskGroups === undefined) {
+    return null;
+  }
+
+  const hydratedTaskGroups = taskGroups.map((taskGroup) => {
+    return {
+      value: taskGroup.title,
+      id: taskGroup.id,
+    };
+  });
 
   return (
     <SafeAreaView className="bg-slate-700 flex p-4 h-full">
@@ -130,6 +153,9 @@ export function CreateTaskScreen() {
           )}
           name="description"
         />
+        {errors.description && (
+          <Text className="text-red-300">Description is required</Text>
+        )}
         <Text className="text-white">Options:</Text>
         <View className="flex flex-row items-center">
           <Text className="text-white">Recurring task</Text>
@@ -142,8 +168,13 @@ export function CreateTaskScreen() {
             }
           />
         </View>
-        {errors.description && (
-          <Text className="text-red-300">Description is required</Text>
+        {taskType === "recurring" && (
+          <CustomMultiSelect
+            header="Select task group"
+            values={hydratedTaskGroups}
+            selectedValues={selectedTaskGroups}
+            setSelectedValues={setSelectedTaskGroups}
+          />
         )}
         <Pressable
           // TODO: nativewind won't work here for some odd reason

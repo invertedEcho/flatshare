@@ -6,7 +6,7 @@ import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
 import { AuthContext } from "./src/auth-context";
-import { Pressable, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
 
 export type RootStackParamList = {
