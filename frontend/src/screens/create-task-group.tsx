@@ -1,15 +1,10 @@
 import * as React from "react";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Platform,
-  Pressable,
-  SafeAreaView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Platform, Pressable, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import Loading from "../components/loading";
@@ -17,7 +12,6 @@ import UserMultiSelect from "../components/user-multi-select";
 import WebDateTimerPicker from "../components/web-date-picker";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -34,7 +28,6 @@ async function createTaskGroup({
   initialStartDate,
   userIds,
 }: CreateTaskGroup & { initialStartDate: Date; userIds: number[] }) {
-  console.log("why");
   await fetchWrapper.post("tasks/taskGroup", {
     title,
     description,
@@ -59,8 +52,7 @@ export function CreateTaskGroupScreen() {
     reset: resetForm,
   } = useForm<CreateTaskGroup>({
     defaultValues,
-    // TODO: readd resolver
-    // resolver: zodResolver(createTaskGroupSchema),
+    resolver: zodResolver(createTaskGroupSchema),
   });
 
   const { data: users, isLoading } = useQuery({
@@ -160,7 +152,7 @@ export function CreateTaskGroupScreen() {
                 onChangeText={onChange}
                 value={value}
                 className="p-2 rounded-lg bg-white mb-2"
-                keyboardType="numbers-and-punctuation"
+                keyboardType="numeric"
               />
             )}
             name="intervalDays"
