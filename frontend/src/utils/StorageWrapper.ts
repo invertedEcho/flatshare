@@ -20,18 +20,19 @@ class StorageWrapper {
       return await (StorageWrapper.storage as AsyncStorageStatic).getItem(key);
     } else {
       return await (StorageWrapper.storage as typeof SecureStore).getItemAsync(
-        key
+        key,
       );
     }
   }
 
   static async setItem(key: string, value: string): Promise<void> {
+    console.log({ key, value });
     if (Platform.OS === "web") {
       return await StorageWrapper.storage.setItem(key, value);
     } else {
       return await (StorageWrapper.storage as typeof SecureStore).setItemAsync(
         key,
-        value
+        value,
       );
     }
   }
@@ -39,7 +40,7 @@ class StorageWrapper {
   static async deleteItem(key: string): Promise<void> {
     if (Platform.OS === "web") {
       return await (StorageWrapper.storage as AsyncStorageStatic).removeItem(
-        key
+        key,
       );
     } else {
       return await (

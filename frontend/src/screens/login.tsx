@@ -6,11 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
-import { Dropdown } from "react-native-element-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { AuthContext } from "../auth-context";
 import StorageWrapper from "../utils/StorageWrapper";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 
@@ -26,7 +24,12 @@ async function login({ username, password }: LoginFormData) {
     username,
     password,
   });
+  if (!res.ok) {
+    console.error("Failed login");
+    throw new Error("Failed to log in");
+  }
   const json = await res.json();
+  console.log({ json });
   return json["access_token"];
 }
 
@@ -35,9 +38,10 @@ const defaultValues = {
   password: "",
 };
 
-export function LoginScreen({
-  navigation,
-}: NativeStackScreenProps<RootStackParamList, "Login">) {
+export function LoginScreen({}: NativeStackScreenProps<
+  RootStackParamList,
+  "Login"
+>) {
   const {
     control,
     handleSubmit,
@@ -50,7 +54,7 @@ export function LoginScreen({
 
   const { isAuthorized, setIsAuthorized } = React.useContext(AuthContext);
 
-  const { mutate, data } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: ({ ...args }: LoginFormData) =>
       login({
         username: args.username,
@@ -60,6 +64,7 @@ export function LoginScreen({
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ ...defaultValues });
       setIsAuthorized(true);
+      console.log({ res });
       StorageWrapper.setItem("jwt-token", res);
     },
     onError: (err) => {
@@ -87,6 +92,7 @@ export function LoginScreen({
           render={({ field: { onChange, value } }) => (
             <TextInput
               placeholder="Username"
+              placeholderTextColor="white"
               style={{ color: "white" }}
               onChangeText={onChange}
               value={value}
@@ -110,6 +116,7 @@ export function LoginScreen({
                 color: "white",
               }}
               placeholder="Password"
+              placeholderTextColor="white"
               onChangeText={onChange}
               value={value}
               textContentType="password"

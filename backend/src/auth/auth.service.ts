@@ -3,6 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { findUserByName } from 'src/db/functions/user';
 
+export type User = {
+  id: string;
+  userName: string;
+};
+
 @Injectable()
 export class AuthService {
   constructor(private jwtService: JwtService) {}
@@ -17,9 +22,8 @@ export class AuthService {
     return null;
   }
 
-  // TODO: fix typing
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.id };
+  async login(user: User) {
+    const payload = { username: user.userName, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };

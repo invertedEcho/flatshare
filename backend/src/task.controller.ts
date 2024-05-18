@@ -6,8 +6,6 @@ export type CreateTask = {
   title: string;
   description?: string;
   taskGroupId?: number;
-  // intervalType: 'hours' | 'days' | 'weeks';
-  // intervalValue: number;
 };
 
 // todo: this shouldnt be a seperate type

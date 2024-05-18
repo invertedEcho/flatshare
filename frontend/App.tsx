@@ -33,7 +33,7 @@ type IconGlyph = keyof typeof Ionicons.glyphMap;
 
 function getIconName(
   routeName: string,
-  focused: boolean
+  focused: boolean,
 ): IconGlyph | undefined {
   switch (routeName) {
     case "MyAssignments":

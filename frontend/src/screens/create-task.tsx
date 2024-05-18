@@ -1,47 +1,50 @@
 import * as React from "react";
 
-import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
-import { Dropdown } from "react-native-element-dropdown";
-import { intervalItems } from "../utils/interval";
 import { fetchWrapper } from "../utils/fetchWrapper";
-
-const intervalType = z.enum(["hours", "days", "weeks"]);
-export type IntervalType = z.infer<typeof intervalType>;
 
 const createTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
-  intervalValue: z.coerce.number(),
 });
 
 type CreateTask = z.infer<typeof createTaskSchema>;
 
-async function createTask({
-  title,
-  description,
-  intervalValue,
-  intervalType,
-}: CreateTask & { intervalType: IntervalType }) {
+async function createTask({ title, description }: CreateTask) {
   await fetchWrapper.post("tasks", {
     title,
     description,
-    intervalValue,
-    intervalType,
   });
+}
+
+async function getTaskGroups() {
+  const response = await fetchWrapper.get("task-groups");
+  const json = await response.json();
+  console.log({ json });
+  return json;
 }
 
 const defaultValues = {
   title: "",
   description: "",
-  intervalValue: 1,
 };
 
 export function CreateTaskScreen() {
+  const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
+    "recurring",
+  );
   const queryClient = useQueryClient();
   const {
     control,
@@ -53,15 +56,11 @@ export function CreateTaskScreen() {
     resolver: zodResolver(createTaskSchema),
   });
 
-  const [intervalType, setIntervalType] = React.useState<IntervalType>("days");
-
-  const { mutate } = useMutation({
+  const { mutate: createTaskMutation } = useMutation({
     mutationFn: ({ ...args }: CreateTask) =>
       createTask({
         title: args.title,
         description: args.description,
-        intervalValue: args.intervalValue,
-        intervalType,
       }),
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully created task" });
@@ -74,8 +73,14 @@ export function CreateTaskScreen() {
     mutationKey: ["tasks"],
   });
 
+  const { data: taskGroups } = useQuery({
+    queryKey: ["taskGroup"],
+    queryFn: getTaskGroups,
+  });
+  console.log({ taskGroups });
+
   function onSubmit(data: CreateTask) {
-    mutate({
+    createTaskMutation({
       ...data,
     });
     queryClient.refetchQueries({ queryKey: ["tasks"] });
@@ -93,6 +98,7 @@ export function CreateTaskScreen() {
           render={({ field: { onChange, value } }) => (
             <TextInput
               placeholder="Enter a title"
+              placeholderTextColor="white"
               style={{ color: "white" }}
               onChangeText={onChange}
               value={value}
@@ -115,6 +121,7 @@ export function CreateTaskScreen() {
               style={{
                 color: "white",
               }}
+              placeholderTextColor="white"
               placeholder="Enter a description"
               onChangeText={onChange}
               value={value}
@@ -123,40 +130,20 @@ export function CreateTaskScreen() {
           )}
           name="description"
         />
+        <Text className="text-white">Options:</Text>
+        <View className="flex flex-row items-center">
+          <Text className="text-white">Recurring task</Text>
+          <Switch
+            value={taskType === "recurring"}
+            onValueChange={() =>
+              setTaskType(
+                taskType === "recurring" ? "non-recurring" : "recurring",
+              )
+            }
+          />
+        </View>
         {errors.description && (
           <Text className="text-red-300">Description is required</Text>
-        )}
-        <Text className="text-white">Select an interval type</Text>
-        <Dropdown
-          style={{ padding: 10 }}
-          data={intervalItems}
-          labelField="label"
-          valueField="value"
-          onChange={(item) => setIntervalType(item.value)}
-          value={intervalType}
-          placeholderStyle={{ color: "white" }}
-          selectedTextStyle={{ color: "white" }}
-        />
-        <Text className="text-white">Interval</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder="Interval"
-              onChangeText={onChange}
-              value={String(value)}
-              className="p-4 text-white"
-              inputMode="numeric"
-              style={{ color: "white" }}
-            />
-          )}
-          name="intervalValue"
-        />
-        {errors.intervalValue && (
-          <Text className="text-red-300">Interval is required</Text>
         )}
         <Pressable
           // TODO: nativewind won't work here for some odd reason
@@ -167,7 +154,7 @@ export function CreateTaskScreen() {
           }}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text>Submit</Text>
+          <Text className="text-center font-bold">Submit</Text>
         </Pressable>
       </View>
     </SafeAreaView>

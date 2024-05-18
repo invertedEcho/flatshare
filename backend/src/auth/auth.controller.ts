@@ -30,6 +30,7 @@ export class AuthController {
   @Post('login')
   //TODO: Fix typing
   async login(@Request() req: { user: any }) {
+    console.log({ user: req.user });
     return this.authService.login(req.user);
   }
 

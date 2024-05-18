@@ -9,25 +9,24 @@ export const fetchWrapper = {
 };
 
 function getAuthorizedFetcher(
-  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
 ) {
   return async (endpoint: string, data?: any, options?: RequestInit) => {
     const jwtToken = await StorageWrapper.getItem("jwt-token");
-    return fetch(`${process.env.EXPO_PUBLIC_API_URL}/${endpoint}`, {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-        "Content-Type": "application/json",
-        ...options?.headers,
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_API_URL}/${endpoint}`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+          ...options?.headers,
+        },
+        method,
+        body: data ? JSON.stringify(data) : undefined,
+        ...options,
       },
-      method,
-      body: data ? JSON.stringify(data) : undefined,
-      ...options,
-    }).then(async (res) => {
-      if (!res.ok) {
-        throw new Error(await res.json());
-      }
-      // Maybe returning the json here is to explicit, could change in future
-      return res;
-    });
+    );
+
+    return response;
   };
 }
