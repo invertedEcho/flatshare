@@ -34,6 +34,7 @@ export const taskGroupTable = pgTable('task_group', {
   title: text('title').notNull(),
   description: text('description'),
   interval: interval('interval').notNull(),
+  initialStartDate: timestamp('initial_start_date').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -45,7 +46,6 @@ export const userTaskGroupTable = pgTable('user_task_group', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
-  initialStartDate: timestamp('initial_start_date').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
