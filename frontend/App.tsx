@@ -17,6 +17,7 @@ export type RootStackParamList = {
   Login: undefined;
   MyAssignments: undefined;
   AllTasks: undefined;
+  CreateTaskGroup: undefined;
 };
 
 import { AssigmentsScreen } from "./src/screens/assignments";
@@ -26,6 +27,8 @@ import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
 import AllTasksScreen from "./src/screens/all-tasks";
 import { NavigationContainer } from "@react-navigation/native";
+import { CreateTaskGroupScreen } from "./src/screens/create-task-group";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
@@ -78,65 +81,72 @@ export default function App() {
   return (
     <AuthContext.Provider value={{ isAuthorized, setIsAuthorized, userId }}>
       <QueryClientProvider client={queryClient}>
-        <NavigationContainer>
-          <BottomTabNavigator.Navigator
-            initialRouteName="CreateTask"
-            screenOptions={({ route }) => ({
-              tabBarIcon: ({ focused, color, size }) => {
-                const iconName = getIconName(route.name, focused);
-                return <Ionicons name={iconName} size={size} color={color} />;
-              },
-              tabBarActiveTintColor: "tomato",
-              tabBarInactiveTintColor: "gray",
-              headerRight: () => (
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <BottomTabNavigator.Navigator
+              initialRouteName="CreateTaskGroup"
+              screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                  const iconName = getIconName(route.name, focused);
+                  return <Ionicons name={iconName} size={size} color={color} />;
+                },
+                tabBarActiveTintColor: "tomato",
+                tabBarInactiveTintColor: "gray",
+                headerRight: () => (
+                  <>
+                    {isAuthorized && (
+                      <LogoutButton
+                        onClick={() => {
+                          StorageWrapper.deleteItem("jwt-token");
+                          setIsAuthorized(false);
+                        }}
+                      />
+                    )}
+                  </>
+                ),
+                headerRightContainerStyle: { marginRight: 20 },
+              })}
+            >
+              {!isAuthorized && (
                 <>
-                  {isAuthorized && (
-                    <LogoutButton
-                      onClick={() => {
-                        StorageWrapper.deleteItem("jwt-token");
-                        setIsAuthorized(false);
-                      }}
-                    />
-                  )}
+                  <BottomTabNavigator.Screen
+                    name="Login"
+                    component={LoginScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="Register"
+                    component={RegisterScreen}
+                  />
                 </>
-              ),
-              headerRightContainerStyle: { marginRight: 20 },
-            })}
-          >
-            {!isAuthorized && (
-              <>
-                <BottomTabNavigator.Screen
-                  name="Login"
-                  component={LoginScreen}
-                />
-                <BottomTabNavigator.Screen
-                  name="Register"
-                  component={RegisterScreen}
-                />
-              </>
-            )}
-            {isAuthorized && (
-              <>
-                <BottomTabNavigator.Screen
-                  name="MyAssignments"
-                  options={{ title: "My Assignments" }}
-                  component={AssigmentsScreen}
-                />
-                <BottomTabNavigator.Screen
-                  name="CreateTask"
-                  options={{ title: "Create a task" }}
-                  component={CreateTaskScreen}
-                />
-                <BottomTabNavigator.Screen
-                  name="AllTasks"
-                  component={AllTasksScreen}
-                  options={{ title: "All Tasks" }}
-                />
-              </>
-            )}
-          </BottomTabNavigator.Navigator>
-          <Toast />
-        </NavigationContainer>
+              )}
+              {isAuthorized && (
+                <>
+                  <BottomTabNavigator.Screen
+                    name="MyAssignments"
+                    options={{ title: "My Assignments" }}
+                    component={AssigmentsScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="CreateTask"
+                    options={{ title: "Create a task" }}
+                    component={CreateTaskScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="AllTasks"
+                    component={AllTasksScreen}
+                    options={{ title: "All Tasks" }}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="CreateTaskGroup"
+                    component={CreateTaskGroupScreen}
+                    options={{ title: "Create a Task Group" }}
+                  />
+                </>
+              )}
+            </BottomTabNavigator.Navigator>
+            <Toast />
+          </NavigationContainer>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </AuthContext.Provider>
   );

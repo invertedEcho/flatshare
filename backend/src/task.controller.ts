@@ -1,13 +1,24 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { dbCreateTask, dbGetAllTasks, dbUpdateTask } from './db/task';
+import {
+  dbCreateTask,
+  dbCreateTaskGroup,
+  dbGetAllTasks,
+  dbUpdateTask,
+} from './db/task';
 import { SelectTask } from './db/schema';
 
 export type CreateTask = {
   title: string;
   description?: string;
   taskGroupId?: number;
-  // intervalType: 'hours' | 'days' | 'weeks';
-  // intervalValue: number;
+};
+
+export type CreateTaskGroup = {
+  title: string;
+  description?: string;
+  intervalDays: string;
+  userIds: number[];
+  initialStartDate: string;
 };
 
 // todo: this shouldnt be a seperate type
@@ -30,6 +41,12 @@ export class TasksController {
   async createTask(@Body() task: CreateTask) {
     console.log({ task });
     await dbCreateTask(task);
+  }
+
+  @Post('taskGroup')
+  async createTaskGroup(@Body() taskGroup: CreateTaskGroup) {
+    console.log({ taskGroup });
+    await dbCreateTaskGroup(taskGroup);
   }
 
   @Put(':id')

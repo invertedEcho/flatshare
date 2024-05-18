@@ -15,6 +15,13 @@
       "when": 1715894454119,
       "tag": "0001_cuddly_synch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1715904770184,
+      "tag": "0002_oval_kid_colt",
+      "breakpoints": true
     }
   ]
 }
