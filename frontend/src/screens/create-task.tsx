@@ -30,7 +30,7 @@ async function createTask({ title, description }: CreateTask) {
 }
 
 async function getTaskGroups() {
-  const response = await fetchWrapper.get("task-groups");
+  const response = await fetchWrapper.get("task-group");
   const json = await response.json();
   console.log({ json });
   return json;

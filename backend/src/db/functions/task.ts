@@ -1,12 +1,7 @@
 import { eq } from 'drizzle-orm';
-import { db } from '.';
-import {
-  SelectTask,
-  taskGroupTable,
-  taskTable,
-  userTaskGroupTable,
-} from './schema';
-import { CreateTask, CreateTaskGroup, UpdateTask } from 'src/task.controller';
+import { CreateTask, UpdateTask } from 'src/task.controller';
+import { db } from '..';
+import { SelectTask, taskTable } from '../schema';
 
 export async function dbGetAllTasks(): Promise<SelectTask[]> {
   return await db.select().from(taskTable);
@@ -36,38 +31,6 @@ export async function dbCreateTask({
       description,
       taskGroupId,
     });
-  } catch (error) {
-    console.error({ error });
-    throw error;
-  }
-}
-
-export async function dbCreateTaskGroup({
-  title,
-  description,
-  intervalDays,
-  userIds,
-  initialStartDate,
-}: CreateTaskGroup) {
-  try {
-    const res = await db
-      .insert(taskGroupTable)
-      .values({
-        title,
-        description,
-        interval: `${intervalDays} days`,
-        initialStartDate: new Date(initialStartDate),
-      })
-      .returning({ taskGroupId: taskGroupTable.id });
-
-    const { taskGroupId } = res[0];
-
-    await db.insert(userTaskGroupTable).values(
-      userIds.map((userId) => ({
-        taskGroupId,
-        userId,
-      })),
-    );
   } catch (error) {
     console.error({ error });
     throw error;

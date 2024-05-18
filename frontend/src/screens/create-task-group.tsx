@@ -28,7 +28,7 @@ async function createTaskGroup({
   initialStartDate,
   userIds,
 }: CreateTaskGroup & { initialStartDate: Date; userIds: number[] }) {
-  await fetchWrapper.post("tasks/taskGroup", {
+  await fetchWrapper.post("task-group", {
     title,
     description,
     intervalDays,
