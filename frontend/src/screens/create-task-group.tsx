@@ -4,7 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
-import { Platform, Pressable, Text, TextInput, View } from "react-native";
+import {
+  Button,
+  Platform,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import Loading from "../components/loading";
@@ -62,6 +69,7 @@ export function CreateTaskGroupScreen() {
 
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [showDatePicker, setShowDatePicker] = React.useState(false);
 
   const { mutate } = useMutation({
     mutationFn: ({ ...args }: CreateTaskGroup) =>
@@ -172,26 +180,57 @@ export function CreateTaskGroupScreen() {
         <View className=" items-start">
           <Text className="text-white mb-2">Select initial start date</Text>
 
-          {Platform.OS === "web" ? (
-            <WebDateTimerPicker
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setDate(new Date(e.currentTarget.value))
-              }
-              value={
-                date?.toLocaleDateString("en-CA") ??
-                new Date().toLocaleDateString("en-CA")
-              }
-            />
-          ) : (
-            // TODO: test on mobile
-            <RNDateTimePicker
-              value={date ? new Date(date) : new Date()}
-              onChange={(e, date) => setDate(date)}
-              accentColor="lightblue"
-              mode="date"
-              themeVariant="dark"
-            />
-          )}
+          {Platform.select({
+            ios: (
+              <RNDateTimePicker
+                value={date ? new Date(date) : new Date()}
+                onChange={(e, date) => {
+                  setDate(date);
+                  setShowDatePicker(false);
+                  console.debug("WTF");
+                }}
+                accentColor="lightblue"
+                mode="date"
+                themeVariant="dark"
+              />
+            ),
+            android: (
+              <>
+                <Pressable
+                  onPress={() => setShowDatePicker(true)}
+                  className="bg-slate-700 p-2 rounded-lg"
+                >
+                  <Text className="text-xl text-white">
+                    {date?.toLocaleDateString("de-DE")}
+                  </Text>
+                </Pressable>
+                {showDatePicker && (
+                  <RNDateTimePicker
+                    value={date ? new Date(date) : new Date()}
+                    onChange={(e, date) => {
+                      setDate(date);
+                      setShowDatePicker(false);
+                      console.debug("WTF");
+                    }}
+                    accentColor="lightblue"
+                    mode="date"
+                    themeVariant="dark"
+                  />
+                )}
+              </>
+            ),
+            web: (
+              <WebDateTimerPicker
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setDate(new Date(e.currentTarget.value))
+                }
+                value={
+                  date?.toLocaleDateString("en-CA") ??
+                  new Date().toLocaleDateString("en-CA")
+                }
+              />
+            ),
+          })}
         </View>
       </View>
       <Pressable
