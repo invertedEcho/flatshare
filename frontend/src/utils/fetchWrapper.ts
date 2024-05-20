@@ -13,16 +13,19 @@ function getAuthorizedFetcher(
 ) {
   return async (endpoint: string, data?: any, options?: RequestInit) => {
     const jwtToken = await StorageWrapper.getItem("jwt-token");
-    const response = await fetch(`http://192.168.178.87:3000/${endpoint}`, {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-        "Content-Type": "application/json",
-        ...options?.headers,
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_API_URL}/${endpoint}`,
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+          ...options?.headers,
+        },
+        method,
+        body: data ? JSON.stringify(data) : undefined,
+        ...options,
       },
-      method,
-      body: data ? JSON.stringify(data) : undefined,
-      ...options,
-    });
+    );
     if (!response.ok) {
       throw new Error("response was not ok");
     }
