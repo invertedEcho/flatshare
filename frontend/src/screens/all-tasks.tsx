@@ -41,18 +41,17 @@ export default function AllTasksScreen() {
     return <Loading message="Loading all tasks" />;
   }
 
+  async function refreshTasks() {
+    setRefreshing(true);
+    await queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
+    setRefreshing(false);
+  }
+
   return (
     <SafeAreaView className="text-black flex-1 items-center bg-slate-700">
       <ScrollView
         refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={async () => {
-              setRefreshing(true);
-              await queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
-              setRefreshing(false);
-            }}
-          />
+          <RefreshControl refreshing={refreshing} onRefresh={refreshTasks} />
         }
         className="p-4 w-full"
         contentContainerStyle={{ gap: 12 }}

@@ -102,19 +102,21 @@ export function AssigmentsScreen() {
     (assignment) => assignment.assigneeId === selectedUserId,
   );
 
+  async function refreshAssignments() {
+    setRefreshing(true);
+    await queryClient.refetchQueries({
+      queryKey: [queryKeys.assignments],
+    });
+    setRefreshing(false);
+  }
+
   return (
     <SafeAreaView className="text-black flex-1 bg-slate-700">
       <ScrollView
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={async () => {
-              setRefreshing(true);
-              await queryClient.refetchQueries({
-                queryKey: [queryKeys.assignments],
-              });
-              setRefreshing(false);
-            }}
+            onRefresh={refreshAssignments}
           />
         }
         className="p-4 w-full"
