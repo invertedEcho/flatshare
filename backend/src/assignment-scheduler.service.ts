@@ -1,24 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { dbGetTaskGroupUsers } from './db/functions/task-group';
 import {
-  dbGetTaskGroupUsers,
-  dbGetTaskGroupsToCreateForCurrentInterval,
-} from './db/functions/task-group';
-import { dbGetAssignmentsForTaskGroup } from './db/functions/assignment-task-group';
+  dbCreateTaskGroupAssignment,
+  dbGetAssignmentsForTaskGroup,
+  dbGetTaskGroupsToAssignForCurrentInterval,
+} from './db/functions/assignment-task-group';
+import { randomFromArray } from './utils/array';
 
 @Injectable()
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_5_SECONDS)
   async handleCron() {
+    console.debug('CRON job running');
     const taskGroupsToCreateAssignmentsFor =
-      await dbGetTaskGroupsToCreateForCurrentInterval();
+      await dbGetTaskGroupsToAssignForCurrentInterval();
+    console.debug({ taskGroupsToCreateAssignmentsFor });
     for (const { taskGroupId } of taskGroupsToCreateAssignmentsFor) {
-      const users = await dbGetTaskGroupUsers(taskGroupId);
-      const assignments = await dbGetAssignmentsForTaskGroup(
+      const userIds = await dbGetTaskGroupUsers(taskGroupId);
+      if (userIds.length === 0) {
+        continue;
+      }
+      const lastAssignments = await dbGetAssignmentsForTaskGroup(
         taskGroupId,
-        users.length,
+        userIds.length,
       );
-      console.log({ assignments });
+      const firstTimeAssignmentUsers = userIds.filter(
+        ({ userId }) =>
+          !lastAssignments.some((assignment) => assignment.userId === userId),
+      );
+
+      console.debug({ userIds });
+      console.debug({ firstTimeAssignmentUsers });
+      console.debug({ lastAssignments, taskGroupId });
+
+      let nextResponsibleUserId: number;
+      if (firstTimeAssignmentUsers.length === 0) {
+        nextResponsibleUserId =
+          lastAssignments[lastAssignments.length - 1].userId;
+      } else {
+        nextResponsibleUserId = randomFromArray(
+          firstTimeAssignmentUsers,
+        ).userId;
+      }
+
+      await dbCreateTaskGroupAssignment(taskGroupId, nextResponsibleUserId);
     }
   }
 }
