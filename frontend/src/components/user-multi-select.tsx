@@ -18,15 +18,15 @@ function MultiSelectItem({ username }: MultiSelectItemProps) {
 
 type MultiSelectProps = {
   users: { username: string; id: number }[];
-  selectedUserIds: number[];
-  setSelectedUserIds: React.Dispatch<React.SetStateAction<number[]>>;
+  selectedUserIds: string[];
+  setSelectedUserIds: React.Dispatch<React.SetStateAction<string[]>>;
   header: string;
 };
 
 export default function UserMultiSelect({
   users,
-  setSelectedUserIds: setSelectedValues,
-  selectedUserIds: selectedValues,
+  setSelectedUserIds,
+  selectedUserIds,
   header,
 }: MultiSelectProps) {
   return (
@@ -42,12 +42,12 @@ export default function UserMultiSelect({
         labelField="username"
         valueField="id"
         placeholder="Select item"
-        value={selectedValues.map((value) => value.toString())}
+        value={selectedUserIds}
         activeColor="#9bd4e4"
         search
         searchPlaceholder="Search..."
-        onChange={(values) => {
-          setSelectedValues(values.map((value) => Number(value)));
+        onChange={(userIds) => {
+          setSelectedUserIds(userIds);
         }}
         renderLeftIcon={() => (
           <Ionicons style={styles.icon} color="black" name="person" size={20} />

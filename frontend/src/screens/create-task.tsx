@@ -41,7 +41,7 @@ async function createOneOffTask({
   description,
   userIds,
 }: CreateOneOffTask) {
-  await fetchWrapper.post("/tasks/one-off/", {
+  await fetchWrapper.post("tasks/one-off/", {
     title,
     description,
     userIds,
@@ -106,7 +106,7 @@ export function CreateTaskScreen() {
         ? createOneOffTask({
             title: args.title,
             description: args.description,
-            userIds: [],
+            userIds: selectedUserIds,
           })
         : createRecurringTask({
             title: args.title,
