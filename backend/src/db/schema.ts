@@ -26,7 +26,7 @@ export const taskTable = pgTable('task', {
   title: text('title').notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  taskGroupId: integer('task_id').references(() => taskGroupTable.id),
+  taskGroupId: integer('task_group_id').references(() => taskGroupTable.id),
 });
 
 export const taskGroupTable = pgTable('task_group', {
