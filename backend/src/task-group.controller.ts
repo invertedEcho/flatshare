@@ -10,7 +10,7 @@ export type CreateTaskGroup = {
 };
 
 @Controller('task-group')
-export class TaskGroupsController {
+export class TaskGroupController {
   @Get()
   async getTaskGroups() {
     const taskGroups = await dbGetTaskGroups();

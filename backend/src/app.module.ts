@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { TaskGroupsController } from './task-group.controller';
+import { TaskGroupController } from './task-group.controller';
 
 @Module({
   imports: [AuthModule],
@@ -13,7 +13,7 @@ import { TaskGroupsController } from './task-group.controller';
     TasksController,
     AssignmentController,
     AuthController,
-    TaskGroupsController,
+    TaskGroupController,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
