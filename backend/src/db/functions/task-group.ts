@@ -1,6 +1,12 @@
+import { eq, sql } from 'drizzle-orm';
 import { CreateTaskGroup } from 'src/task-group.controller';
 import { db } from '..';
-import { taskGroupTable, taskGroupUserTable } from '../schema';
+import {
+  taskGroupAssignmentTable,
+  taskGroupTable,
+  taskGroupUserTable,
+  userTable,
+} from '../schema';
 
 export async function dbGetTaskGroups() {
   return await db.select().from(taskGroupTable);
@@ -32,6 +38,43 @@ export async function dbCreateTaskGroup({
         userId,
       })),
     );
+  } catch (error) {
+    console.error({ error });
+    throw error;
+  }
+}
+
+export async function dbGetTaskGroupsToCreateForCurrentInterval() {
+  try {
+    const taskGroupIdsToCreateAssignmentsFor = await db
+      .select({
+        taskGroupId: taskGroupTable.id,
+      })
+      .from(taskGroupTable)
+      .innerJoin(
+        taskGroupAssignmentTable,
+        eq(taskGroupTable.id, taskGroupAssignmentTable.taskGroupId),
+      )
+      .groupBy(taskGroupTable.id)
+      .having(
+        sql` MAX(${taskGroupAssignmentTable.createdAt}) < (NOW() - ${taskGroupTable.interval})`,
+      );
+    return taskGroupIdsToCreateAssignmentsFor;
+  } catch (error) {
+    console.error({ error });
+    throw error;
+  }
+}
+
+export async function dbGetTaskGroupUsers(taskGroupId: number) {
+  try {
+    const taskGroupUsers = await db
+      .select({ userId: userTable.id })
+      .from(taskGroupUserTable)
+      .innerJoin(userTable, eq(taskGroupUserTable.userId, userTable.id))
+      .where(eq(taskGroupTable.id, taskGroupId));
+
+    return taskGroupUsers;
   } catch (error) {
     console.error({ error });
     throw error;
