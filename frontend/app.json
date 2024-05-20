@@ -1,6 +1,11 @@
 {
   "expo": {
-    "name": "frontend",
+    "platforms": [
+      "web",
+      "android",
+      "ios"
+    ],
+    "name": "WG-Tasks",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -29,6 +34,11 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "4c4ae101-99c9-4338-a54f-3a4c2b35d0fc"
+      }
+    }
   }
 }

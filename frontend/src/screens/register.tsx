@@ -6,10 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
-import { Dropdown } from "react-native-element-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
-import { AuthContext } from "../auth-context";
-import StorageWrapper from "../utils/StorageWrapper";
 import { RootStackParamList } from "../../App";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -47,7 +44,7 @@ export function RegisterScreen({
     resolver: zodResolver(registerFormSchema),
   });
 
-  const { mutate, data } = useMutation({
+  const { mutate: registerMutation } = useMutation({
     mutationFn: ({ ...args }: RegisterFormData) =>
       register({
         username: args.username,
@@ -66,7 +63,7 @@ export function RegisterScreen({
   });
 
   function onSubmit(data: RegisterFormData) {
-    mutate({
+    registerMutation({
       ...data,
     });
   }
@@ -83,6 +80,7 @@ export function RegisterScreen({
           render={({ field: { onChange, value } }) => (
             <TextInput
               placeholder="Username"
+              placeholderTextColor="white"
               style={{ color: "white" }}
               onChangeText={onChange}
               value={value}
@@ -106,6 +104,7 @@ export function RegisterScreen({
                 color: "white",
               }}
               placeholder="Password"
+              placeholderTextColor="white"
               onChangeText={onChange}
               value={value}
               textContentType="password"
@@ -131,6 +130,7 @@ export function RegisterScreen({
                 color: "white",
               }}
               placeholder="Email"
+              placeholderTextColor="white"
               onChangeText={onChange}
               value={value}
               textContentType="emailAddress"

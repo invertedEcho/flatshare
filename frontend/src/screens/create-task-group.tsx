@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
@@ -15,10 +15,10 @@ import {
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import Loading from "../components/loading";
-import UserMultiSelect from "../components/user-multi-select";
 import WebDateTimerPicker from "../components/web-date-picker";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
+import UserMultiSelect from "../components/user-multi-select";
 
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -35,7 +35,7 @@ async function createTaskGroup({
   initialStartDate,
   userIds,
 }: CreateTaskGroup & { initialStartDate: Date; userIds: number[] }) {
-  await fetchWrapper.post("tasks/taskGroup", {
+  await fetchWrapper.post("task-group", {
     title,
     description,
     intervalDays,
@@ -51,7 +51,6 @@ const defaultValues = {
 };
 
 export function CreateTaskGroupScreen() {
-  const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
@@ -174,6 +173,7 @@ export function CreateTaskGroupScreen() {
           users={users}
           selectedUserIds={selectedUserIds}
           setSelectedUserIds={setSelectedUserIds}
+          header="Select Users"
         />
         {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db 
         Probably some timezone issues, investigate how to do this correctly */}

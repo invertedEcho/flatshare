@@ -2,32 +2,36 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 import { Ionicons } from "@expo/vector-icons";
-import { User } from "../screens/assignments";
 
-function renderItem(item: { username: string; id: number }) {
+type MultiSelectItemProps = {
+  username: string;
+};
+
+function MultiSelectItem({ username }: MultiSelectItemProps) {
   return (
     <View style={styles.item}>
-      <Text style={styles.selectedTextStyle}>{item.username}</Text>
+      <Text style={styles.selectedTextStyle}>{username}</Text>
       <Ionicons style={styles.icon} color="black" name="person" size={20} />
     </View>
   );
 }
 
-type Props = {
-  users: User[];
+type MultiSelectProps = {
+  users: { username: string; id: number }[];
   selectedUserIds: string[];
   setSelectedUserIds: React.Dispatch<React.SetStateAction<string[]>>;
+  header: string;
 };
 
-function UserMultiSelect({
+export default function UserMultiSelect({
   users,
   setSelectedUserIds,
   selectedUserIds,
-}: Props) {
+  header,
+}: MultiSelectProps) {
   return (
-    <View style={styles.container}>
-      <Text className="text-white mb-2">Select Users</Text>
-
+    <View className="py-2">
+      <Text className="text-white mb-2">{header}</Text>
       <MultiSelect
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
@@ -48,7 +52,7 @@ function UserMultiSelect({
         renderLeftIcon={() => (
           <Ionicons style={styles.icon} color="black" name="person" size={20} />
         )}
-        renderItem={renderItem}
+        renderItem={MultiSelectItem}
         renderSelectedItem={(item, unSelect) => (
           <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
             <View style={styles.selectedStyle}>
@@ -61,8 +65,6 @@ function UserMultiSelect({
     </View>
   );
 }
-
-export default UserMultiSelect;
 
 const styles = StyleSheet.create({
   dropdown: {

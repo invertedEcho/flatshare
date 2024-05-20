@@ -13,13 +13,13 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <View style={dropdownStyles.container}>
       <Dropdown
-        style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
+        style={[dropdownStyles.dropdown, isFocus && { borderColor: "blue" }]}
+        placeholderStyle={dropdownStyles.placeholderStyle}
+        selectedTextStyle={dropdownStyles.selectedTextStyle}
+        inputSearchStyle={dropdownStyles.inputSearchStyle}
+        iconStyle={dropdownStyles.iconStyle}
         data={data}
         search
         maxHeight={300}
@@ -36,7 +36,7 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
         }}
         renderLeftIcon={() => (
           <AntDesign
-            style={styles.icon}
+            style={dropdownStyles.icon}
             color={isFocus ? "blue" : "black"}
             name="user"
             size={20}
@@ -49,7 +49,7 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
 
 export default UserDropdown;
 
-const styles = StyleSheet.create({
+export const dropdownStyles = StyleSheet.create({
   container: {
     padding: 0,
   },

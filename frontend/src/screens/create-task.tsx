@@ -1,71 +1,126 @@
 import * as React from "react";
 
-import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
-import { Dropdown } from "react-native-element-dropdown";
-import { intervalItems } from "../utils/interval";
 import { fetchWrapper } from "../utils/fetchWrapper";
+import { Dropdown } from "react-native-element-dropdown";
+import { dropdownStyles } from "../components/user-dropdown";
+import UserMultiSelect from "../components/user-multi-select";
+import { getUsers } from "./assignments";
+import Loading from "../components/loading";
 
-const intervalType = z.enum(["hours", "days", "weeks"]);
-export type IntervalType = z.infer<typeof intervalType>;
-
-const createTaskSchema = z.object({
+const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
-  intervalValue: z.coerce.number(),
+  taskGroupId: z.number().optional(),
 });
 
-type CreateTask = z.infer<typeof createTaskSchema>;
+type CreateRecurringTask = z.infer<typeof createRecurringTaskSchema>;
 
-async function createTask({
+const createOneOffTaskSchema = z.object({
+  title: z.string().min(1, { message: "Title is missing" }),
+  description: z.string().optional(),
+  userIds: z.number().array(),
+});
+
+type CreateOneOffTask = z.infer<typeof createOneOffTaskSchema>;
+
+async function createOneOffTask({
   title,
   description,
-  intervalValue,
-  intervalType,
-}: CreateTask & { intervalType: IntervalType }) {
-  await fetchWrapper.post("tasks", {
+  userIds,
+}: CreateOneOffTask) {
+  await fetchWrapper.post("tasks/one-off/", {
     title,
     description,
-    intervalValue,
-    intervalType,
+    userIds,
   });
+}
+
+// TODO: Should be moved inside task group list screen when it exists
+const taskGroupSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+});
+
+async function createRecurringTask({
+  title,
+  description,
+  taskGroupId,
+}: CreateRecurringTask) {
+  await fetchWrapper.post("tasks/recurring", {
+    title,
+    description,
+    taskGroupId,
+  });
+}
+
+// TODO: Should be moved inside task group list screen when it exists
+async function getTaskGroups() {
+  const response = await fetchWrapper.get("task-group");
+  const json = await response.json();
+  const parsed = z.array(taskGroupSchema).parse(json);
+  return parsed;
 }
 
 const defaultValues = {
   title: "",
   description: "",
-  intervalValue: 1,
 };
 
 export function CreateTaskScreen() {
+  const [selectedTaskGroupId, setSelectedTaskGroupId] = React.useState<
+    number | undefined
+  >(undefined);
+
+  const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
+    "recurring",
+  );
+  const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
+
   const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset: resetForm,
-  } = useForm<CreateTask>({
+  } = useForm<CreateRecurringTask>({
     defaultValues,
-    resolver: zodResolver(createTaskSchema),
+    resolver: zodResolver(createRecurringTaskSchema),
   });
 
-  const [intervalType, setIntervalType] = React.useState<IntervalType>("days");
-
-  const { mutate } = useMutation({
-    mutationFn: ({ ...args }: CreateTask) =>
-      createTask({
-        title: args.title,
-        description: args.description,
-        intervalValue: args.intervalValue,
-        intervalType,
-      }),
+  const { mutate: createTaskMutation } = useMutation({
+    mutationFn: ({ ...args }: CreateRecurringTask) => {
+      return selectedTaskGroupId === undefined
+        ? createOneOffTask({
+            title: args.title,
+            description: args.description,
+            userIds: selectedUserIds,
+          })
+        : createRecurringTask({
+            title: args.title,
+            description: args.description,
+            taskGroupId: selectedTaskGroupId,
+          });
+    },
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully created task" });
       resetForm({ ...defaultValues });
+      queryClient.refetchQueries({ queryKey: ["tasks"] });
+      queryClient.refetchQueries({ queryKey: ["assignments"] });
+      setSelectedUserIds([]);
+      setSelectedTaskGroupId(undefined);
     },
     onError: (err) => {
       console.error(err);
@@ -74,12 +129,33 @@ export function CreateTaskScreen() {
     mutationKey: ["tasks"],
   });
 
-  function onSubmit(data: CreateTask) {
-    mutate({
+  const { data: taskGroups, isLoading: isTaskGroupsLoading } = useQuery({
+    queryKey: ["taskGroup"],
+    queryFn: getTaskGroups,
+  });
+
+  const { data: users, isLoading: isUsersLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
+
+  function onSubmit(data: CreateRecurringTask) {
+    createTaskMutation({
       ...data,
     });
     queryClient.refetchQueries({ queryKey: ["tasks"] });
   }
+
+  if (
+    isTaskGroupsLoading ||
+    taskGroups === undefined ||
+    isUsersLoading ||
+    users === undefined
+  ) {
+    return <Loading message="Loading data required for creating a task..." />;
+  }
+
+  const noTaskGroupExist = taskGroups.length === 0;
 
   return (
     <SafeAreaView className="bg-slate-700 flex p-4 h-full">
@@ -93,6 +169,7 @@ export function CreateTaskScreen() {
           render={({ field: { onChange, value } }) => (
             <TextInput
               placeholder="Enter a title"
+              placeholderTextColor="white"
               style={{ color: "white" }}
               onChangeText={onChange}
               value={value}
@@ -115,6 +192,7 @@ export function CreateTaskScreen() {
               style={{
                 color: "white",
               }}
+              placeholderTextColor="white"
               placeholder="Enter a description"
               onChangeText={onChange}
               value={value}
@@ -126,37 +204,60 @@ export function CreateTaskScreen() {
         {errors.description && (
           <Text className="text-red-300">Description is required</Text>
         )}
-        <Text className="text-white">Select an interval type</Text>
-        <Dropdown
-          style={{ padding: 10 }}
-          data={intervalItems}
-          labelField="label"
-          valueField="value"
-          onChange={(item) => setIntervalType(item.value)}
-          value={intervalType}
-          placeholderStyle={{ color: "white" }}
-          selectedTextStyle={{ color: "white" }}
-        />
-        <Text className="text-white">Interval</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder="Interval"
-              onChangeText={onChange}
-              value={String(value)}
-              className="p-4 text-white"
-              inputMode="numeric"
-              style={{ color: "white" }}
+        <Text className="text-white">Options:</Text>
+        <View className="flex flex-row items-center">
+          <Text
+            className={
+              taskType === "recurring" ? "text-gray-500" : "text-white"
+            }
+          >
+            One-off task
+          </Text>
+          <Switch
+            value={taskType === "recurring"}
+            onValueChange={() =>
+              setTaskType(
+                taskType === "recurring" ? "non-recurring" : "recurring",
+              )
+            }
+          />
+          <Text
+            className={
+              taskType === "recurring" ? "text-white" : "text-gray-500"
+            }
+          >
+            Recurring task
+          </Text>
+        </View>
+        {taskType === "recurring" ? (
+          <>
+            <Dropdown
+              data={taskGroups}
+              disable={noTaskGroupExist}
+              labelField="title"
+              valueField="id"
+              onChange={(item) => setSelectedTaskGroupId(item.id)}
+              style={dropdownStyles.dropdown}
+              placeholderStyle={dropdownStyles.placeholderStyle}
+              selectedTextStyle={dropdownStyles.selectedTextStyle}
+              inputSearchStyle={dropdownStyles.inputSearchStyle}
+              iconStyle={dropdownStyles.iconStyle}
+              placeholder="Select a task group (optional)"
             />
-          )}
-          name="intervalValue"
-        />
-        {errors.intervalValue && (
-          <Text className="text-red-300">Interval is required</Text>
+            {noTaskGroupExist && (
+              <Text className="text-red-200">
+                Currently, there are no task groups available. Please create a
+                task group first in order to assign tasks to it.
+              </Text>
+            )}
+          </>
+        ) : (
+          <UserMultiSelect
+            users={users}
+            selectedUserIds={selectedUserIds}
+            setSelectedUserIds={setSelectedUserIds}
+            header="Select users"
+          />
         )}
         <Pressable
           // TODO: nativewind won't work here for some odd reason
@@ -167,7 +268,7 @@ export function CreateTaskScreen() {
           }}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text>Submit</Text>
+          <Text className="text-center font-bold">Submit</Text>
         </Pressable>
       </View>
     </SafeAreaView>

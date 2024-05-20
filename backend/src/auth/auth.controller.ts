@@ -10,7 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
 import { db } from 'src/db';
 import { userTable } from 'src/db/schema';
-import { AuthService } from './auth.service';
+import { AuthService, User } from './auth.service';
 import { Public } from './public.decorators';
 
 class RegisterDto {
@@ -28,8 +28,7 @@ export class AuthController {
   @Public()
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  //TODO: Fix typing
-  async login(@Request() req: { user: any }) {
+  async login(@Request() req: { user: User }) {
     return this.authService.login(req.user);
   }
 

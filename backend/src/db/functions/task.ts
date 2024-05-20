@@ -1,12 +1,7 @@
 import { eq } from 'drizzle-orm';
-import { db } from '.';
-import {
-  SelectTask,
-  taskGroupTable,
-  taskTable,
-  userTaskGroupTable,
-} from './schema';
-import { CreateTask, CreateTaskGroup, UpdateTask } from 'src/task.controller';
+import { CreateTask, OneOffTask, UpdateTask } from 'src/task.controller';
+import { db } from '..';
+import { SelectTask, assignmentTable, taskTable } from '../schema';
 
 export async function dbGetAllTasks(): Promise<SelectTask[]> {
   return await db.select().from(taskTable);
@@ -25,7 +20,7 @@ export async function dbGetTaskById(taskId: number) {
   }
 }
 
-export async function dbCreateTask({
+export async function dbCreateRecurringTask({
   title,
   description,
   taskGroupId,
@@ -36,38 +31,6 @@ export async function dbCreateTask({
       description,
       taskGroupId,
     });
-  } catch (error) {
-    console.error({ error });
-    throw error;
-  }
-}
-
-export async function dbCreateTaskGroup({
-  title,
-  description,
-  intervalDays,
-  userIds,
-  initialStartDate,
-}: CreateTaskGroup) {
-  try {
-    const res = await db
-      .insert(taskGroupTable)
-      .values({
-        title,
-        description,
-        interval: `${intervalDays} days`,
-        initialStartDate: new Date(initialStartDate),
-      })
-      .returning({ taskGroupId: taskGroupTable.id });
-
-    const { taskGroupId } = res[0];
-
-    await db.insert(userTaskGroupTable).values(
-      userIds.map((userId) => ({
-        taskGroupId,
-        userId,
-      })),
-    );
   } catch (error) {
     console.error({ error });
     throw error;
@@ -89,4 +52,25 @@ export async function dbUpdateTask({
     console.error({ error });
     throw error;
   }
+}
+
+export async function dbCreateOneOffTask({
+  title,
+  description,
+  userIds,
+}: OneOffTask) {
+  const tasks = await db
+    .insert(taskTable)
+    .values({ title, description })
+    .returning({ taskId: taskTable.id });
+  const task = tasks[0];
+
+  const hydratedAssignments = userIds.map((userId) => {
+    return {
+      taskId: task.taskId,
+      userId,
+    };
+  });
+
+  await db.insert(assignmentTable).values(hydratedAssignments);
 }
