@@ -14,31 +14,62 @@ import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Toast from "react-native-toast-message";
 import { fetchWrapper } from "../utils/fetchWrapper";
-import CustomMultiSelect from "../components/user-multi-select";
+import { Dropdown } from "react-native-element-dropdown";
+import { dropdownStyles } from "../components/user-dropdown";
+import UserMultiSelect from "../components/user-multi-select";
+import { getUsers } from "./assignments";
+import Loading from "../components/loading";
 
-const createTaskSchema = z.object({
+const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
+  taskGroupId: z.number().optional(),
 });
 
-type CreateTask = z.infer<typeof createTaskSchema>;
+type CreateRecurringTask = z.infer<typeof createRecurringTaskSchema>;
 
+const createOneOffTaskSchema = z.object({
+  title: z.string().min(1, { message: "Title is missing" }),
+  description: z.string().optional(),
+  userIds: z.number().array(),
+});
+
+type CreateOneOffTask = z.infer<typeof createOneOffTaskSchema>;
+
+async function createOneOffTask({
+  title,
+  description,
+  userIds,
+}: CreateOneOffTask) {
+  await fetchWrapper.post("/tasks/one-off/", {
+    title,
+    description,
+    userIds,
+  });
+}
+
+// TODO: Should be moved inside task group list screen when it exists
 const taskGroupSchema = z.object({
   id: z.number(),
   title: z.string(),
 });
 
-async function createTask({ title, description }: CreateTask) {
-  await fetchWrapper.post("tasks", {
+async function createRecurringTask({
+  title,
+  description,
+  taskGroupId,
+}: CreateRecurringTask) {
+  await fetchWrapper.post("tasks/recurring", {
     title,
     description,
+    taskGroupId,
   });
 }
 
+// TODO: Should be moved inside task group list screen when it exists
 async function getTaskGroups() {
   const response = await fetchWrapper.get("task-group");
   const json = await response.json();
-  console.log({ json });
   const parsed = z.array(taskGroupSchema).parse(json);
   return parsed;
 }
@@ -49,30 +80,40 @@ const defaultValues = {
 };
 
 export function CreateTaskScreen() {
-  const [selectedTaskGroups, setSelectedTaskGroups] = React.useState<string[]>(
-    [],
-  );
+  const [selectedTaskGroupId, setSelectedTaskGroupId] = React.useState<
+    number | undefined
+  >(undefined);
 
   const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
     "recurring",
   );
+  const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
+
   const queryClient = useQueryClient();
   const {
     control,
     handleSubmit,
     formState: { errors },
     reset: resetForm,
-  } = useForm<CreateTask>({
+  } = useForm<CreateRecurringTask>({
     defaultValues,
-    resolver: zodResolver(createTaskSchema),
+    resolver: zodResolver(createRecurringTaskSchema),
   });
 
   const { mutate: createTaskMutation } = useMutation({
-    mutationFn: ({ ...args }: CreateTask) =>
-      createTask({
-        title: args.title,
-        description: args.description,
-      }),
+    mutationFn: ({ ...args }: CreateRecurringTask) => {
+      return selectedTaskGroupId === undefined
+        ? createOneOffTask({
+            title: args.title,
+            description: args.description,
+            userIds: [],
+          })
+        : createRecurringTask({
+            title: args.title,
+            description: args.description,
+            taskGroupId: selectedTaskGroupId,
+          });
+    },
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully created task" });
       resetForm({ ...defaultValues });
@@ -84,30 +125,33 @@ export function CreateTaskScreen() {
     mutationKey: ["tasks"],
   });
 
-  const { data: taskGroups, isLoading } = useQuery({
+  const { data: taskGroups, isLoading: isTaskGrousLoading } = useQuery({
     queryKey: ["taskGroup"],
     queryFn: getTaskGroups,
   });
 
-  console.log({ taskGroups });
+  const { data: users, isLoading: isUsersLoading } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUsers,
+  });
 
-  function onSubmit(data: CreateTask) {
+  function onSubmit(data: CreateRecurringTask) {
     createTaskMutation({
       ...data,
     });
     queryClient.refetchQueries({ queryKey: ["tasks"] });
   }
 
-  if (isLoading || taskGroups === undefined) {
-    return null;
+  if (
+    isTaskGrousLoading ||
+    taskGroups === undefined ||
+    isUsersLoading ||
+    users === undefined
+  ) {
+    return <Loading message="Loading data required for creating a task..." />;
   }
 
-  const hydratedTaskGroups = taskGroups.map((taskGroup) => {
-    return {
-      value: taskGroup.title,
-      id: taskGroup.id,
-    };
-  });
+  const noTaskGroupExist = taskGroups.length === 0;
 
   return (
     <SafeAreaView className="bg-slate-700 flex p-4 h-full">
@@ -158,7 +202,13 @@ export function CreateTaskScreen() {
         )}
         <Text className="text-white">Options:</Text>
         <View className="flex flex-row items-center">
-          <Text className="text-white">Recurring task</Text>
+          <Text
+            className={
+              taskType === "recurring" ? "text-gray-500" : "text-white"
+            }
+          >
+            One-off task
+          </Text>
           <Switch
             value={taskType === "recurring"}
             onValueChange={() =>
@@ -167,13 +217,42 @@ export function CreateTaskScreen() {
               )
             }
           />
+          <Text
+            className={
+              taskType === "recurring" ? "text-white" : "text-gray-500"
+            }
+          >
+            Recurring task
+          </Text>
         </View>
-        {taskType === "recurring" && (
-          <CustomMultiSelect
-            header="Select task group"
-            values={hydratedTaskGroups}
-            selectedValues={selectedTaskGroups}
-            setSelectedValues={setSelectedTaskGroups}
+        {taskType === "recurring" ? (
+          <>
+            <Dropdown
+              data={taskGroups}
+              disable={noTaskGroupExist}
+              labelField="title"
+              valueField="id"
+              onChange={(item) => setSelectedTaskGroupId(item.id)}
+              style={dropdownStyles.dropdown}
+              placeholderStyle={dropdownStyles.placeholderStyle}
+              selectedTextStyle={dropdownStyles.selectedTextStyle}
+              inputSearchStyle={dropdownStyles.inputSearchStyle}
+              iconStyle={dropdownStyles.iconStyle}
+              placeholder="Select a task group (optional)"
+            />
+            {noTaskGroupExist && (
+              <Text className="text-red-200">
+                Currently, there are no task groups available. Please create a
+                task group first in order to assign tasks to it.
+              </Text>
+            )}
+          </>
+        ) : (
+          <UserMultiSelect
+            users={users}
+            selectedUserIds={selectedUserIds}
+            setSelectedUserIds={setSelectedUserIds}
+            header="Select users"
           />
         )}
         <Pressable

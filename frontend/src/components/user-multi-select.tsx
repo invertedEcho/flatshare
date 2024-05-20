@@ -3,30 +3,34 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 import { Ionicons } from "@expo/vector-icons";
 
-function renderItem(item: { value: string; id: number }) {
+type MultiSelectItemProps = {
+  username: string;
+};
+
+function MultiSelectItem({ username }: MultiSelectItemProps) {
   return (
     <View style={styles.item}>
-      <Text style={styles.selectedTextStyle}>{item.value}</Text>
+      <Text style={styles.selectedTextStyle}>{username}</Text>
       <Ionicons style={styles.icon} color="black" name="person" size={20} />
     </View>
   );
 }
 
-type Props = {
-  values: { value: string; id: number }[];
-  selectedValues: string[];
-  setSelectedValues: React.Dispatch<React.SetStateAction<string[]>>;
+type MultiSelectProps = {
+  users: { username: string; id: number }[];
+  selectedUserIds: number[];
+  setSelectedUserIds: React.Dispatch<React.SetStateAction<number[]>>;
   header: string;
 };
 
-export default function CustomMultiSelect({
-  values,
-  setSelectedValues,
-  selectedValues,
+export default function UserMultiSelect({
+  users,
+  setSelectedUserIds: setSelectedValues,
+  selectedUserIds: selectedValues,
   header,
-}: Props) {
+}: MultiSelectProps) {
   return (
-    <View style={styles.container}>
+    <View className="py-2">
       <Text className="text-white mb-2">{header}</Text>
       <MultiSelect
         style={styles.dropdown}
@@ -34,25 +38,25 @@ export default function CustomMultiSelect({
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={values}
-        labelField="value"
+        data={users}
+        labelField="username"
         valueField="id"
         placeholder="Select item"
-        value={selectedValues}
+        value={selectedValues.map((value) => value.toString())}
         activeColor="#9bd4e4"
         search
         searchPlaceholder="Search..."
-        onChange={(value) => {
-          setSelectedValues(value);
+        onChange={(values) => {
+          setSelectedValues(values.map((value) => Number(value)));
         }}
         renderLeftIcon={() => (
           <Ionicons style={styles.icon} color="black" name="person" size={20} />
         )}
-        renderItem={renderItem}
+        renderItem={MultiSelectItem}
         renderSelectedItem={(item, unSelect) => (
           <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
             <View style={styles.selectedStyle}>
-              <Text style={styles.textSelectedStyle}>{item.value}</Text>
+              <Text style={styles.textSelectedStyle}>{item.username}</Text>
               <Ionicons color="black" name="trash-bin-outline" size={17} />
             </View>
           </TouchableOpacity>

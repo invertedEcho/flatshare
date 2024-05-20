@@ -1,11 +1,23 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { SelectTask } from './db/schema';
-import { dbCreateTask, dbGetAllTasks, dbUpdateTask } from './db/functions/task';
+import {
+  dbCreateOneOffTask,
+  dbCreateRecurringTask,
+  dbGetAllTasks,
+  dbUpdateTask,
+} from './db/functions/task';
 
 export type CreateTask = {
   title: string;
   description?: string;
   taskGroupId?: number;
+};
+
+// TODO: extra type for this feels weird
+export type OneOffTask = {
+  title: string;
+  description: string;
+  userIds: number[];
 };
 
 // todo: this shouldnt be a seperate type
@@ -24,15 +36,21 @@ export class TasksController {
     return tasks;
   }
 
-  @Post()
-  async createTask(@Body() task: CreateTask) {
+  @Post('/recurring')
+  async createRecurringTask(@Body() task: CreateTask) {
     console.log({ task });
-    await dbCreateTask(task);
+    await dbCreateRecurringTask(task);
   }
 
   @Put(':id')
   async updateTask(@Param('id') id: string, @Body() task: UpdateTask) {
     console.log({ updatedTask: task });
     await dbUpdateTask({ ...task, id: Number(id) });
+  }
+
+  @Post('/one-off')
+  async createOneOffTask(@Body() oneOffTask: OneOffTask) {
+    console.log(oneOffTask);
+    await dbCreateOneOffTask(oneOffTask);
   }
 }

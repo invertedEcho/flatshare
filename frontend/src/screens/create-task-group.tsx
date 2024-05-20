@@ -11,7 +11,7 @@ import Loading from "../components/loading";
 import WebDateTimerPicker from "../components/web-date-picker";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
-import CustomMultiSelect from "../components/user-multi-select";
+import UserMultiSelect from "../components/user-multi-select";
 
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -168,10 +168,10 @@ export function CreateTaskGroupScreen() {
             <Text className="text-red-300">Interval is required</Text>
           )}
         </View>
-        <CustomMultiSelect
-          values={hydratedUsers}
-          selectedValues={selectedUserIds}
-          setSelectedValues={setSelectedUserIds}
+        <UserMultiSelect
+          users={users}
+          selectedUserIds={selectedUserIds}
+          setSelectedUserIds={setSelectedUserIds}
           header="Select Users"
         />
         {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db 

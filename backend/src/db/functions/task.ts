@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
-import { CreateTask, UpdateTask } from 'src/task.controller';
+import { CreateTask, OneOffTask, UpdateTask } from 'src/task.controller';
 import { db } from '..';
-import { SelectTask, taskTable } from '../schema';
+import { SelectTask, assignmentTable, taskTable } from '../schema';
 
 export async function dbGetAllTasks(): Promise<SelectTask[]> {
   return await db.select().from(taskTable);
@@ -20,7 +20,7 @@ export async function dbGetTaskById(taskId: number) {
   }
 }
 
-export async function dbCreateTask({
+export async function dbCreateRecurringTask({
   title,
   description,
   taskGroupId,
@@ -52,4 +52,25 @@ export async function dbUpdateTask({
     console.error({ error });
     throw error;
   }
+}
+
+export async function dbCreateOneOffTask({
+  title,
+  description,
+  userIds,
+}: OneOffTask) {
+  const tasks = await db
+    .insert(taskTable)
+    .values({ title, description })
+    .returning({ taskId: taskTable.id });
+  const task = tasks[0];
+
+  const hydratedAssignments = userIds.map((userId) => {
+    return {
+      taskId: task.taskId,
+      userId,
+    };
+  });
+
+  await db.insert(assignmentTable).values(hydratedAssignments);
 }
