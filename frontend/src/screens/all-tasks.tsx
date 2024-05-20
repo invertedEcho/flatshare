@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import * as React from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
-import { FlatList, SafeAreaView, ScrollView } from "react-native";
+import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
 import { z } from "zod";
 import Loading from "../components/loading";
 import { TaskItem } from "../components/task-item";
 import { fetchWrapper } from "../utils/fetchWrapper";
+import { queryKeys } from "../utils/queryKeys";
 
 export const taskSchema = z.object({
   title: z.string(),
@@ -29,9 +31,11 @@ async function getAllTasks() {
 
 export default function AllTasksScreen() {
   const { data, isLoading } = useQuery({
-    queryKey: ["tasks"],
+    queryKey: [queryKeys.tasks],
     queryFn: getAllTasks,
   });
+  const [refreshing, setRefreshing] = React.useState(false);
+  const queryClient = useQueryClient();
 
   if (data === undefined || isLoading) {
     return <Loading message="Loading all tasks" />;
@@ -39,7 +43,20 @@ export default function AllTasksScreen() {
 
   return (
     <SafeAreaView className="text-black flex-1 items-center bg-slate-700">
-      <ScrollView className="p-4 w-full" contentContainerStyle={{ gap: 12 }}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={async () => {
+              setRefreshing(true);
+              await queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
+              setRefreshing(false);
+            }}
+          />
+        }
+        className="p-4 w-full"
+        contentContainerStyle={{ gap: 12 }}
+      >
         <StatusBar style="auto" />
         {data.map((task) => (
           <TaskItem

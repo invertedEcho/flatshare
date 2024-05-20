@@ -19,6 +19,7 @@ import { dropdownStyles } from "../components/user-dropdown";
 import UserMultiSelect from "../components/user-multi-select";
 import { getUsers } from "./assignments";
 import Loading from "../components/loading";
+import { queryKeys } from "../utils/queryKeys";
 
 const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -117,8 +118,8 @@ export function CreateTaskScreen() {
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully created task" });
       resetForm({ ...defaultValues });
-      queryClient.refetchQueries({ queryKey: ["tasks"] });
-      queryClient.refetchQueries({ queryKey: ["assignments"] });
+      queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
+      queryClient.refetchQueries({ queryKey: [queryKeys.assignments] });
       setSelectedUserIds([]);
       setSelectedTaskGroupId(undefined);
     },
@@ -126,16 +127,16 @@ export function CreateTaskScreen() {
       console.error(err);
       Toast.show({ type: "error", text1: "Failed creating task" });
     },
-    mutationKey: ["tasks"],
+    mutationKey: [queryKeys.tasks],
   });
 
   const { data: taskGroups, isLoading: isTaskGroupsLoading } = useQuery({
-    queryKey: ["taskGroup"],
+    queryKey: [queryKeys.taskGroups],
     queryFn: getTaskGroups,
   });
 
   const { data: users, isLoading: isUsersLoading } = useQuery({
-    queryKey: ["users"],
+    queryKey: [queryKeys.users],
     queryFn: getUsers,
   });
 
@@ -143,7 +144,7 @@ export function CreateTaskScreen() {
     createTaskMutation({
       ...data,
     });
-    queryClient.refetchQueries({ queryKey: ["tasks"] });
+    queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
   }
 
   if (
@@ -156,6 +157,8 @@ export function CreateTaskScreen() {
   }
 
   const noTaskGroupExist = taskGroups.length === 0;
+  const disableSubmit =
+    taskType === "non-recurring" && selectedUserIds.length === 0;
 
   return (
     <SafeAreaView className="bg-slate-700 flex p-4 h-full">
@@ -262,11 +265,12 @@ export function CreateTaskScreen() {
         <Pressable
           // TODO: nativewind won't work here for some odd reason
           style={{
-            backgroundColor: "white",
+            backgroundColor: disableSubmit ? "gray" : "white",
             padding: 10,
             borderRadius: 5,
           }}
           onPress={handleSubmit(onSubmit)}
+          disabled={disableSubmit}
         >
           <Text className="text-center font-bold">Submit</Text>
         </Pressable>

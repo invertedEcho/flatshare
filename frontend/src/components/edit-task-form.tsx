@@ -5,6 +5,7 @@ import Toast from "react-native-toast-message";
 import { Task } from "../screens/all-tasks";
 import { modalStyles } from "./task-item";
 import { fetchWrapper } from "../utils/fetchWrapper";
+import { queryKeys } from "../utils/queryKeys";
 
 async function updateTask({
   id,
@@ -39,7 +40,7 @@ export function EditTaskForm({
     mutationFn: updateTask,
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Successfully updated task" });
-      queryClient.refetchQueries({ queryKey: ["tasks"] });
+      queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
     },
     onError: () => {
       Toast.show({ type: "error", text1: "Failed updated task" });
