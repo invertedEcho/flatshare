@@ -19,6 +19,7 @@ import WebDateTimerPicker from "../components/web-date-picker";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
 import UserMultiSelect from "../components/user-multi-select";
+import { queryKeys } from "../utils/queryKeys";
 
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -62,7 +63,7 @@ export function CreateTaskGroupScreen() {
   });
 
   const { data: users, isLoading } = useQuery({
-    queryKey: ["users"],
+    queryKey: [queryKeys.users],
     queryFn: getUsers,
   });
 
@@ -92,7 +93,7 @@ export function CreateTaskGroupScreen() {
       console.error(err);
       Toast.show({ type: "error", text1: "Failed creating task group" });
     },
-    mutationKey: ["tasks"],
+    mutationKey: [queryKeys.tasks],
   });
 
   function onSubmit(data: CreateTaskGroup) {

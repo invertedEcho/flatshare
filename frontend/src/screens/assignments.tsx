@@ -1,13 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { FlatList, SafeAreaView, Text, View } from "react-native";
+import {
+  FlatList,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { z } from "zod";
 import { AuthContext } from "../auth-context";
 import { AssignmentItem } from "../components/assignment-item";
 import Loading from "../components/loading";
 import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
+import { queryKeys } from "../utils/queryKeys";
 
 export const assignmentSchema = z.object({
   id: z.number(),
@@ -55,17 +63,18 @@ async function updateAssignmentStatus(
 export function AssigmentsScreen() {
   const queryClient = useQueryClient();
   const { data: assignments, isLoading } = useQuery({
-    queryKey: ["assignments"],
+    queryKey: [queryKeys.assignments],
     queryFn: getAssigments,
   });
   const { userId } = React.useContext(AuthContext);
 
   const { data: users } = useQuery({
-    queryKey: ["users"],
+    queryKey: [queryKeys.users],
     queryFn: getUsers,
   });
 
   const [selectedUserId, setSelectedUserId] = React.useState(userId);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const { mutate } = useMutation({
     mutationFn: ({
@@ -76,10 +85,11 @@ export function AssigmentsScreen() {
       state: AssignmentState;
     }) => updateAssignmentStatus(assignmentId, state),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ["assignments"] });
+      queryClient.refetchQueries({ queryKey: [queryKeys.assignments] });
     },
   });
 
+  console.log({ assignments });
   if (assignments === undefined || users === undefined || isLoading) {
     return <Loading message="Loading your assignments..." />;
   }
@@ -92,9 +102,26 @@ export function AssigmentsScreen() {
     (assignment) => assignment.assigneeId === selectedUserId,
   );
 
+  async function refreshAssignments() {
+    setRefreshing(true);
+    await queryClient.refetchQueries({
+      queryKey: [queryKeys.assignments],
+    });
+    setRefreshing(false);
+  }
+
   return (
     <SafeAreaView className="text-black flex-1 bg-slate-700">
-      <View className="p-4 w-full" style={{ gap: 20 }}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={refreshAssignments}
+          />
+        }
+        className="p-4 w-full"
+        style={{ gap: 20 }}
+      >
         <View>
           <Text className="text-white" style={{ fontSize: 16 }}>
             From user
@@ -126,12 +153,14 @@ export function AssigmentsScreen() {
                   assignmentId: item.id,
                   state: item.isCompleted ? "pending" : "completed",
                 });
-                queryClient.refetchQueries({ queryKey: ["assignments"] });
+                queryClient.refetchQueries({
+                  queryKey: [queryKeys.assignments],
+                });
               }}
             />
           )}
         />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
