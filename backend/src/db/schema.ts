@@ -68,7 +68,7 @@ export const assignmentTable = pgTable('assignment', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
-  state: assigmentStateEnum('state').default('pending'),
+  state: assigmentStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

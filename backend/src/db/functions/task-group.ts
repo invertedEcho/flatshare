@@ -1,7 +1,12 @@
 import { eq } from 'drizzle-orm';
 import { CreateTaskGroup } from 'src/task-group.controller';
 import { db } from '..';
-import { taskGroupTable, taskGroupUserTable, userTable } from '../schema';
+import {
+  taskGroupTable,
+  taskGroupUserTable,
+  taskTable,
+  userTable,
+} from '../schema';
 
 export async function dbGetTaskGroups() {
   return await db.select().from(taskGroupTable);
@@ -52,4 +57,11 @@ export async function dbGetTaskGroupUsers(taskGroupId: number) {
     console.error({ error });
     throw error;
   }
+}
+
+export async function dbGetTasksOfTaskGroup(taskGroupId: number) {
+  return await db
+    .select()
+    .from(taskTable)
+    .where(eq(taskTable.taskGroupId, taskGroupId));
 }

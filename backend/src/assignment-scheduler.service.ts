@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { dbGetTaskGroupUsers } from './db/functions/task-group';
+import {
+  dbGetTaskGroupUsers,
+  dbGetTasksOfTaskGroup,
+} from './db/functions/task-group';
 import {
   dbCreateTaskGroupAssignment,
   dbGetAssignmentsForTaskGroup,
   dbGetTaskGroupsToAssignForCurrentInterval,
 } from './db/functions/assignment-task-group';
 import { randomFromArray } from './utils/array';
+import { db } from './db';
+import { assignmentTable } from './db/schema';
 
 @Injectable()
 export class AssignmentSchedulerService {
@@ -45,6 +50,14 @@ export class AssignmentSchedulerService {
       }
 
       await dbCreateTaskGroupAssignment(taskGroupId, nextResponsibleUserId);
+      const tasksOfTaskGroup = await dbGetTasksOfTaskGroup(taskGroupId);
+      const assignmentsToCreate = tasksOfTaskGroup.map((task) => {
+        return {
+          taskId: task.id,
+          userId: nextResponsibleUserId,
+        };
+      });
+      await db.insert(assignmentTable).values(assignmentsToCreate);
     }
   }
 }
