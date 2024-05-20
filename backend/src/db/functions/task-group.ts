@@ -55,10 +55,10 @@ export async function dbGetTaskGroupsToCreateForCurrentInterval() {
         taskGroupAssignmentTable,
         eq(taskGroupTable.id, taskGroupAssignmentTable.taskGroupId),
       )
-      .groupBy(taskGroupTable.id);
-    // .having(
-    //   sql`MAX(${taskGroupAssignmentTable.createdAt}) < (NOW() - ${taskGroupTable.interval})`,
-    // );
+      .groupBy(taskGroupTable.id)
+      .having(
+        sql`MAX(${taskGroupAssignmentTable.createdAt}) < (NOW() - ${taskGroupTable.interval})`,
+      );
     return taskGroupIdsToCreateAssignmentsFor;
   } catch (error) {
     console.error({ error });
@@ -72,7 +72,7 @@ export async function dbGetTaskGroupUsers(taskGroupId: number) {
       .select({ userId: userTable.id })
       .from(taskGroupUserTable)
       .innerJoin(userTable, eq(taskGroupUserTable.userId, userTable.id))
-      .where(eq(taskGroupTable.id, taskGroupId));
+      .where(eq(taskGroupUserTable.taskGroupId, taskGroupId));
 
     return taskGroupUsers;
   } catch (error) {
