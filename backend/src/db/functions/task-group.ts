@@ -1,6 +1,6 @@
 import { CreateTaskGroup } from 'src/task-group.controller';
 import { db } from '..';
-import { taskGroupTable, userTaskGroupTable } from '../schema';
+import { taskGroupTable, taskGroupUserTable } from '../schema';
 
 export async function dbGetTaskGroups() {
   return await db.select().from(taskGroupTable);
@@ -26,7 +26,7 @@ export async function dbCreateTaskGroup({
 
     const { taskGroupId } = res[0];
 
-    await db.insert(userTaskGroupTable).values(
+    await db.insert(taskGroupUserTable).values(
       userIds.map((userId) => ({
         taskGroupId,
         userId,
