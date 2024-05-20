@@ -47,7 +47,7 @@ export async function getUsers() {
 
 async function updateAssignmentStatus(
   assignmentId: number,
-  state: AssignmentState
+  state: AssignmentState,
 ) {
   await fetchWrapper.post(`assignments/${assignmentId}/${state}`);
 }
@@ -55,7 +55,7 @@ async function updateAssignmentStatus(
 export function AssigmentsScreen() {
   const queryClient = useQueryClient();
   const { data: assignments, isLoading } = useQuery({
-    queryKey: ["todos"],
+    queryKey: ["assignments"],
     queryFn: getAssigments,
   });
   const { userId } = React.useContext(AuthContext);
@@ -76,7 +76,7 @@ export function AssigmentsScreen() {
       state: AssignmentState;
     }) => updateAssignmentStatus(assignmentId, state),
     onSuccess: () => {
-      queryClient.refetchQueries({ queryKey: ["todos"] });
+      queryClient.refetchQueries({ queryKey: ["assignments"] });
     },
   });
 
@@ -85,11 +85,11 @@ export function AssigmentsScreen() {
   }
 
   const sortedAssignments = assignments.sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
   );
 
   const filteredAssignments = sortedAssignments.filter(
-    (assignment) => assignment.assigneeId === selectedUserId
+    (assignment) => assignment.assigneeId === selectedUserId,
   );
 
   return (
@@ -126,7 +126,7 @@ export function AssigmentsScreen() {
                   assignmentId: item.id,
                   state: item.isCompleted ? "pending" : "completed",
                 });
-                queryClient.refetchQueries({ queryKey: ["todos"] });
+                queryClient.refetchQueries({ queryKey: ["assignments"] });
               }}
             />
           )}

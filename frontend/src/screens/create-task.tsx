@@ -117,6 +117,10 @@ export function CreateTaskScreen() {
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully created task" });
       resetForm({ ...defaultValues });
+      queryClient.refetchQueries({ queryKey: ["tasks"] });
+      queryClient.refetchQueries({ queryKey: ["assignments"] });
+      setSelectedUserIds([]);
+      setSelectedTaskGroupId(undefined);
     },
     onError: (err) => {
       console.error(err);
