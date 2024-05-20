@@ -55,10 +55,10 @@ export async function dbGetTaskGroupsToCreateForCurrentInterval() {
         taskGroupAssignmentTable,
         eq(taskGroupTable.id, taskGroupAssignmentTable.taskGroupId),
       )
-      .groupBy(taskGroupTable.id)
-      .having(
-        sql` MAX(${taskGroupAssignmentTable.createdAt}) < (NOW() - ${taskGroupTable.interval})`,
-      );
+      .groupBy(taskGroupTable.id);
+    // .having(
+    //   sql`MAX(${taskGroupAssignmentTable.createdAt}) < (NOW() - ${taskGroupTable.interval})`,
+    // );
     return taskGroupIdsToCreateAssignmentsFor;
   } catch (error) {
     console.error({ error });
