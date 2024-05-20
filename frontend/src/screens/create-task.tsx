@@ -125,7 +125,7 @@ export function CreateTaskScreen() {
     mutationKey: ["tasks"],
   });
 
-  const { data: taskGroups, isLoading: isTaskGrousLoading } = useQuery({
+  const { data: taskGroups, isLoading: isTaskGroupsLoading } = useQuery({
     queryKey: ["taskGroup"],
     queryFn: getTaskGroups,
   });
@@ -143,7 +143,7 @@ export function CreateTaskScreen() {
   }
 
   if (
-    isTaskGrousLoading ||
+    isTaskGroupsLoading ||
     taskGroups === undefined ||
     isUsersLoading ||
     users === undefined

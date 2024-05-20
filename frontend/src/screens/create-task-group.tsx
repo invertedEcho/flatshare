@@ -108,13 +108,6 @@ export function CreateTaskGroupScreen() {
     return <Loading message="Loading Users ..." />;
   }
 
-  const hydratedUsers = users.map((user) => {
-    return {
-      value: user.username,
-      id: user.id,
-    };
-  });
-
   return (
     <View className=" bg-slate-900 p-4   flex-1 justify-between">
       <View style={{ rowGap: 16 }}>

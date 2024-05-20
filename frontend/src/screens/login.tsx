@@ -24,9 +24,6 @@ async function login({ username, password }: LoginFormData) {
     username,
     password,
   });
-  if (!res.ok) {
-    throw new Error("Failed to log in");
-  }
   const json = await res.json();
   return json["access_token"];
 }
