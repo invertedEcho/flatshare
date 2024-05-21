@@ -66,6 +66,19 @@ export async function dbGetAssignmentsForTaskGroup(
   return await result.limit(limit);
 }
 
+export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
+  const currentAssignments = await db
+    .select()
+    .from(assignmentTable)
+    .innerJoin(taskTable, eq(taskTable.id, assignmentTable.taskId))
+    .innerJoin(taskGroupTable, eq(taskGroupTable.id, taskTable.taskGroupId))
+    .where(
+      sql`${assignmentTable.createdAt} >= NOW() - ${taskGroupTable.interval} AND ${taskGroupTable.id} = ${taskGroupId}`,
+    );
+
+  return currentAssignments;
+}
+
 export async function dbGetTasksToAssignForCurrentInterval() {
   try {
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period

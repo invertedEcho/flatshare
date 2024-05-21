@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { eq, sql } from 'drizzle-orm';
 import { db } from './db';
 import {
   dbGetAssignmentsForTaskGroup,
+  dbGetCurrentAssignmentsForTaskGroup,
   dbGetTasksToAssignForCurrentInterval,
 } from './db/functions/assignment';
 import { dbGetTaskGroupUsers } from './db/functions/task-group';
-import { assignmentTable, taskGroupTable, taskTable } from './db/schema';
+import { assignmentTable } from './db/schema';
 import { randomFromArray } from './utils/array';
 
 @Injectable()
@@ -57,14 +57,8 @@ async function getNextResponsibleUserId(
   taskGroupId: number,
   userIds: number[],
 ) {
-  const currentAssignments = await db
-    .select()
-    .from(assignmentTable)
-    .innerJoin(taskTable, eq(taskTable.id, assignmentTable.taskId))
-    .innerJoin(taskGroupTable, eq(taskGroupTable.id, taskTable.taskGroupId))
-    .where(
-      sql`${assignmentTable.createdAt} >= NOW() - ${taskGroupTable.interval} AND ${taskGroupTable.id} = ${taskGroupId}`,
-    );
+  const currentAssignments =
+    await dbGetCurrentAssignmentsForTaskGroup(taskGroupId);
 
   /* If there already are current assignments, return the userId of one of the current assignments
    (It doesn't matter which one, they should all be assigned to the same user) */
