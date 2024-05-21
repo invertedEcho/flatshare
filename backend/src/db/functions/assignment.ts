@@ -73,7 +73,7 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
     .innerJoin(taskTable, eq(taskTable.id, assignmentTable.taskId))
     .innerJoin(taskGroupTable, eq(taskGroupTable.id, taskTable.taskGroupId))
     .where(
-      sql`${assignmentTable.createdAt} >= NOW() - ${taskGroupTable.interval} AND ${taskGroupTable.id} = ${taskGroupId}`,
+      sql`${assignmentTable.createdAt}::date >= NOW()::date - ${taskGroupTable.interval} AND ${taskGroupTable.id} = ${taskGroupId}`,
     );
 
   return currentAssignments;
@@ -94,7 +94,7 @@ export async function dbGetTasksToAssignForCurrentInterval() {
       .having(
         or(
           eq(count(assignmentTable.id), 0),
-          sql`MAX(${assignmentTable.createdAt}) <= (NOW() - ${taskGroupTable.interval})`,
+          sql`MAX(${assignmentTable.createdAt})::date <= (NOW()::date - ${taskGroupTable.interval})`,
         ),
       );
 
