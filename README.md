@@ -1,6 +1,7 @@
 # wg-app WIP
 
 ## User flow
+
 https://excalidraw.com/#room=2a90cf068f4d87bce613,24I3dxykUBivS35QOdgTqw
 
 ## setup
@@ -59,3 +60,7 @@ The user flow should be the following
 - all tasks in the group will be assigned to the same user in one period
 
 This means we will remove the frequency column from the task table and add it to the task_group table.
+
+## How to build apk
+
+- `eas build --profile production --platform android --local`

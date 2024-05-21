@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import {
   Button,
@@ -67,6 +67,8 @@ export function CreateTaskGroupScreen() {
     queryFn: getUsers,
   });
 
+  const queryClient = useQueryClient();
+
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
@@ -88,6 +90,7 @@ export function CreateTaskGroupScreen() {
       resetForm({ ...defaultValues });
       setSelectedUserIds([]);
       setDate(new Date());
+      queryClient.refetchQueries({ queryKey: ["taskGroup"] });
     },
     onError: (err) => {
       console.error(err);
@@ -100,9 +103,6 @@ export function CreateTaskGroupScreen() {
     mutate({
       ...data,
     });
-
-    // TODO: refetch taskgroups
-    // queryClient.refetchQueries({ queryKey: ["tasks"] });
   }
 
   if (users === undefined || isLoading) {

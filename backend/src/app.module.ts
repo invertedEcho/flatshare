@@ -6,9 +6,11 @@ import { AuthController } from './auth/auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TaskGroupController } from './task-group.controller';
+import { ScheduleModule } from '@nestjs/schedule';
+import { AssignmentsModule } from './assignment.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, ScheduleModule.forRoot(), AssignmentsModule],
   controllers: [
     TasksController,
     AssignmentController,

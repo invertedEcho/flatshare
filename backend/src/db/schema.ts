@@ -38,7 +38,7 @@ export const taskGroupTable = pgTable('task_group', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-export const userTaskGroupTable = pgTable('user_task_group', {
+export const taskGroupUserTable = pgTable('task_group_user', {
   id: serial('id').primaryKey(),
   taskGroupId: integer('task_group_id')
     .references(() => taskGroupTable.id)
@@ -57,7 +57,7 @@ export const assignmentTable = pgTable('assignment', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
-  state: assigmentStateEnum('state').default('pending'),
+  state: assigmentStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
