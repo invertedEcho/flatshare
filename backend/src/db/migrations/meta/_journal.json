@@ -43,6 +43,13 @@
       "when": 1716209687796,
       "tag": "0005_new_ultimatum",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1716234766177,
+      "tag": "0006_tough_pandemic",
+      "breakpoints": true
     }
   ]
 }

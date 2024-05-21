@@ -38,17 +38,6 @@ export const taskGroupTable = pgTable('task_group', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-export const taskGroupAssignmentTable = pgTable('task_group_assignment', {
-  id: serial('id').primaryKey(),
-  taskGroupId: integer('task_group_id')
-    .references(() => taskGroupTable.id)
-    .notNull(),
-  userId: integer('user_id')
-    .references(() => userTable.id)
-    .notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
-
 export const taskGroupUserTable = pgTable('task_group_user', {
   id: serial('id').primaryKey(),
   taskGroupId: integer('task_group_id')
