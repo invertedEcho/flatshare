@@ -47,7 +47,7 @@ export async function getUsers() {
 
 async function updateAssignmentStatus(
   assignmentId: number,
-  state: AssignmentState,
+  state: AssignmentState
 ) {
   await fetchWrapper.post(`assignments/${assignmentId}/${state}`);
 }
@@ -85,11 +85,11 @@ export function AssigmentsScreen() {
   }
 
   const sortedAssignments = assignments.sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
   );
 
   const filteredAssignments = sortedAssignments.filter(
-    (assignment) => assignment.assigneeId === selectedUserId,
+    (assignment) => assignment.assigneeId === selectedUserId
   );
 
   return (
