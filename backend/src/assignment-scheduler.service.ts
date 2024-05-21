@@ -12,7 +12,7 @@ import { randomFromArray } from './utils/array';
 
 @Injectable()
 export class AssignmentSchedulerService {
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
