@@ -23,24 +23,23 @@ export class AssignmentSchedulerService {
     );
 
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
-      Record<string, number[]>
+      Map<number, number[]>
     >((acc, curr) => {
-      if (!acc[curr.taskGroupId]) {
-        acc[curr.taskGroupId] = [];
+      if (!acc.get(curr.taskGroupId)) {
+        acc.set(curr.taskGroupId, []);
       }
-      acc[curr.taskGroupId].push(curr.taskId);
+      acc.get(curr.taskGroupId)?.push(curr.taskId);
       return acc;
-    }, {});
+    }, new Map());
 
-    for (const [taskGroupId, taskIds] of Object.entries(tasksByGroup)) {
-      // FIXME: ugly type conversion, maybe use a map
-      const userIds = await dbGetTaskGroupUsers(Number(taskGroupId));
+    for (const [taskGroupId, taskIds] of tasksByGroup) {
+      const userIds = await dbGetTaskGroupUsers(taskGroupId);
       if (userIds.length === 0) {
         continue;
       }
 
       const nextResponsibleUserId = await getNextResponsibleUserId(
-        Number(taskGroupId),
+        taskGroupId,
         userIds.map(({ userId }) => userId),
       );
 
@@ -70,18 +69,16 @@ async function getNextResponsibleUserId(
     taskGroupId,
     userIds.length,
   );
-
   const userIdsWithoutAnyAssignments = userIds.filter(
     (userId) =>
       !lastAssignments.some(({ assignment }) => assignment.userId === userId),
   );
 
-  let nextResponsibleUserId: number;
+  /* If all users were already assigned the task, the next responsible user is the one who was assigned the task the longest ago.
+    Otherwise it is randomly chosen from the users that were not assigned the task yet */
   if (userIdsWithoutAnyAssignments.length === 0) {
-    nextResponsibleUserId =
-      lastAssignments[lastAssignments.length - 1].assignment.userId;
+    return lastAssignments[lastAssignments.length - 1].assignment.userId;
   } else {
-    nextResponsibleUserId = randomFromArray(userIdsWithoutAnyAssignments);
+    return randomFromArray(userIdsWithoutAnyAssignments);
   }
-  return nextResponsibleUserId;
 }
