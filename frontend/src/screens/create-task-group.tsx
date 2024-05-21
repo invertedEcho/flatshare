@@ -90,7 +90,7 @@ export function CreateTaskGroupScreen() {
       resetForm({ ...defaultValues });
       setSelectedUserIds([]);
       setDate(new Date());
-      queryClient.refetchQueries({ queryKey: ["taskGroup"] });
+      queryClient.refetchQueries({ queryKey: [queryKeys.taskGroups] });
     },
     onError: (err) => {
       console.error(err);
