@@ -1,3 +1,4 @@
+import { count, desc, eq, or, sql } from 'drizzle-orm';
 import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
@@ -7,7 +8,6 @@ import {
   taskTable,
   userTable,
 } from '../schema';
-import { count, desc, eq, or, sql } from 'drizzle-orm';
 
 export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
   try {
@@ -90,6 +90,7 @@ export async function dbGetTasksToAssignForCurrentInterval() {
       .from(taskGroupTable)
       .innerJoin(taskTable, eq(taskGroupTable.id, taskTable.taskGroupId))
       .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
+      .where(sql`${taskGroupTable.initialStartDate}::date <= NOW()::date`)
       .groupBy(taskGroupTable.id, taskTable.id)
       .having(
         or(
