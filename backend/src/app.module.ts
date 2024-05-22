@@ -8,9 +8,22 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TaskGroupController } from './task-group.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AssignmentsModule } from './assignment.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
+
+const rootPathStatic = join(__dirname, '../../src/client/public/');
 
 @Module({
-  imports: [AuthModule, ScheduleModule.forRoot(), AssignmentsModule],
+  imports: [
+    AuthModule,
+    ScheduleModule.forRoot(),
+    AssignmentsModule,
+    ServeStaticModule.forRoot({
+      rootPath: rootPathStatic,
+      // TODO: What exactly does this?
+      exclude: ['/api/(.*)'],
+    }),
+  ],
   controllers: [
     TasksController,
     AssignmentController,

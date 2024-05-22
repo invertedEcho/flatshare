@@ -8,6 +8,7 @@ import { LoginScreen } from "./src/screens/login";
 import { AuthContext } from "./src/auth-context";
 import { Pressable } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
+import * as Linking from "expo-linking";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -54,12 +55,19 @@ function getIconName(
   }
 }
 
+const prefix = Linking.createURL("/");
+
 const queryClient = new QueryClient();
 
 export default function App() {
   const [isAuthorized, setIsAuthorized] = React.useState(false);
   const [userId, setUserId] = React.useState<number>();
 
+  const linking = {
+    prefixes: [prefix],
+  };
+
+  // TODO: We should investigate on how to properly auth in react native
   React.useEffect(() => {
     (async () => {
       const jwtMaybe = await StorageWrapper.getItem("jwt-token");
@@ -82,7 +90,7 @@ export default function App() {
     <AuthContext.Provider value={{ isAuthorized, setIsAuthorized, userId }}>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <NavigationContainer>
+          <NavigationContainer linking={linking}>
             <BottomTabNavigator.Navigator
               initialRouteName="CreateTaskGroup"
               screenOptions={({ route }) => ({

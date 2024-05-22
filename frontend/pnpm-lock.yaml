@@ -35,6 +35,9 @@ dependencies:
   expo-dev-client:
     specifier: ~4.0.14
     version: 4.0.14(expo@51.0.8)
+  expo-linking:
+    specifier: ~6.3.1
+    version: 6.3.1(expo@51.0.8)
   expo-secure-store:
     specifier: ~13.0.1
     version: 13.0.1(expo@51.0.8)
@@ -4332,7 +4335,7 @@ packages:
     peerDependencies:
       expo: '*'
     dependencies:
-      '@expo/config': 9.0.1
+      '@expo/config': 9.0.2
       expo: 51.0.8(@babel/core@7.24.4)(@babel/preset-env@7.24.4)
     transitivePeerDependencies:
       - supports-color
@@ -4413,6 +4416,16 @@ packages:
       expo: '*'
     dependencies:
       expo: 51.0.8(@babel/core@7.24.4)(@babel/preset-env@7.24.4)
+    dev: false
+
+  /expo-linking@6.3.1(expo@51.0.8):
+    resolution: {integrity: sha512-xuZCntSBGWCD/95iZ+mTUGTwHdy8Sx+immCqbUBxdvZ2TN61P02kKg7SaLS8A4a/hLrSCwrg5tMMwu5wfKr35g==}
+    dependencies:
+      expo-constants: 16.0.1(expo@51.0.8)
+      invariant: 2.2.4
+    transitivePeerDependencies:
+      - expo
+      - supports-color
     dev: false
 
   /expo-manifests@0.14.2(expo@51.0.8):
