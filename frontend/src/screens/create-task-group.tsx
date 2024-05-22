@@ -20,6 +20,7 @@ import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
 import UserMultiSelect from "../components/user-multi-select";
 import { queryKeys } from "../utils/queryKeys";
+import { setTimeToZero, addDays } from "../utils/date";
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
@@ -56,6 +57,7 @@ export function CreateTaskGroupScreen() {
     handleSubmit,
     formState: { errors },
     reset: resetForm,
+    watch,
   } = useForm<CreateTaskGroup>({
     defaultValues,
     resolver: zodResolver(createTaskGroupSchema),
@@ -71,6 +73,8 @@ export function CreateTaskGroupScreen() {
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [showDatePicker, setShowDatePicker] = React.useState(false);
+
+  const intervalDays = watch("intervalDays");
 
   const { mutate } = useMutation({
     mutationFn: ({ ...args }: CreateTaskGroup) =>
@@ -183,20 +187,16 @@ export function CreateTaskGroupScreen() {
           {Platform.select({
             ios: (
               <RNDateTimePicker
-                value={date ? date : new Date(new Date().setHours(0, 0, 0, 0))}
+                value={date ? date : setTimeToZero(new Date())}
                 onChange={(e, date) => {
-                  setDate(
-                    new Date(
-                      date?.setHours(0, 0, 0, 0) ??
-                        new Date(new Date().setHours(0, 0, 0, 0))
-                    )
-                  );
+                  setDate(setTimeToZero(date ?? new Date()));
                   setShowDatePicker(false);
                 }}
                 accentColor="lightblue"
                 mode="date"
                 themeVariant="dark"
                 timeZoneName="Europe/Berlin"
+                minimumDate={addDays(new Date(), -(Number(intervalDays) - 1))}
               />
             ),
             android: (
@@ -211,26 +211,24 @@ export function CreateTaskGroupScreen() {
                 </Pressable>
                 {showDatePicker && (
                   <RNDateTimePicker
-                    value={
-                      date ? date : new Date(new Date().setHours(0, 0, 0, 0))
-                    }
+                    value={date ? date : setTimeToZero(new Date())}
                     onChange={(e, date) => {
-                      setDate(
-                        new Date(
-                          date?.setHours(0, 0, 0, 0) ??
-                            new Date(new Date().setHours(0, 0, 0, 0))
-                        )
-                      );
+                      setDate(setTimeToZero(date ?? new Date()));
                       setShowDatePicker(false);
                     }}
                     accentColor="lightblue"
                     mode="date"
                     themeVariant="dark"
+                    minimumDate={addDays(
+                      new Date(),
+                      -(Number(intervalDays) - 1)
+                    )}
                   />
                 )}
               </>
             ),
             web: (
+              // TODO: add mindate
               <WebDateTimerPicker
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setDate(
