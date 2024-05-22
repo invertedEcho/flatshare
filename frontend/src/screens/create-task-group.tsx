@@ -20,7 +20,6 @@ import { fetchWrapper } from "../utils/fetchWrapper";
 import { getUsers } from "./assignments";
 import UserMultiSelect from "../components/user-multi-select";
 import { queryKeys } from "../utils/queryKeys";
-
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
@@ -184,15 +183,20 @@ export function CreateTaskGroupScreen() {
           {Platform.select({
             ios: (
               <RNDateTimePicker
-                value={date ? new Date(date) : new Date()}
+                value={date ? date : new Date(new Date().setHours(0, 0, 0, 0))}
                 onChange={(e, date) => {
-                  setDate(date);
+                  setDate(
+                    new Date(
+                      date?.setHours(0, 0, 0, 0) ??
+                        new Date(new Date().setHours(0, 0, 0, 0))
+                    )
+                  );
                   setShowDatePicker(false);
-                  console.debug("WTF");
                 }}
                 accentColor="lightblue"
                 mode="date"
                 themeVariant="dark"
+                timeZoneName="Europe/Berlin"
               />
             ),
             android: (
@@ -207,11 +211,17 @@ export function CreateTaskGroupScreen() {
                 </Pressable>
                 {showDatePicker && (
                   <RNDateTimePicker
-                    value={date ? new Date(date) : new Date()}
+                    value={
+                      date ? date : new Date(new Date().setHours(0, 0, 0, 0))
+                    }
                     onChange={(e, date) => {
-                      setDate(date);
+                      setDate(
+                        new Date(
+                          date?.setHours(0, 0, 0, 0) ??
+                            new Date(new Date().setHours(0, 0, 0, 0))
+                        )
+                      );
                       setShowDatePicker(false);
-                      console.debug("WTF");
                     }}
                     accentColor="lightblue"
                     mode="date"
@@ -223,7 +233,11 @@ export function CreateTaskGroupScreen() {
             web: (
               <WebDateTimerPicker
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setDate(new Date(e.currentTarget.value))
+                  setDate(
+                    new Date(
+                      new Date(e.currentTarget.value).setHours(0, 0, 0, 0)
+                    )
+                  )
                 }
                 value={
                   date?.toLocaleDateString("en-CA") ??
