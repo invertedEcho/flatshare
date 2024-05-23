@@ -71,7 +71,9 @@ export function CreateTaskGroupScreen() {
   const queryClient = useQueryClient();
 
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [date, setDate] = React.useState<Date | undefined>(
+    setTimeToZero(new Date())
+  );
   const [showDatePicker, setShowDatePicker] = React.useState(false);
 
   const intervalDays = watch("intervalDays");
