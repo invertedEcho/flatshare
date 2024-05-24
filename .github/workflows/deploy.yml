@@ -13,9 +13,9 @@ jobs:
     - name: update deployment
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
+        host: ${{ secrets.DEPLOY_SSH_HOST }}
+        username: ${{ secrets.DEPLOY_SSH_USERNAME }}
+        password: ${{ secrets.DEPLOY_SSH_PASSWORD }}
         port: ${{ secrets.PORT }}
         script: |
           export PATH=$PATH:~/.local/share/pnpm/
