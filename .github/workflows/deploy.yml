@@ -1,0 +1,25 @@
+name: update backend deployment
+on:
+  push:
+    branches:
+      - master
+
+# Let's do this via a docker container in the future, this is pretty ugly.
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: update deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.DEPLOY_SSH_HOST }}
+        username: ${{ secrets.DEPLOY_SSH_USERNAME }}
+        password: ${{ secrets.DEPLOY_SSH_PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: |
+          export PATH=$PATH:~/.local/share/pnpm/
+          cd ~/wg-app/backend
+          pnpm i
+          pnpm build
+          pnpm start:prod

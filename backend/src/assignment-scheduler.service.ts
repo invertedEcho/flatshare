@@ -16,11 +16,11 @@ export class AssignmentSchedulerService {
   async handleCron() {
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
-
-    console.debug(
-      'Running task scheduling cron job for',
-      tasksToCreateAssignmentsFor,
-    );
+    if (tasksToCreateAssignmentsFor.length >= 1) {
+      console.info(
+        `Creating new assignments for ${tasksToCreateAssignmentsFor}`,
+      );
+    }
 
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
       Map<
