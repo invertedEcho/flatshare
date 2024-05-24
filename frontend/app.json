@@ -8,9 +8,9 @@
     "name": "WG-Tasks",
     "slug": "frontend",
     "version": "1.0.0",
+    "scheme": "inverted-echo-wg-app",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
-    "userInterfaceStyle": "light",
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
@@ -35,8 +35,8 @@
 	  "data": [
 	    {
 	      "scheme": "https",
-	      "host": "*.myapp.io",
-	      "pathPrefix": "/records"
+	      "host": "wg.mainfraeme.com",
+	      "pathPrefix": "/invite"
 	    }
 	  ],
 	  "category": ["BROWSABLE", "DEFAULT"]
@@ -53,7 +53,6 @@
       "eas": {
         "projectId": "4c4ae101-99c9-4338-a54f-3a4c2b35d0fc"
       }
-    },
-    "scheme": "invertedEcho-wg-app"
+    }
   }
 }
