@@ -16,23 +16,31 @@ export class AssignmentSchedulerService {
   async handleCron() {
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
-
-    console.debug(
-      'Running task scheduling cron job for',
-      tasksToCreateAssignmentsFor,
-    );
+    if (tasksToCreateAssignmentsFor.length >= 1) {
+      console.info(
+        `Creating new assignments for ${tasksToCreateAssignmentsFor}`,
+      );
+    }
 
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
-      Map<number, number[]>
+      Map<
+        number,
+        {
+          taskId: number;
+          taskGroupId: number;
+          taskGroupInitialStartDate: Date;
+          isInFirstInterval: boolean;
+        }[]
+      >
     >((acc, curr) => {
       if (!acc.get(curr.taskGroupId)) {
         acc.set(curr.taskGroupId, []);
       }
-      acc.get(curr.taskGroupId)?.push(curr.taskId);
+      acc.get(curr.taskGroupId)?.push(curr);
       return acc;
     }, new Map());
 
-    for (const [taskGroupId, taskIds] of tasksByGroup) {
+    for (const [taskGroupId, tasks] of tasksByGroup) {
       const userIds = await dbGetTaskGroupUsers(taskGroupId);
       if (userIds.length === 0) {
         continue;
@@ -43,11 +51,17 @@ export class AssignmentSchedulerService {
         userIds.map(({ userId }) => userId),
       );
 
-      await db
-        .insert(assignmentTable)
-        .values(
-          taskIds.map((taskId) => ({ taskId, userId: nextResponsibleUserId })),
-        );
+      await db.insert(assignmentTable).values(
+        tasks.map(
+          ({ taskId, isInFirstInterval, taskGroupInitialStartDate }) => ({
+            taskId,
+            userId: nextResponsibleUserId,
+            createdAt: isInFirstInterval
+              ? taskGroupInitialStartDate
+              : new Date(new Date().setHours(0, 0, 0, 0)),
+          }),
+        ),
+      );
     }
   }
 }

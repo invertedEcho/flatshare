@@ -32,7 +32,7 @@ export class TasksController {
   @Get()
   async getAll(): Promise<SelectTask[]> {
     const tasks = await dbGetAllTasks();
-    console.log({ tasks });
+    // console.log({ tasks });
     return tasks;
   }
 
