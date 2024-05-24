@@ -112,16 +112,7 @@ export function AssigmentsScreen() {
 
   return (
     <SafeAreaView className="text-black flex-1 bg-slate-700">
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refreshAssignments}
-          />
-        }
-        className="p-4 w-full"
-        style={{ gap: 20 }}
-      >
+      <View className="p-4 w-full" style={{ gap: 20 }}>
         <View>
           <Text className="text-white" style={{ fontSize: 16 }}>
             From user
@@ -139,6 +130,12 @@ export function AssigmentsScreen() {
         </View>
         <StatusBar style="auto" />
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={refreshAssignments}
+            />
+          }
           contentContainerStyle={{ gap: 12 }}
           data={filteredAssignments}
           renderItem={({ item }) => (
@@ -160,7 +157,7 @@ export function AssigmentsScreen() {
             />
           )}
         />
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
