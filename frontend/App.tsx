@@ -6,7 +6,7 @@ import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
 import { AuthContext } from "./src/auth-context";
-import { Pressable } from "react-native";
+import { Pressable, Text } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
 import * as Linking from "expo-linking";
 
@@ -62,6 +62,7 @@ const queryClient = new QueryClient();
 export default function App() {
   const [isAuthorized, setIsAuthorized] = React.useState(false);
   const [userId, setUserId] = React.useState<number>();
+  const url = Linking.useURL();
 
   const linking = {
     prefixes: [prefix],
@@ -115,6 +116,7 @@ export default function App() {
                 headerRightContainerStyle: { marginRight: 20 },
               })}
             >
+              <Text>{url}</Text>
               {!isAuthorized && (
                 <>
                   <BottomTabNavigator.Screen
