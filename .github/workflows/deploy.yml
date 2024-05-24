@@ -4,7 +4,7 @@ on:
     branches:
       - master
 
-# Let's do this via a docker container in the future, this is pretty bad.
+# Let's do this via a docker container in the future, this is pretty ugly.
 jobs:
   build:
     name: Build
@@ -17,4 +17,9 @@ jobs:
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
-        script: fuser -k 3000/tcp & cd wg-app/backend && ~/.local/share/pnpm/pnpm i && ~/.local/share/pnpm/pnpm build && ~/.local/share/pnpm/pnpm start:prod
+        script: |
+          export PATH=$PATH:~/.local/share/pnpm/
+          cd ~/wg-app/backend
+          pnpm i
+          pnpm build
+          pnpm start:prod
