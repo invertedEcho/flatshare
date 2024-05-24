@@ -1,25 +1,19 @@
 import * as React from "react";
 
-import {
-  Pressable,
-  SafeAreaView,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Toast from "react-native-toast-message";
-import { fetchWrapper } from "../utils/fetchWrapper";
+import { useForm } from "react-hook-form";
+import { Pressable, Switch, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
+import Toast from "react-native-toast-message";
+import { z } from "zod";
+import FormTextInput from "../components/form-text-input";
+import Loading from "../components/loading";
 import { dropdownStyles } from "../components/user-dropdown";
 import UserMultiSelect from "../components/user-multi-select";
-import { getUsers } from "./assignments";
-import Loading from "../components/loading";
+import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
+import { getUsers } from "./assignments";
 
 const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -86,7 +80,7 @@ export function CreateTaskScreen() {
   >(undefined);
 
   const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
-    "recurring",
+    "recurring"
   );
   const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
 
@@ -161,66 +155,33 @@ export function CreateTaskScreen() {
     taskType === "non-recurring" && selectedUserIds.length === 0;
 
   return (
-    <SafeAreaView className="bg-slate-700 flex p-4 h-full">
-      <View className="p-4 w-full bg-slate-900 rounded-lg h-full">
-        <Text className="text-white">Title *</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder="Enter a title"
-              placeholderTextColor="white"
-              style={{ color: "white" }}
-              onChangeText={onChange}
-              value={value}
-              className="p-4 text-white"
-            />
-          )}
+    <View className=" bg-slate-900 p-4 flex-1 justify-between">
+      <View style={{ rowGap: 16 }}>
+        <FormTextInput
           name="title"
-        />
-        {errors.title && (
-          <Text className="text-red-300">Title is required</Text>
-        )}
-        <Text className="text-white">Description</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
+          labelText="Title"
+          textInputProps={{
+            placeholder: "Enter a title",
           }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={{
-                color: "white",
-              }}
-              placeholderTextColor="white"
-              placeholder="Enter a description"
-              onChangeText={onChange}
-              value={value}
-              className="p-4 text-white"
-            />
-          )}
-          name="description"
+          control={control}
+          errors={errors}
+          rules={{ required: true }}
         />
-        {errors.description && (
-          <Text className="text-red-300">Description is required</Text>
-        )}
-        <Text className="text-white">Options:</Text>
-        <View className="flex flex-row items-center">
-          <Text
-            className={
-              taskType === "recurring" ? "text-gray-500" : "text-white"
-            }
-          >
-            One-off task
-          </Text>
+        <FormTextInput
+          name="description"
+          labelText="Description"
+          textInputProps={{
+            placeholder: "Enter a description",
+          }}
+          control={control}
+          errors={errors}
+        />
+        <View className="flex flex-row items-center gap-2">
           <Switch
             value={taskType === "recurring"}
             onValueChange={() =>
               setTaskType(
-                taskType === "recurring" ? "non-recurring" : "recurring",
+                taskType === "recurring" ? "non-recurring" : "recurring"
               )
             }
           />
@@ -233,7 +194,8 @@ export function CreateTaskScreen() {
           </Text>
         </View>
         {taskType === "recurring" ? (
-          <>
+          <View>
+            <Text className="text-white mb-2">Select Task group</Text>
             <Dropdown
               data={taskGroups}
               disable={noTaskGroupExist}
@@ -242,6 +204,7 @@ export function CreateTaskScreen() {
               onChange={(item) => setSelectedTaskGroupId(item.id)}
               style={dropdownStyles.dropdown}
               placeholderStyle={dropdownStyles.placeholderStyle}
+              containerStyle={dropdownStyles.container}
               selectedTextStyle={dropdownStyles.selectedTextStyle}
               inputSearchStyle={dropdownStyles.inputSearchStyle}
               iconStyle={dropdownStyles.iconStyle}
@@ -253,7 +216,7 @@ export function CreateTaskScreen() {
                 task group first in order to assign tasks to it.
               </Text>
             )}
-          </>
+          </View>
         ) : (
           <UserMultiSelect
             users={users}
@@ -262,19 +225,20 @@ export function CreateTaskScreen() {
             header="Select users"
           />
         )}
-        <Pressable
-          // TODO: nativewind won't work here for some odd reason
-          style={{
-            backgroundColor: disableSubmit ? "gray" : "white",
-            padding: 10,
-            borderRadius: 5,
-          }}
-          onPress={handleSubmit(onSubmit)}
-          disabled={disableSubmit}
-        >
-          <Text className="text-center font-bold">Submit</Text>
-        </Pressable>
       </View>
-    </SafeAreaView>
+      <Pressable
+        // TODO: nativewind won't work here for some odd reason
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+          paddingHorizontal: 24,
+          paddingVertical: 12,
+          borderRadius: 5,
+        })}
+        onPress={handleSubmit(onSubmit)}
+        disabled={disableSubmit}
+      >
+        <Text className="font-bold text-center ">Submit</Text>
+      </Pressable>
+    </View>
   );
 }
