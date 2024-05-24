@@ -22,7 +22,6 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
         iconStyle={dropdownStyles.iconStyle}
         containerStyle={dropdownStyles.container}
         data={data}
-        search
         maxHeight={300}
         labelField="label"
         valueField="value"
