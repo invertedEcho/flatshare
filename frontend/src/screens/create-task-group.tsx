@@ -3,24 +3,18 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
-import {
-  Button,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { useForm } from "react-hook-form";
+import { Platform, Pressable, Text, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
+import FormTextInput from "../components/form-text-input";
 import Loading from "../components/loading";
-import WebDateTimerPicker from "../components/web-date-picker";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { getUsers } from "./assignments";
 import UserMultiSelect from "../components/user-multi-select";
+import WebDateTimerPicker from "../components/web-date-picker";
+import { addDays, setTimeToZero } from "../utils/date";
+import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
-import { setTimeToZero, addDays } from "../utils/date";
+import { getUsers } from "./assignments";
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
@@ -117,64 +111,32 @@ export function CreateTaskGroupScreen() {
   return (
     <View className=" bg-slate-900 p-4   flex-1 justify-between">
       <View style={{ rowGap: 16 }}>
-        <View>
-          <Text className="text-white mb-2">Title *</Text>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder="Enter a title"
-                onChangeText={onChange}
-                value={value}
-                className="p-4 rounded-lg bg-white mb-2"
-              />
-            )}
-            name="title"
-          />
-          {errors.title && (
-            <Text className="text-red-300">Title is required</Text>
-          )}
-        </View>
-        <View>
-          <Text className="text-white mb-2">Description</Text>
-          <Controller
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                placeholder="Enter a description"
-                onChangeText={onChange}
-                value={value}
-                className="p-4 rounded-lg bg-white"
-              />
-            )}
-            name="description"
-          />
-        </View>
-        <View>
-          <Text className="text-white mb-2">Interval days</Text>
-          <Controller
-            control={control}
-            rules={{
-              required: true,
-            }}
-            render={({ field: { onChange, value } }) => (
-              <TextInput
-                onChangeText={onChange}
-                value={value}
-                className="p-2 rounded-lg bg-white mb-2"
-                keyboardType="numeric"
-                returnKeyType="done"
-              />
-            )}
-            name="intervalDays"
-          />
-          {errors.intervalDays && (
-            <Text className="text-red-300">Interval is required</Text>
-          )}
-        </View>
+        <FormTextInput
+          name="title"
+          labelText="Title"
+          textInputProps={{
+            placeholder: "Enter a title",
+          }}
+          control={control}
+          errors={errors}
+          rules={{ required: true }}
+        />
+        <FormTextInput
+          name="description"
+          labelText="Description"
+          textInputProps={{
+            placeholder: "Enter a description",
+          }}
+          control={control}
+          errors={errors}
+        />
+        <FormTextInput
+          control={control}
+          errors={errors}
+          name="intervalDays"
+          labelText="Description"
+          textInputProps={{ keyboardType: "numeric", returnKeyType: "done" }}
+        />
         <UserMultiSelect
           users={users}
           selectedUserIds={selectedUserIds}
