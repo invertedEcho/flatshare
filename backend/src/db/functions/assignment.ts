@@ -26,6 +26,7 @@ export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
         assigneeName: query.user.email,
         isCompleted: query.assignment.state === 'completed',
         createdAt: query.assignment.createdAt,
+        isOneOff: !query.task.taskGroupId,
       } satisfies AssignmentResponse;
     });
   } catch (error) {

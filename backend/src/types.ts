@@ -8,4 +8,5 @@ export type AssignmentResponse = {
   assigneeName: string;
   isCompleted: boolean;
   createdAt: Date;
+  isOneOff: boolean;
 };
