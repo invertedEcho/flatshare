@@ -1,6 +1,6 @@
 import Animated, { FadeIn } from "react-native-reanimated";
 
-import React, { useEffect } from "react";
+import React from "react";
 
 function SlideView({
   children,
