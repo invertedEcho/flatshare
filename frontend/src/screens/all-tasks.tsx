@@ -49,7 +49,7 @@ export default function AllTasksScreen() {
   }
 
   return (
-    <AnimatedView key="tasksall">
+    <AnimatedView>
       <SafeAreaView className="text-black flex-1 items-center bg-slate-900">
         <ScrollView
           refreshControl={

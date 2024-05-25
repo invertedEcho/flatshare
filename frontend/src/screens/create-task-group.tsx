@@ -110,7 +110,7 @@ export function CreateTaskGroupScreen() {
   }
 
   return (
-    <AnimatedView key="group">
+    <AnimatedView>
       <View className=" bg-slate-900 p-4   flex-1 justify-between">
         <View style={{ rowGap: 16 }}>
           <FormTextInput

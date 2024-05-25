@@ -156,7 +156,7 @@ export function CreateTaskScreen() {
     taskType === "non-recurring" && selectedUserIds.length === 0;
 
   return (
-    <AnimatedView key="tasks">
+    <AnimatedView>
       <View className=" bg-slate-900 p-4 flex-1 justify-between">
         <View style={{ rowGap: 16 }}>
           <FormTextInput

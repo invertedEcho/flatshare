@@ -1,16 +1,13 @@
-import Animated, { FadeIn } from "react-native-reanimated";
+import Animated, { FadeIn, SlideInLeft } from "react-native-reanimated";
 
 import React from "react";
 
-function SlideView({
-  children,
-  key,
-}: {
-  children: React.ReactNode;
-  key: string;
-}) {
+function SlideView({ children }: { children: React.ReactNode }) {
   return (
-    <Animated.View entering={FadeIn.duration(400)} style={{ height: "100%" }}>
+    <Animated.View
+      entering={SlideInLeft.duration(400)}
+      style={{ height: "100%" }}
+    >
       {children}
     </Animated.View>
   );

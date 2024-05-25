@@ -112,7 +112,7 @@ export function AssigmentsScreen() {
   }
 
   return (
-    <AnimatedView key="assignments">
+    <AnimatedView>
       <SafeAreaView className="text-black flex-1 bg-slate-900">
         <View className="p-4 w-full" style={{ gap: 20 }}>
           <View>
