@@ -186,6 +186,7 @@ export function CreateTaskScreen() {
                   taskType === "recurring" ? "non-recurring" : "recurring"
                 )
               }
+              trackColor={{ true: "#24a0ed" }}
             />
             <Text
               className={
