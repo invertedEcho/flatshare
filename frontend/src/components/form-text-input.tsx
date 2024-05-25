@@ -45,7 +45,9 @@ function FormTextInput<T extends FieldValues>({
         )}
         name={name}
       />
-      {errors[name] && <Text className="text-red-300">Title is required</Text>}
+      {errors[name] && (
+        <Text className="text-red-300">{labelText} is required</Text>
+      )}
     </View>
   );
 }
