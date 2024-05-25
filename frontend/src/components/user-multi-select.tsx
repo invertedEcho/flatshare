@@ -2,16 +2,28 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { MultiSelect } from "react-native-element-dropdown";
 import { Ionicons } from "@expo/vector-icons";
+import { dropdownStyles } from "./user-dropdown";
 
 type MultiSelectItemProps = {
   username: string;
 };
 
-function MultiSelectItem({ username }: MultiSelectItemProps) {
+function MultiSelectItem(
+  { username }: MultiSelectItemProps,
+  selected?: boolean
+) {
+  console.debug({ selected });
   return (
     <View style={styles.item}>
-      <Text style={styles.selectedTextStyle}>{username}</Text>
-      <Ionicons style={styles.icon} color="black" name="person" size={20} />
+      <Text style={selected ? styles.selectedTextStyle : styles.itemTextStyle}>
+        {username}
+      </Text>
+      <Ionicons
+        style={styles.icon}
+        color={selected ? "#24a0ed" : "black"}
+        name="person"
+        size={20}
+      />
     </View>
   );
 }
@@ -30,12 +42,12 @@ export default function UserMultiSelect({
   header,
 }: MultiSelectProps) {
   return (
-    <View className="py-2">
+    <View>
       <Text className="text-white mb-2">{header}</Text>
       <MultiSelect
         style={styles.dropdown}
+        containerStyle={dropdownStyles.container}
         placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
         data={users}
@@ -43,9 +55,7 @@ export default function UserMultiSelect({
         valueField="id"
         placeholder="Select item"
         value={selectedUserIds}
-        activeColor="#9bd4e4"
-        search
-        searchPlaceholder="Search..."
+        activeColor="white"
         onChange={(userIds) => {
           setSelectedUserIds(userIds);
         }}
@@ -56,8 +66,8 @@ export default function UserMultiSelect({
         renderSelectedItem={(item, unSelect) => (
           <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
             <View style={styles.selectedStyle}>
-              <Text style={styles.textSelectedStyle}>{item.username}</Text>
-              <Ionicons color="black" name="trash-bin-outline" size={17} />
+              <Text style={{ fontSize: 12 }}>{item.username}</Text>
+              <Ionicons color="#ff3333" name="trash-outline" size={17} />
             </View>
           </TouchableOpacity>
         )}
@@ -86,8 +96,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   selectedTextStyle: {
-    fontSize: 14,
+    fontWeight: "bold",
   },
+  itemTextStyle: {
+    fontWeight: "normal",
+  },
+
   iconStyle: {
     width: 20,
     height: 20,
@@ -109,7 +123,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 14,
+    borderRadius: 8,
     backgroundColor: "white",
     shadowColor: "#000",
     marginTop: 8,
@@ -122,11 +136,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-
     elevation: 2,
-  },
-  textSelectedStyle: {
-    marginRight: 5,
-    fontSize: 16,
+    gap: 4,
   },
 });

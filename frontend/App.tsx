@@ -26,7 +26,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
 import AllTasksScreen from "./src/screens/all-tasks";
-import { NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { CreateTaskGroupScreen } from "./src/screens/create-task-group";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -36,7 +36,7 @@ type IconGlyph = keyof typeof Ionicons.glyphMap;
 
 function getIconName(
   routeName: string,
-  focused: boolean,
+  focused: boolean
 ): IconGlyph | undefined {
   switch (routeName) {
     case "MyAssignments":
@@ -82,7 +82,12 @@ export default function App() {
     <AuthContext.Provider value={{ isAuthorized, setIsAuthorized, userId }}>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <NavigationContainer>
+          <NavigationContainer
+            theme={{
+              ...DefaultTheme,
+              colors: { ...DefaultTheme.colors, background: "#0F172A" },
+            }}
+          >
             <BottomTabNavigator.Navigator
               initialRouteName="CreateTaskGroup"
               screenOptions={({ route }) => ({
@@ -90,7 +95,7 @@ export default function App() {
                   const iconName = getIconName(route.name, focused);
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: "tomato",
+                tabBarActiveTintColor: "#3aaaef",
                 tabBarInactiveTintColor: "gray",
                 headerRight: () => (
                   <>
@@ -105,6 +110,7 @@ export default function App() {
                   </>
                 ),
                 headerRightContainerStyle: { marginRight: 20 },
+                unmountOnBlur: true,
               })}
             >
               {!isAuthorized && (

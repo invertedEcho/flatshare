@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from "react-native";
+import React from "react";
+import { Animated, Pressable, Text, View } from "react-native";
 
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
@@ -20,32 +21,57 @@ export function AssignmentItem({
   disabled = false,
   onPress,
 }: ListItemProps) {
+  const [isPressed, setIsPressed] = React.useState(false);
+
+  const scaleAnim = React.useRef(new Animated.Value(1)).current;
+
+  const scaleIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.95,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const scaleOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <View className="p-2 bg-slate-900 flex-row justify-between items-start rounded-lg">
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <Pressable
-        className="bg-slate-900 flex-col items-start rounded-lg"
+        className={`p-2 bg-white justify-between items-center rounded-lg flex flex-row`}
         onPress={() => onPress(id)}
+        onPressIn={scaleIn}
+        onPressOut={scaleOut}
         disabled={disabled}
       >
-        <Text
-          className={`font-semibold text-lg text-gray-200 ${
-            isCompleted && "line-through"
-          }`}
-        >
-          {title}
-        </Text>
-        <Text className="text-gray-100 text-lg">{description}</Text>
+        <View>
+          <Text
+            className={`font-semibold text-slate-900 text-lg ${
+              isCompleted && "line-through"
+            }`}
+          >
+            {title}
+          </Text>
+          <Text className="text-slate-500 text-lg">{description}</Text>
+        </View>
+        <BouncyCheckbox
+          size={25}
+          unFillColor="#FFFFFF"
+          fillColor="#7cc6f4"
+          iconStyle={{ borderColor: "black" }}
+          innerIconStyle={{ borderWidth: 2 }}
+          isChecked={isCompleted}
+          disabled={disabled}
+          onPress={() => onPress(id)}
+          className="justify-center"
+        />
       </Pressable>
-      <BouncyCheckbox
-        size={25}
-        unFillColor="#FFFFFF"
-        iconStyle={{ borderColor: "black" }}
-        innerIconStyle={{ borderWidth: 2 }}
-        isChecked={isCompleted}
-        disabled={disabled}
-        onPress={() => onPress(id)}
-        className="justify-center"
-      />
-    </View>
+    </Animated.View>
   );
 }
