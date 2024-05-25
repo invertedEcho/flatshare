@@ -9,11 +9,6 @@ function SlideView({
   children: React.ReactNode;
   key: string;
 }) {
-  useEffect(() => {
-    return () => {
-      console.log("SlideView unmounted");
-    };
-  }, []);
   return (
     <Animated.View entering={FadeIn.duration(400)} style={{ height: "100%" }}>
       {children}

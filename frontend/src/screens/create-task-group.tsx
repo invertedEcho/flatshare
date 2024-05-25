@@ -145,8 +145,6 @@ export function CreateTaskGroupScreen() {
             setSelectedUserIds={setSelectedUserIds}
             header="Select Users"
           />
-          {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db
-          Probably some timezone issues, investigate how to do this correctly */}
           <View className=" items-start">
             <Text className="text-white mb-2">Select initial start date</Text>
             {Platform.select({
