@@ -110,7 +110,8 @@ export default function App() {
                   </>
                 ),
                 headerRightContainerStyle: { marginRight: 20 },
-                unmountOnBlur: true,
+                // This causes layout shift on android, but the screen transition animation depends on it
+                // unmountOnBlur: true,
               })}
             >
               {!isAuthorized && (
