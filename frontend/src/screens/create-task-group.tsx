@@ -15,6 +15,7 @@ import { addDays, setTimeToZero } from "../utils/date";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
 import { getUsers } from "./assignments";
+import AnimatedView from "../components/animated-view";
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
@@ -109,119 +110,120 @@ export function CreateTaskGroupScreen() {
   }
 
   return (
-    <View className=" bg-slate-900 p-4   flex-1 justify-between">
-      <View style={{ rowGap: 16 }}>
-        <FormTextInput
-          name="title"
-          labelText="Title"
-          textInputProps={{
-            placeholder: "Enter a title",
-          }}
-          control={control}
-          errors={errors}
-          rules={{ required: true }}
-        />
-        <FormTextInput
-          name="description"
-          labelText="Description"
-          textInputProps={{
-            placeholder: "Enter a description",
-          }}
-          control={control}
-          errors={errors}
-        />
-        <FormTextInput
-          control={control}
-          errors={errors}
-          name="intervalDays"
-          labelText="Description"
-          textInputProps={{ keyboardType: "numeric", returnKeyType: "done" }}
-        />
-        <UserMultiSelect
-          users={users}
-          selectedUserIds={selectedUserIds}
-          setSelectedUserIds={setSelectedUserIds}
-          header="Select Users"
-        />
-        {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db 
-        Probably some timezone issues, investigate how to do this correctly */}
-        <View className=" items-start">
-          <Text className="text-white mb-2">Select initial start date</Text>
-
-          {Platform.select({
-            ios: (
-              <RNDateTimePicker
-                value={date ? date : setTimeToZero(new Date())}
-                onChange={(e, date) => {
-                  setDate(setTimeToZero(date ?? new Date()));
-                  setShowDatePicker(false);
-                }}
-                accentColor="lightblue"
-                mode="date"
-                themeVariant="dark"
-                timeZoneName="Europe/Berlin"
-                minimumDate={addDays(new Date(), -(Number(intervalDays) - 1))}
-              />
-            ),
-            android: (
-              <>
-                <Pressable
-                  onPress={() => setShowDatePicker(true)}
-                  className="bg-slate-700 p-2 rounded-lg"
-                >
-                  <Text className="text-xl text-white">
-                    {date?.toLocaleDateString("de-DE")}
-                  </Text>
-                </Pressable>
-                {showDatePicker && (
-                  <RNDateTimePicker
-                    value={date ? date : setTimeToZero(new Date())}
-                    onChange={(e, date) => {
-                      setDate(setTimeToZero(date ?? new Date()));
-                      setShowDatePicker(false);
-                    }}
-                    accentColor="lightblue"
-                    mode="date"
-                    themeVariant="dark"
-                    minimumDate={addDays(
-                      new Date(),
-                      -(Number(intervalDays) - 1)
-                    )}
-                  />
-                )}
-              </>
-            ),
-            web: (
-              // TODO: add mindate
-              <WebDateTimerPicker
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setDate(
-                    new Date(
-                      new Date(e.currentTarget.value).setHours(0, 0, 0, 0)
+    <AnimatedView key="group">
+      <View className=" bg-slate-900 p-4   flex-1 justify-between">
+        <View style={{ rowGap: 16 }}>
+          <FormTextInput
+            name="title"
+            labelText="Title"
+            textInputProps={{
+              placeholder: "Enter a title",
+            }}
+            control={control}
+            errors={errors}
+            rules={{ required: true }}
+          />
+          <FormTextInput
+            name="description"
+            labelText="Description"
+            textInputProps={{
+              placeholder: "Enter a description",
+            }}
+            control={control}
+            errors={errors}
+          />
+          <FormTextInput
+            control={control}
+            errors={errors}
+            name="intervalDays"
+            labelText="Description"
+            textInputProps={{ keyboardType: "numeric", returnKeyType: "done" }}
+          />
+          <UserMultiSelect
+            users={users}
+            selectedUserIds={selectedUserIds}
+            setSelectedUserIds={setSelectedUserIds}
+            header="Select Users"
+          />
+          {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db
+          Probably some timezone issues, investigate how to do this correctly */}
+          <View className=" items-start">
+            <Text className="text-white mb-2">Select initial start date</Text>
+            {Platform.select({
+              ios: (
+                <RNDateTimePicker
+                  value={date ? date : setTimeToZero(new Date())}
+                  onChange={(e, date) => {
+                    setDate(setTimeToZero(date ?? new Date()));
+                    setShowDatePicker(false);
+                  }}
+                  accentColor="lightblue"
+                  mode="date"
+                  themeVariant="dark"
+                  timeZoneName="Europe/Berlin"
+                  minimumDate={addDays(new Date(), -(Number(intervalDays) - 1))}
+                />
+              ),
+              android: (
+                <>
+                  <Pressable
+                    onPress={() => setShowDatePicker(true)}
+                    className="bg-slate-700 p-2 rounded-lg"
+                  >
+                    <Text className="text-xl text-white">
+                      {date?.toLocaleDateString("de-DE")}
+                    </Text>
+                  </Pressable>
+                  {showDatePicker && (
+                    <RNDateTimePicker
+                      value={date ? date : setTimeToZero(new Date())}
+                      onChange={(e, date) => {
+                        setDate(setTimeToZero(date ?? new Date()));
+                        setShowDatePicker(false);
+                      }}
+                      accentColor="lightblue"
+                      mode="date"
+                      themeVariant="dark"
+                      minimumDate={addDays(
+                        new Date(),
+                        -(Number(intervalDays) - 1)
+                      )}
+                    />
+                  )}
+                </>
+              ),
+              web: (
+                // TODO: add mindate
+                <WebDateTimerPicker
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setDate(
+                      new Date(
+                        new Date(e.currentTarget.value).setHours(0, 0, 0, 0)
+                      )
                     )
-                  )
-                }
-                value={
-                  date?.toLocaleDateString("en-CA") ??
-                  new Date().toLocaleDateString("en-CA")
-                }
-              />
-            ),
-          })}
+                  }
+                  value={
+                    date?.toLocaleDateString("en-CA") ??
+                    new Date().toLocaleDateString("en-CA")
+                  }
+                />
+              ),
+            })}
+          </View>
         </View>
+        <Pressable
+          // TODO: nativewind won't work here for some odd reason
+          style={({ pressed }) => ({
+            backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+            paddingHorizontal: 24,
+            paddingVertical: 12,
+            borderRadius: 5,
+          })}
+          onPress={handleSubmit(onSubmit)}
+        >
+          <Text className="font-bold text-center ">Submit</Text>
+        </Pressable>
       </View>
-      <Pressable
-        // TODO: nativewind won't work here for some odd reason
-        style={({ pressed }) => ({
-          backgroundColor: pressed ? "#24aeff" : "#24a0ed",
-          paddingHorizontal: 24,
-          paddingVertical: 12,
-          borderRadius: 5,
-        })}
-        onPress={handleSubmit(onSubmit)}
-      >
-        <Text className="font-bold text-center ">Submit</Text>
-      </Pressable>
-    </View>
+    </AnimatedView>
   );
 }
