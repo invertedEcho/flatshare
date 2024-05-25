@@ -38,3 +38,5 @@ yarn-error.*
 # build
 android/
 ios/
+
+*.apk
