@@ -15,22 +15,22 @@ export function TaskItem({
   const [isEditing, setIsEditing] = React.useState(false);
 
   return (
-    <View className="p-2 bg-slate-900 flex-row justify-between items-start rounded-lg">
+    <View className="p-2 bg-white flex-row justify-between items-start rounded-lg">
       <View style={{ flexGrow: 1 }}>
-        <Text className="font-semibold text-lg text-gray-200">{title}</Text>
+        <Text className="font-semibold text-lg text-slate-900">{title}</Text>
         {description && (
-          <Text className="text-base text-gray-400">{description}</Text>
+          <Text className="text-base text-slate-500">{description}</Text>
         )}
-        <Text className="text-gray-100 text-xs">
+        <Text className="text-slate-400 text-xs">
           Created at {createdAt.toLocaleString()}
         </Text>
       </View>
       <View className="justify-center self-center">
         <Pressable onPress={() => setIsEditing(true)}>
           {isEditing ? (
-            <Feather size={30} color="white" name="save" />
+            <Feather size={30} color="black" name="save" />
           ) : (
-            <Feather size={30} color="white" name="edit" />
+            <Feather size={30} color="black" name="edit" />
           )}
         </Pressable>
       </View>
