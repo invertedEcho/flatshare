@@ -219,7 +219,7 @@ export function CreateTaskGroupScreen() {
           })}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text className="font-bold text-center ">Submit</Text>
+          <Text className="font-bold text-center">Login</Text>
         </Pressable>
       </View>
     </AnimatedView>

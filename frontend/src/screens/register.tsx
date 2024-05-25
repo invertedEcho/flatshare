@@ -9,6 +9,7 @@ import Toast from "react-native-toast-message";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { RootStackParamList } from "../../App";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import FormTextInput from "../components/form-text-input";
 
 const registerFormSchema = z.object({
   username: z.string(),
@@ -69,92 +70,53 @@ export function RegisterScreen({
   }
 
   return (
-    <SafeAreaView className="bg-slate-700 flex p-4 h-full">
-      <View className="p-4 w-full bg-slate-900 rounded-lg h-full">
-        <Text className="text-white">Username *</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder="Username"
-              placeholderTextColor="white"
-              style={{ color: "white" }}
-              onChangeText={onChange}
-              value={value}
-              className="p-4 text-white"
-            />
-          )}
+    <View className=" bg-slate-900 p-4 flex-1 justify-between">
+      <View style={{ rowGap: 16 }}>
+        <FormTextInput
           name="username"
-        />
-        {errors.username && (
-          <Text className="text-red-300">Title is required</Text>
-        )}
-        <Text className="text-white">Password</Text>
-        <Controller
+          labelText="Username"
+          textInputProps={{ placeholder: "Username" }}
           control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={{
-                color: "white",
-              }}
-              placeholder="Password"
-              placeholderTextColor="white"
-              onChangeText={onChange}
-              value={value}
-              textContentType="password"
-              className="p-4 text-white"
-              secureTextEntry
-            />
-          )}
+          errors={errors}
+          rules={{ required: true }}
+        />
+        <FormTextInput
           name="password"
-        />
-        {errors.password && (
-          <Text className="text-red-300">Password is required</Text>
-        )}
-
-        <Text className="text-white">Email</Text>
-        <Controller
+          labelText="Password"
+          textInputProps={{
+            placeholder: "Password",
+            secureTextEntry: true,
+            textContentType: "password",
+          }}
           control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={{
-                color: "white",
-              }}
-              placeholder="Email"
-              placeholderTextColor="white"
-              onChangeText={onChange}
-              value={value}
-              textContentType="emailAddress"
-              className="p-4 text-white"
-            />
-          )}
-          name="email"
+          errors={errors}
+          rules={{ required: true }}
         />
-        {errors.email && (
-          <Text className="text-red-300">Email is required</Text>
-        )}
-
-        <Pressable
-          // TODO: nativewind won't work here for some odd reason
-          style={{
-            backgroundColor: "white",
-            padding: 10,
-            borderRadius: 5,
+        <FormTextInput
+          name="email"
+          labelText="Email"
+          textInputProps={{
+            placeholder: "email@web.de",
+            textContentType: "emailAddress",
           }}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text>Submit</Text>
-        </Pressable>
+          control={control}
+          errors={errors}
+          rules={{ required: true }}
+        />
       </View>
-    </SafeAreaView>
+      {errors.email && <Text className="text-red-300">Email is required</Text>}
+      <Pressable
+        // TODO: nativewind won't work here for some odd reason
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+          paddingHorizontal: 24,
+          paddingVertical: 12,
+          borderRadius: 5,
+        })}
+        onPress={handleSubmit(onSubmit)}
+      >
+        <Text className="font-bold text-center ">Register</Text>
+      </Pressable>
+    </View>
   );
 }
