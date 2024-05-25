@@ -42,6 +42,7 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
             size={20}
           />
         )}
+        autoScroll={false}
       />
     </View>
   );
