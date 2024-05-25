@@ -136,7 +136,7 @@ export function CreateTaskGroupScreen() {
             control={control}
             errors={errors}
             name="intervalDays"
-            labelText="Description"
+            labelText="Interval days"
             textInputProps={{ keyboardType: "numeric", returnKeyType: "done" }}
           />
           <UserMultiSelect
