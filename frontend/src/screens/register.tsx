@@ -27,11 +27,6 @@ async function register({ username, password, email }: RegisterFormData) {
   });
 }
 
-const defaultValues = {
-  username: "",
-  password: "",
-};
-
 export function RegisterScreen({
   navigation,
 }: NativeStackScreenProps<RootStackParamList, "Register">) {
@@ -41,7 +36,6 @@ export function RegisterScreen({
     formState: { errors },
     reset: resetForm,
   } = useForm<RegisterFormData>({
-    defaultValues,
     resolver: zodResolver(registerFormSchema),
   });
 
@@ -54,7 +48,7 @@ export function RegisterScreen({
       }),
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully register" });
-      resetForm({ ...defaultValues });
+      resetForm({ username: "", password: "", email: "" });
       navigation.navigate("Login");
     },
     onError: (err) => {
@@ -104,7 +98,6 @@ export function RegisterScreen({
           rules={{ required: true }}
         />
       </View>
-      {errors.email && <Text className="text-red-300">Email is required</Text>}
       <Pressable
         // TODO: nativewind won't work here for some odd reason
         style={({ pressed }) => ({

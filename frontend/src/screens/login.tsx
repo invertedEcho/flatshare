@@ -29,11 +29,6 @@ async function login({ username, password }: LoginFormData) {
   return json["access_token"];
 }
 
-const defaultValues = {
-  username: "",
-  password: "",
-};
-
 export function LoginScreen({}: NativeStackScreenProps<
   RootStackParamList,
   "Login"
@@ -43,8 +38,8 @@ export function LoginScreen({}: NativeStackScreenProps<
     handleSubmit,
     formState: { errors },
     reset: resetForm,
+    resetField,
   } = useForm<LoginFormData>({
-    defaultValues,
     resolver: zodResolver(loginFormSchema),
   });
 
@@ -58,13 +53,14 @@ export function LoginScreen({}: NativeStackScreenProps<
       }),
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
-      resetForm({ ...defaultValues });
+      resetForm({ password: "", username: "" });
       setIsAuthorized(true);
       console.log({ res });
       StorageWrapper.setItem("jwt-token", res);
     },
     onError: (err) => {
       console.error(err);
+      resetField("password");
       Toast.show({ type: "error", text1: "Failed to log in" });
       setIsAuthorized(false);
     },
