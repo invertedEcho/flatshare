@@ -26,6 +26,7 @@ export const assignmentSchema = z.object({
   assigneeId: z.number(),
   assigneeName: z.string(),
   createdAt: z.coerce.date(),
+  isOneOff: z.boolean(),
 });
 
 export const userSchema = z.object({
@@ -90,7 +91,6 @@ export function AssigmentsScreen() {
     },
   });
 
-  console.log({ assignments });
   if (assignments === undefined || users === undefined || isLoading) {
     return <Loading message="Loading your assignments..." />;
   }
@@ -100,7 +100,9 @@ export function AssigmentsScreen() {
   );
 
   const filteredAssignments = sortedAssignments.filter(
-    (assignment) => assignment.assigneeId === selectedUserId
+    (assignment) =>
+      assignment.assigneeId === selectedUserId &&
+      !(assignment.isOneOff && assignment.isCompleted)
   );
 
   async function refreshAssignments() {
