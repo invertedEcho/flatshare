@@ -16,6 +16,7 @@ import Loading from "../components/loading";
 import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
+import AnimatedView from "../components/animated-view";
 
 export const assignmentSchema = z.object({
   id: z.number(),
@@ -111,53 +112,55 @@ export function AssigmentsScreen() {
   }
 
   return (
-    <SafeAreaView className="text-black flex-1 bg-slate-700">
-      <View className="p-4 w-full" style={{ gap: 20 }}>
-        <View>
-          <Text className="text-white" style={{ fontSize: 16 }}>
-            From user
-          </Text>
-          <UserDropdown
-            data={users.map((user) => ({
-              label: user.username,
-              value: String(user.id),
-            }))}
-            onChange={(id: number) => {
-              setSelectedUserId(id);
-            }}
-            selectedUserId={selectedUserId}
+    <AnimatedView key="assignments">
+      <SafeAreaView className="text-black flex-1 bg-slate-900">
+        <View className="p-4 w-full" style={{ gap: 20 }}>
+          <View>
+            <Text className="text-white" style={{ fontSize: 16 }}>
+              From user
+            </Text>
+            <UserDropdown
+              data={users.map((user) => ({
+                label: user.username,
+                value: String(user.id),
+              }))}
+              onChange={(id: number) => {
+                setSelectedUserId(id);
+              }}
+              selectedUserId={selectedUserId}
+            />
+          </View>
+          <StatusBar style="auto" />
+          <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={refreshAssignments}
+              />
+            }
+            contentContainerStyle={{ gap: 12 }}
+            data={filteredAssignments}
+            renderItem={({ item }) => (
+              <AssignmentItem
+                title={item.title}
+                description={item.description}
+                isCompleted={item.isCompleted}
+                id={item.id}
+                disabled={item.assigneeId !== userId}
+                onPress={() => {
+                  mutate({
+                    assignmentId: item.id,
+                    state: item.isCompleted ? "pending" : "completed",
+                  });
+                  queryClient.refetchQueries({
+                    queryKey: [queryKeys.assignments],
+                  });
+                }}
+              />
+            )}
           />
         </View>
-        <StatusBar style="auto" />
-        <FlatList
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={refreshAssignments}
-            />
-          }
-          contentContainerStyle={{ gap: 12 }}
-          data={filteredAssignments}
-          renderItem={({ item }) => (
-            <AssignmentItem
-              title={item.title}
-              description={item.description}
-              isCompleted={item.isCompleted}
-              id={item.id}
-              disabled={item.assigneeId !== userId}
-              onPress={() => {
-                mutate({
-                  assignmentId: item.id,
-                  state: item.isCompleted ? "pending" : "completed",
-                });
-                queryClient.refetchQueries({
-                  queryKey: [queryKeys.assignments],
-                });
-              }}
-            />
-          )}
-        />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </AnimatedView>
   );
 }

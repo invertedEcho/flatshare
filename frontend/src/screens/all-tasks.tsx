@@ -1,8 +1,9 @@
-import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
+import * as React from "react";
 import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
 import { z } from "zod";
+import AnimatedView from "../components/animated-view";
 import Loading from "../components/loading";
 import { TaskItem } from "../components/task-item";
 import { fetchWrapper } from "../utils/fetchWrapper";
@@ -48,26 +49,28 @@ export default function AllTasksScreen() {
   }
 
   return (
-    <SafeAreaView className="text-black flex-1 items-center bg-slate-700">
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={refreshTasks} />
-        }
-        className="p-4 w-full"
-        contentContainerStyle={{ gap: 12 }}
-      >
-        <StatusBar style="auto" />
-        {data.map((task) => (
-          <TaskItem
-            title={task.title}
-            description={task.description}
-            createdAt={task.createdAt}
-            id={task.id}
-            taskGroupId={task.taskGroupId}
-            key={task.id}
-          />
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+    <AnimatedView key="tasksall">
+      <SafeAreaView className="text-black flex-1 items-center bg-slate-900">
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={refreshTasks} />
+          }
+          className="p-4 w-full"
+          contentContainerStyle={{ gap: 12 }}
+        >
+          <StatusBar style="auto" />
+          {data.map((task) => (
+            <TaskItem
+              title={task.title}
+              description={task.description}
+              createdAt={task.createdAt}
+              id={task.id}
+              taskGroupId={task.taskGroupId}
+              key={task.id}
+            />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </AnimatedView>
   );
 }
