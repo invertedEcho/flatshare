@@ -26,7 +26,6 @@ class StorageWrapper {
   }
 
   static async setItem(key: string, value: string): Promise<void> {
-    console.log({ key, value });
     if (Platform.OS === "web") {
       return await StorageWrapper.storage.setItem(key, value);
     } else {

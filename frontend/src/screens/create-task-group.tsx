@@ -4,14 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Button,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Platform, Pressable, Text, TextInput, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import Loading from "../components/loading";
@@ -72,7 +65,7 @@ export function CreateTaskGroupScreen() {
 
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [date, setDate] = React.useState<Date | undefined>(
-    setTimeToZero(new Date())
+    setTimeToZero(new Date()),
   );
   const [showDatePicker, setShowDatePicker] = React.useState(false);
 
@@ -181,8 +174,6 @@ export function CreateTaskGroupScreen() {
           setSelectedUserIds={setSelectedUserIds}
           header="Select Users"
         />
-        {/* TODO: When inserting a date into the database, it somehow is one day earlier in the database. For example inserting 31.05.2024 -> 30.05.2024 in db 
-        Probably some timezone issues, investigate how to do this correctly */}
         <View className=" items-start">
           <Text className="text-white mb-2">Select initial start date</Text>
 
@@ -223,7 +214,7 @@ export function CreateTaskGroupScreen() {
                     themeVariant="dark"
                     minimumDate={addDays(
                       new Date(),
-                      -(Number(intervalDays) - 1)
+                      -(Number(intervalDays) - 1),
                     )}
                   />
                 )}
@@ -235,8 +226,8 @@ export function CreateTaskGroupScreen() {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setDate(
                     new Date(
-                      new Date(e.currentTarget.value).setHours(0, 0, 0, 0)
-                    )
+                      new Date(e.currentTarget.value).setHours(0, 0, 0, 0),
+                    ),
                   )
                 }
                 value={

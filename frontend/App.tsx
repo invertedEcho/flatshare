@@ -6,7 +6,7 @@ import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
 import { AuthContext } from "./src/auth-context";
-import { Pressable, Text } from "react-native";
+import { Pressable } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
 import * as Linking from "expo-linking";
 
@@ -19,17 +19,15 @@ export type RootStackParamList = {
   MyAssignments: undefined;
   AllTasks: undefined;
   CreateTaskGroup: undefined;
+  Invite: undefined;
 };
 
-import { AssigmentsScreen } from "./src/screens/assignments";
-import { CreateTaskScreen } from "./src/screens/create-task";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
-import AllTasksScreen from "./src/screens/all-tasks";
 import { NavigationContainer } from "@react-navigation/native";
-import { CreateTaskGroupScreen } from "./src/screens/create-task-group";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GroupInviteScreen } from "./src/screens/invite";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
@@ -50,6 +48,8 @@ function getIconName(
       return focused ? "create" : "create-outline";
     case "CreateTask":
       return focused ? "add" : "add-outline";
+    case "Invite":
+      return focused ? "git-merge" : "git-merge-outline";
     default:
       return undefined;
   }
@@ -62,7 +62,6 @@ const queryClient = new QueryClient();
 export default function App() {
   const [isAuthorized, setIsAuthorized] = React.useState(false);
   const [userId, setUserId] = React.useState<number>();
-  const url = Linking.useURL();
 
   const linking = {
     prefixes: [prefix],
@@ -99,7 +98,7 @@ export default function App() {
                   const iconName = getIconName(route.name, focused);
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: "tomato",
+                tabBarActiveTintColor: "blue",
                 tabBarInactiveTintColor: "gray",
                 headerRight: () => (
                   <>
@@ -116,7 +115,6 @@ export default function App() {
                 headerRightContainerStyle: { marginRight: 20 },
               })}
             >
-              <Text>{url}</Text>
               {!isAuthorized && (
                 <>
                   <BottomTabNavigator.Screen
@@ -132,30 +130,14 @@ export default function App() {
               {isAuthorized && (
                 <>
                   <BottomTabNavigator.Screen
-                    name="MyAssignments"
-                    options={{ title: "My Assignments" }}
-                    component={AssigmentsScreen}
-                  />
-                  <BottomTabNavigator.Screen
-                    name="CreateTask"
-                    options={{ title: "Create a task" }}
-                    component={CreateTaskScreen}
-                  />
-                  <BottomTabNavigator.Screen
-                    name="AllTasks"
-                    component={AllTasksScreen}
-                    options={{ title: "All Tasks" }}
-                  />
-                  <BottomTabNavigator.Screen
-                    name="CreateTaskGroup"
-                    component={CreateTaskGroupScreen}
-                    options={{ title: "Create a Task Group" }}
+                    name="Invite"
+                    component={GroupInviteScreen}
                   />
                 </>
               )}
             </BottomTabNavigator.Navigator>
-            <Toast />
           </NavigationContainer>
+          <Toast />
         </SafeAreaProvider>
       </QueryClientProvider>
     </AuthContext.Provider>

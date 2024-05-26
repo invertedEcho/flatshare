@@ -3,4 +3,5 @@ export const queryKeys = {
   tasks: "tasks",
   taskGroups: "taskGroups",
   users: "users",
+  groups: "groups",
 };

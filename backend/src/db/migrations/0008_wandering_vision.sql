@@ -1,0 +1,1 @@
+ALTER TABLE "group" RENAME COLUMN "group" TO "name";

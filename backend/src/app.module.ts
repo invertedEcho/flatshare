@@ -10,6 +10,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AssignmentsModule } from './assignment.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { UserGroupController } from './user-group.controller';
 
 const rootPathStatic = join(__dirname, '../../src/client/public/');
 
@@ -29,6 +30,7 @@ const rootPathStatic = join(__dirname, '../../src/client/public/');
     AssignmentController,
     AuthController,
     TaskGroupController,
+    UserGroupController,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })

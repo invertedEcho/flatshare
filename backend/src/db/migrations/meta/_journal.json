@@ -50,6 +50,20 @@
       "when": 1716234766177,
       "tag": "0006_tough_pandemic",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1716593376742,
+      "tag": "0007_clever_scarlet_witch",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1716718934031,
+      "tag": "0008_wandering_vision",
+      "breakpoints": true
     }
   ]
 }

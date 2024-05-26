@@ -47,7 +47,7 @@ export function LoginScreen({}: NativeStackScreenProps<
     resolver: zodResolver(loginFormSchema),
   });
 
-  const { isAuthorized, setIsAuthorized } = React.useContext(AuthContext);
+  const { setIsAuthorized } = React.useContext(AuthContext);
 
   const { mutate } = useMutation({
     mutationFn: ({ ...args }: LoginFormData) =>

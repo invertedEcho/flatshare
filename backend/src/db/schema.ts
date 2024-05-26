@@ -21,6 +21,31 @@ export const userTable = pgTable('user', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
+export const groupTable = pgTable('group', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const groupInviteTable = pgTable('group_invite', {
+  id: serial('id').primaryKey(),
+  code: integer('code').notNull(),
+  groupId: integer('group_id')
+    .references(() => groupTable.id)
+    .notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+export const userGroupTable = pgTable('user_group', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  groupId: integer('group_id')
+    .references(() => groupTable.id)
+    .notNull(),
+});
+
 export const taskTable = pgTable('task', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
@@ -28,6 +53,7 @@ export const taskTable = pgTable('task', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   taskGroupId: integer('task_group_id').references(() => taskGroupTable.id),
 });
+export type SelectTask = typeof taskTable.$inferSelect;
 
 export const taskGroupTable = pgTable('task_group', {
   id: serial('id').primaryKey(),
@@ -60,7 +86,3 @@ export const assignmentTable = pgTable('assignment', {
   state: assigmentStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
-
-export type SelectTask = typeof taskTable.$inferSelect;
-export type InsertTask = typeof taskTable.$inferInsert;
-export type SelectUser = typeof userTable.$inferSelect;

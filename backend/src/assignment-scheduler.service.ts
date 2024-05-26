@@ -5,7 +5,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
-    console.log('cron');
+    return;
     //     const tasksToCreateAssignmentsFor =
     //       await dbGetTasksToAssignForCurrentInterval();
     //     if (tasksToCreateAssignmentsFor.length >= 1) {
