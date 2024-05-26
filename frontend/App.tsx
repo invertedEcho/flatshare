@@ -28,6 +28,10 @@ import Toast from "react-native-toast-message";
 import { NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GroupInviteScreen } from "./src/screens/invite";
+import { AssigmentsScreen } from "./src/screens/assignments";
+import { CreateTaskScreen } from "./src/screens/create-task";
+import AllTasksScreen from "./src/screens/all-tasks";
+import { CreateTaskGroupScreen } from "./src/screens/create-task-group";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
@@ -132,6 +136,26 @@ export default function App() {
                   <BottomTabNavigator.Screen
                     name="Invite"
                     component={GroupInviteScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="MyAssignments"
+                    options={{ title: "My Assignments" }}
+                    component={AssigmentsScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="CreateTask"
+                    options={{ title: "Create a task" }}
+                    component={CreateTaskScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="AllTasks"
+                    component={AllTasksScreen}
+                    options={{ title: "All Tasks" }}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="CreateTaskGroup"
+                    component={CreateTaskGroupScreen}
+                    options={{ title: "Create a Task Group" }}
                   />
                 </>
               )}
