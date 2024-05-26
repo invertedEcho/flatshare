@@ -16,6 +16,7 @@ import Loading from "../components/loading";
 import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
+import AnimatedView from "../components/animated-view";
 
 export const assignmentSchema = z.object({
   id: z.number(),
@@ -25,6 +26,7 @@ export const assignmentSchema = z.object({
   assigneeId: z.number(),
   assigneeName: z.string(),
   createdAt: z.coerce.date(),
+  isOneOff: z.boolean(),
 });
 
 export const userSchema = z.object({
@@ -89,7 +91,6 @@ export function AssigmentsScreen() {
     },
   });
 
-  console.log({ assignments });
   if (assignments === undefined || users === undefined || isLoading) {
     return <Loading message="Loading your assignments..." />;
   }
@@ -99,7 +100,9 @@ export function AssigmentsScreen() {
   );
 
   const filteredAssignments = sortedAssignments.filter(
-    (assignment) => assignment.assigneeId === selectedUserId
+    (assignment) =>
+      assignment.assigneeId === selectedUserId &&
+      !(assignment.isOneOff && assignment.isCompleted)
   );
 
   async function refreshAssignments() {
@@ -111,56 +114,55 @@ export function AssigmentsScreen() {
   }
 
   return (
-    <SafeAreaView className="text-black flex-1 bg-slate-700">
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refreshAssignments}
-          />
-        }
-        className="p-4 w-full"
-        style={{ gap: 20 }}
-      >
-        <View>
-          <Text className="text-white" style={{ fontSize: 16 }}>
-            From user
-          </Text>
-          <UserDropdown
-            data={users.map((user) => ({
-              label: user.username,
-              value: String(user.id),
-            }))}
-            onChange={(id: number) => {
-              setSelectedUserId(id);
-            }}
-            selectedUserId={selectedUserId}
+    <AnimatedView>
+      <SafeAreaView className="text-black flex-1 bg-slate-900">
+        <View className="p-4 w-full" style={{ gap: 20 }}>
+          <View>
+            <Text className="text-white" style={{ fontSize: 16 }}>
+              From user
+            </Text>
+            <UserDropdown
+              data={users.map((user) => ({
+                label: user.username,
+                value: String(user.id),
+              }))}
+              onChange={(id: number) => {
+                setSelectedUserId(id);
+              }}
+              selectedUserId={selectedUserId}
+            />
+          </View>
+          <StatusBar style="auto" />
+          <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={refreshAssignments}
+              />
+            }
+            contentContainerStyle={{ gap: 12 }}
+            data={filteredAssignments}
+            renderItem={({ item }) => (
+              <AssignmentItem
+                title={item.title}
+                description={item.description}
+                isCompleted={item.isCompleted}
+                id={item.id}
+                disabled={item.assigneeId !== userId}
+                onPress={() => {
+                  mutate({
+                    assignmentId: item.id,
+                    state: item.isCompleted ? "pending" : "completed",
+                  });
+                  queryClient.refetchQueries({
+                    queryKey: [queryKeys.assignments],
+                  });
+                }}
+              />
+            )}
           />
         </View>
-        <StatusBar style="auto" />
-        <FlatList
-          contentContainerStyle={{ gap: 12 }}
-          data={filteredAssignments}
-          renderItem={({ item }) => (
-            <AssignmentItem
-              title={item.title}
-              description={item.description}
-              isCompleted={item.isCompleted}
-              id={item.id}
-              disabled={item.assigneeId !== userId}
-              onPress={() => {
-                mutate({
-                  assignmentId: item.id,
-                  state: item.isCompleted ? "pending" : "completed",
-                });
-                queryClient.refetchQueries({
-                  queryKey: [queryKeys.assignments],
-                });
-              }}
-            />
-          )}
-        />
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </AnimatedView>
   );
 }

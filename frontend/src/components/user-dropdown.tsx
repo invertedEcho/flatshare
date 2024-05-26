@@ -20,8 +20,8 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
         selectedTextStyle={dropdownStyles.selectedTextStyle}
         inputSearchStyle={dropdownStyles.inputSearchStyle}
         iconStyle={dropdownStyles.iconStyle}
+        containerStyle={dropdownStyles.container}
         data={data}
-        search
         maxHeight={300}
         labelField="label"
         valueField="value"
@@ -42,6 +42,7 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
             size={20}
           />
         )}
+        autoScroll={false}
       />
     </View>
   );
@@ -52,6 +53,9 @@ export default UserDropdown;
 export const dropdownStyles = StyleSheet.create({
   container: {
     padding: 0,
+    borderRadius: 10,
+    overflow: "hidden",
+    marginTop: 4,
   },
   dropdown: {
     height: 50,

@@ -11,6 +11,7 @@ import { AuthContext } from "../auth-context";
 import StorageWrapper from "../utils/StorageWrapper";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
+import FormTextInput from "../components/form-text-input";
 
 const loginFormSchema = z.object({
   username: z.string(),
@@ -28,11 +29,6 @@ async function login({ username, password }: LoginFormData) {
   return json["access_token"];
 }
 
-const defaultValues = {
-  username: "",
-  password: "",
-};
-
 export function LoginScreen({}: NativeStackScreenProps<
   RootStackParamList,
   "Login"
@@ -42,8 +38,8 @@ export function LoginScreen({}: NativeStackScreenProps<
     handleSubmit,
     formState: { errors },
     reset: resetForm,
+    resetField,
   } = useForm<LoginFormData>({
-    defaultValues,
     resolver: zodResolver(loginFormSchema),
   });
 
@@ -57,13 +53,14 @@ export function LoginScreen({}: NativeStackScreenProps<
       }),
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
-      resetForm({ ...defaultValues });
+      resetForm({ password: "", username: "" });
       setIsAuthorized(true);
       console.log({ res });
       StorageWrapper.setItem("jwt-token", res);
     },
     onError: (err) => {
       console.error(err);
+      resetField("password");
       Toast.show({ type: "error", text1: "Failed to log in" });
       setIsAuthorized(false);
     },
@@ -76,67 +73,41 @@ export function LoginScreen({}: NativeStackScreenProps<
   }
 
   return (
-    <SafeAreaView className="bg-slate-700 flex p-4 h-full">
-      <View className="p-4 w-full bg-slate-900 rounded-lg h-full">
-        <Text className="text-white">Username</Text>
-        <Controller
-          control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              placeholder="Username"
-              placeholderTextColor="white"
-              style={{ color: "white" }}
-              onChangeText={onChange}
-              value={value}
-              className="p-4 text-white"
-            />
-          )}
+    <View className=" bg-slate-900 p-4   flex-1 justify-between">
+      <View style={{ rowGap: 16 }}>
+        <FormTextInput
           name="username"
-        />
-        {errors.username && (
-          <Text className="text-red-300">Title is required</Text>
-        )}
-        <Text className="text-white">Password</Text>
-        <Controller
+          labelText="Username"
+          textInputProps={{ placeholder: "Username" }}
           control={control}
-          rules={{
-            required: true,
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={{
-                color: "white",
-              }}
-              placeholder="Password"
-              placeholderTextColor="white"
-              onChangeText={onChange}
-              value={value}
-              textContentType="password"
-              className="p-4 text-white"
-              secureTextEntry
-            />
-          )}
-          name="password"
+          errors={errors}
+          rules={{ required: true }}
         />
-        {errors.password && (
-          <Text className="text-red-300">Password is required</Text>
-        )}
-
-        <Pressable
-          // TODO: nativewind won't work here for some odd reason
-          style={{
-            backgroundColor: "white",
-            padding: 10,
-            borderRadius: 5,
+        <FormTextInput
+          name="password"
+          labelText="Password"
+          textInputProps={{
+            placeholder: "Password",
+            secureTextEntry: true,
+            textContentType: "password",
           }}
-          onPress={handleSubmit(onSubmit)}
-        >
-          <Text>Submit</Text>
-        </Pressable>
+          control={control}
+          errors={errors}
+          rules={{ required: true }}
+        />
       </View>
-    </SafeAreaView>
+      <Pressable
+        // TODO: nativewind won't work here for some odd reason
+        style={({ pressed }) => ({
+          backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+          paddingHorizontal: 24,
+          paddingVertical: 12,
+          borderRadius: 5,
+        })}
+        onPress={handleSubmit(onSubmit)}
+      >
+        <Text className="font-bold text-center ">Submit</Text>
+      </Pressable>
+    </View>
   );
 }

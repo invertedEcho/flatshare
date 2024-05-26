@@ -25,7 +25,7 @@ export type RootStackParamList = {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
-import { NavigationContainer } from "@react-navigation/native";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GroupInviteScreen } from "./src/screens/invite";
 import { AssigmentsScreen } from "./src/screens/assignments";
@@ -94,7 +94,13 @@ export default function App() {
     <AuthContext.Provider value={{ isAuthorized, setIsAuthorized, userId }}>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
-          <NavigationContainer linking={linking}>
+          <NavigationContainer
+            theme={{
+              ...DefaultTheme,
+              colors: { ...DefaultTheme.colors, background: "#0F172A" },
+            }}
+            linking={linking}
+          >
             <BottomTabNavigator.Navigator
               initialRouteName="CreateTaskGroup"
               screenOptions={({ route }) => ({
@@ -102,7 +108,7 @@ export default function App() {
                   const iconName = getIconName(route.name, focused);
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: "blue",
+                tabBarActiveTintColor: "#3aaaef",
                 tabBarInactiveTintColor: "gray",
                 headerRight: () => (
                   <>
@@ -117,6 +123,8 @@ export default function App() {
                   </>
                 ),
                 headerRightContainerStyle: { marginRight: 20 },
+                // This causes layout shift on android, but the screen transition animation depends on it
+                // unmountOnBlur: true,
               })}
             >
               {!isAuthorized && (
