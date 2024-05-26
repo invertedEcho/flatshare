@@ -21,9 +21,9 @@ export class UserGroupController {
     const { inviteCode, userId } = body;
     const maybeInviteCode = await dbGetInviteCode(inviteCode);
     if (maybeInviteCode === undefined) {
-      return { success: false };
+      return { success: false, groupId: null };
     }
     await dbAddUserToGroup({ userId, groupId: maybeInviteCode.groupId });
-    return { success: true };
+    return { success: true, groupId: maybeInviteCode.groupId };
   }
 }

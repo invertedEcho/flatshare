@@ -5,10 +5,11 @@ import "./public/tailwind.css";
 import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
-import { AuthContext } from "./src/auth-context";
-import { Pressable } from "react-native";
+import AuthContextProvider from "./src/auth-context";
+import { View } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
 import * as Linking from "expo-linking";
+import { FontAwesome6 } from "@expo/vector-icons";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -19,7 +20,7 @@ export type RootStackParamList = {
   MyAssignments: undefined;
   AllTasks: undefined;
   CreateTaskGroup: undefined;
-  Invite: undefined;
+  Group: undefined;
 };
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -27,11 +28,15 @@ import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
 import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { GroupInviteScreen } from "./src/screens/invite";
 import { AssigmentsScreen } from "./src/screens/assignments";
 import { CreateTaskScreen } from "./src/screens/create-task";
 import AllTasksScreen from "./src/screens/all-tasks";
 import { CreateTaskGroupScreen } from "./src/screens/create-task-group";
+import { z } from "zod";
+import { Menu } from "react-native-material-menu";
+import { LogoutButton } from "./src/components/log-out-button";
+import { MenuAnchor } from "./src/components/burger-menu-content";
+import { GroupInviteScreen } from "./src/screens/group-invite-screen";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
@@ -52,46 +57,49 @@ function getIconName(
       return focused ? "create" : "create-outline";
     case "CreateTask":
       return focused ? "add" : "add-outline";
-    case "Invite":
-      return focused ? "git-merge" : "git-merge-outline";
     default:
       return undefined;
   }
 }
+
+const profileSchema = z.object({
+  userId: z.number(),
+  groupId: z.number().nullable(),
+});
 
 const prefix = Linking.createURL("/");
 
 const queryClient = new QueryClient();
 
 export default function App() {
-  const [isAuthorized, setIsAuthorized] = React.useState(false);
-  const [userId, setUserId] = React.useState<number>();
+  const [user, setUser] = React.useState<
+    { userId: number; groupId: number | null } | undefined
+  >();
+  const [menuVisible, setMenuVisible] = React.useState(false);
 
   const linking = {
     prefixes: [prefix],
   };
 
-  // TODO: We should investigate on how to properly auth in react native
+  // TODO: I dont like this useEffect
   React.useEffect(() => {
     (async () => {
       const jwtMaybe = await StorageWrapper.getItem("jwt-token");
-      if (!jwtMaybe) {
-        setIsAuthorized(false);
-      } else {
+      if (jwtMaybe) {
         try {
           const res = await fetchWrapper.get("profile");
-          const user = await res.json();
-          setUserId(user.userId);
-          setIsAuthorized(true);
-        } catch {
-          setIsAuthorized(false);
+          const body = await res.json();
+          const parsed = profileSchema.parse(body);
+          setUser(parsed);
+        } catch (error) {
+          console.error({ loc: "Failed to get profile" }, error);
         }
       }
     })();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthorized, setIsAuthorized, userId }}>
+    <AuthContextProvider setUser={setUser} user={user}>
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
           <NavigationContainer
@@ -102,49 +110,64 @@ export default function App() {
             linking={linking}
           >
             <BottomTabNavigator.Navigator
-              initialRouteName="CreateTaskGroup"
+              initialRouteName="MyAssignments"
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                   const iconName = getIconName(route.name, focused);
+                  if (route.name === "Group") {
+                    return (
+                      <FontAwesome6 name="user-group" size={24} color="black" />
+                    );
+                  }
                   return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: "#3aaaef",
                 tabBarInactiveTintColor: "gray",
                 headerRight: () => (
                   <>
-                    {isAuthorized && (
-                      <LogoutButton
-                        onClick={() => {
-                          StorageWrapper.deleteItem("jwt-token");
-                          setIsAuthorized(false);
-                        }}
-                      />
+                    {user !== undefined && (
+                      <Menu
+                        visible={menuVisible}
+                        anchor={
+                          <MenuAnchor
+                            onPress={() => setMenuVisible(!menuVisible)}
+                          />
+                        }
+                        onRequestClose={() => setMenuVisible(false)}
+                      >
+                        <View
+                          style={{
+                            justifyContent: "center",
+                          }}
+                        >
+                          <LogoutButton
+                            onClick={() => {
+                              StorageWrapper.deleteItem("jwt-token");
+                              setUser(undefined);
+                            }}
+                          />
+                        </View>
+                      </Menu>
                     )}
                   </>
                 ),
-                headerRightContainerStyle: { marginRight: 20 },
+                headerRightContainerStyle: { marginRight: 25 },
                 // This causes layout shift on android, but the screen transition animation depends on it
                 // unmountOnBlur: true,
               })}
             >
-              {!isAuthorized && (
-                <>
-                  <BottomTabNavigator.Screen
-                    name="Login"
-                    component={LoginScreen}
-                  />
-                  <BottomTabNavigator.Screen
-                    name="Register"
-                    component={RegisterScreen}
-                  />
-                </>
+              {user !== undefined && (
+                <BottomTabNavigator.Screen
+                  name="Group"
+                  options={{ title: "Group" }}
+                >
+                  {() => (
+                    <GroupInviteScreen groupId={user.groupId ?? undefined} />
+                  )}
+                </BottomTabNavigator.Screen>
               )}
-              {isAuthorized && (
+              {user?.userId !== undefined && user.groupId !== undefined ? (
                 <>
-                  <BottomTabNavigator.Screen
-                    name="Invite"
-                    component={GroupInviteScreen}
-                  />
                   <BottomTabNavigator.Screen
                     name="MyAssignments"
                     options={{ title: "My Assignments" }}
@@ -166,20 +189,25 @@ export default function App() {
                     options={{ title: "Create a Task Group" }}
                   />
                 </>
+              ) : (
+                <>
+                  <>
+                    <BottomTabNavigator.Screen
+                      name="Login"
+                      component={LoginScreen}
+                    />
+                    <BottomTabNavigator.Screen
+                      name="Register"
+                      component={RegisterScreen}
+                    />
+                  </>
+                </>
               )}
             </BottomTabNavigator.Navigator>
           </NavigationContainer>
           <Toast />
         </SafeAreaProvider>
       </QueryClientProvider>
-    </AuthContext.Provider>
-  );
-}
-
-function LogoutButton({ onClick }: { onClick(): void }) {
-  return (
-    <Pressable onPress={onClick}>
-      <Ionicons name="log-out-outline" size={25} />
-    </Pressable>
+    </AuthContextProvider>
   );
 }

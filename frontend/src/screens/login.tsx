@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -18,6 +18,12 @@ const loginFormSchema = z.object({
   password: z.string(),
 });
 
+const loginSchema = z.object({
+  accessToken: z.string(),
+  userId: z.number(),
+  groupId: z.number().nullable(),
+});
+
 type LoginFormData = z.infer<typeof loginFormSchema>;
 
 async function login({ username, password }: LoginFormData) {
@@ -26,7 +32,7 @@ async function login({ username, password }: LoginFormData) {
     password,
   });
   const json = await res.json();
-  return json["access_token"];
+  return loginSchema.parse(json);
 }
 
 export function LoginScreen({}: NativeStackScreenProps<
@@ -43,7 +49,7 @@ export function LoginScreen({}: NativeStackScreenProps<
     resolver: zodResolver(loginFormSchema),
   });
 
-  const { setIsAuthorized } = React.useContext(AuthContext);
+  const { setUser } = React.useContext(AuthContext);
 
   const { mutate } = useMutation({
     mutationFn: ({ ...args }: LoginFormData) =>
@@ -54,15 +60,13 @@ export function LoginScreen({}: NativeStackScreenProps<
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ password: "", username: "" });
-      setIsAuthorized(true);
-      console.log({ res });
-      StorageWrapper.setItem("jwt-token", res);
+      setUser({ userId: res.userId, groupId: res.groupId ?? undefined });
+      StorageWrapper.setItem("jwt-token", res.accessToken);
     },
     onError: (err) => {
       console.error(err);
       resetField("password");
       Toast.show({ type: "error", text1: "Failed to log in" });
-      setIsAuthorized(false);
     },
   });
 

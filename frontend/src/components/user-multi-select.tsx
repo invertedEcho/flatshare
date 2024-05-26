@@ -10,9 +10,8 @@ type MultiSelectItemProps = {
 
 function MultiSelectItem(
   { username }: MultiSelectItemProps,
-  selected?: boolean
+  selected?: boolean,
 ) {
-  console.debug({ selected });
   return (
     <View style={styles.item}>
       <Text style={selected ? styles.selectedTextStyle : styles.itemTextStyle}>

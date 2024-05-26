@@ -12,6 +12,7 @@ import { db } from 'src/db';
 import { userTable } from 'src/db/schema';
 import { AuthService, User } from './auth.service';
 import { Public } from './public.decorators';
+import { dbGetGroupOfUser } from 'src/db/functions/user-group';
 
 class RegisterDto {
   username: string;
@@ -42,8 +43,14 @@ export class AuthController {
   }
 
   @Get('profile')
-  getProfile(@Request() req: { user: any }) {
-    return req.user;
+  async getProfile(
+    @Request() req: { user: { userId: number; username: string } },
+  ) {
+    const group = await dbGetGroupOfUser(req.user.userId);
+    return {
+      userId: req.user.userId,
+      groupId: group?.user_group.groupId ?? null,
+    };
   }
 
   @Get('users')

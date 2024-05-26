@@ -4,22 +4,10 @@ import { Pressable, Text, TextInput, View } from "react-native";
 import { AuthContext } from "../auth-context";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { z } from "zod";
-import Loading from "../components/loading";
 import Toast from "react-native-toast-message";
 import { queryKeys } from "../utils/queryKeys";
-
-const userGroupSchema = z.object({
-  userGroupId: z.number().nullable(),
-  name: z.string().nullable(),
-});
-
-async function getUserGroup(userId: number) {
-  const response = await fetchWrapper.get(`user-group/${userId}`);
-  const body = await response.json();
-  const parsed = userGroupSchema.parse(body);
-  console.log({ parsed });
-  return parsed;
-}
+import { getDefinedValueOrThrow } from "../utils/assert";
+import { GenerateInviteCode } from "../components/generate-invite-code";
 
 async function tryJoinGroup(inviteCode: number | undefined, userId: number) {
   const response = await fetchWrapper.post("user-group/join", {
@@ -27,35 +15,38 @@ async function tryJoinGroup(inviteCode: number | undefined, userId: number) {
     userId,
   });
   const body = await response.json();
-  const { success } = z.object({ success: z.boolean() }).parse(body);
+  const { success, groupId } = z
+    .object({ success: z.boolean(), groupId: z.number().nullable() })
+    .parse(body);
   if (!success) {
     throw new Error("Could not join group.");
   }
+  return groupId;
 }
 
-export function GroupInviteScreen() {
-  const [inviteCode, setInviteCode] = React.useState<number | undefined>(
-    undefined,
-  );
-  const { userId } = React.useContext(AuthContext);
-  if (userId === undefined) {
-    return (
-      <View>
-        <Text>you shouldnt be here.</Text>
-        <Text>landed on group invite screen but userId is undefined</Text>
-      </View>
-    );
-  }
+async function generateInviteCode(groupId: number | undefined) {
+  if (groupId === undefined) return null;
+  return "123456";
+}
 
-  const { data: userGroup, isLoading } = useQuery({
-    queryKey: [queryKeys.groups],
-    queryFn: async () => getUserGroup(userId),
-  });
+export function GroupInviteScreen({
+  groupId,
+}: {
+  groupId: number | undefined;
+}) {
+  const [inviteCode] = React.useState<number | undefined>(undefined);
+  const { user, setUser } = React.useContext(AuthContext);
+
+  // NOTE: The group screen should only be shown if the user is authenticated.
+  const { userId } = getDefinedValueOrThrow(user);
+
   const { mutate } = useMutation({
     mutationKey: [queryKeys.groups],
     mutationFn: async () => tryJoinGroup(inviteCode, userId),
-    onSuccess: () => {
+    onSuccess: (groupId) => {
+      const definedGroupId = getDefinedValueOrThrow(groupId);
       Toast.show({ type: "success", text1: "Joined group!" });
+      setUser({ userId, groupId: definedGroupId });
     },
     onError: () => {
       Toast.show({
@@ -65,9 +56,12 @@ export function GroupInviteScreen() {
     },
   });
 
-  if (userGroup === undefined || isLoading) {
-    return <Loading message="Loading groups..." />;
-  }
+  const { data: generatedInviteCode, refetch } = useQuery({
+    queryKey: [queryKeys.groups],
+    queryFn: () => generateInviteCode(groupId),
+    enabled: false,
+  });
+
   function handleJoinGroup() {
     if (inviteCode === undefined) {
       Toast.show({ type: "error", text1: "No invite code provided." });
@@ -78,14 +72,12 @@ export function GroupInviteScreen() {
 
   return (
     <View>
-      {userGroup.userGroupId === null ? (
-        <View>
-          <Text>To continue, join a group</Text>
+      {groupId === undefined ? (
+        <>
+          <Text className="text-white">To continue, join a group</Text>
           <TextInput
             placeholder="Enter invitation code"
-            value={inviteCode?.toString()}
             // FIXME: I dont like this number cast
-            onChangeText={(text) => setInviteCode(Number(text))}
             keyboardType="numeric"
             maxLength={6}
           />
@@ -95,9 +87,18 @@ export function GroupInviteScreen() {
           >
             <Text>Join Group</Text>
           </Pressable>
-        </View>
+        </>
       ) : (
-        <Text>{`You are part of : ${userGroup.name}`}</Text>
+        <View>
+          {generatedInviteCode ? (
+            <>
+              <Text className="text-white">Generated invite code:</Text>
+              <Text className="text-white">{generatedInviteCode}</Text>
+            </>
+          ) : (
+            <GenerateInviteCode onPress={() => refetch()} />
+          )}
+        </View>
       )}
     </View>
   );
