@@ -17,36 +17,17 @@ import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
 
-export const assignmentSchema = z.discriminatedUnion("isOneOff", [
-  z.object({
-    id: z.number(),
-    title: z.string(),
-    description: z.string().nullable(),
-    isCompleted: z.boolean(),
-    assigneeId: z.number(),
-    assigneeName: z.string(),
-    createdAt: z.coerce.date(),
-    isOneOff: z.literal(false),
-    dueDate: z.coerce.date(),
-  }),
-  z.object({
-    id: z.number(),
-    title: z.string(),
-    description: z.string().nullable(),
-    isCompleted: z.boolean(),
-    assigneeId: z.number(),
-    assigneeName: z.string(),
-    createdAt: z.coerce.date(),
-    isOneOff: z.literal(true),
-    dueDate: z.coerce.date().nullable(),
-  }),
-]);
-
-function hasDueDate(
-  assignment: Assignment
-): assignment is Assignment & { dueDate: Date } {
-  return assignment.dueDate !== null;
-}
+export const assignmentSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string().nullable(),
+  isCompleted: z.boolean(),
+  assigneeId: z.number(),
+  assigneeName: z.string(),
+  createdAt: z.coerce.date(),
+  isOneOff: z.boolean(),
+  dueDate: z.coerce.date().nullable(),
+});
 
 export const userSchema = z.object({
   id: z.number(),
@@ -132,7 +113,7 @@ export function AssigmentsScreen() {
   const assignmentsByDateTimestamp = recurringAssignments.reduce<
     Map<number, Assignment[]>
   >((acc, curr) => {
-    if (hasDueDate(curr)) {
+    if (curr.dueDate !== null) {
       const currTime = curr.dueDate.getTime();
       if (!acc.get(currTime)) {
         acc.set(currTime, []);
