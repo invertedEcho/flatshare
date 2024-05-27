@@ -29,7 +29,7 @@ export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
       .innerJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id));
 
     return queryResult.map((assignment) => {
-      // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the z to make the date constructor interpret it as utc.
+      // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the 'Z' to make the date constructor interpret it as UTC.
       const date = new Date(assignment.dueDate + 'Z');
       return {
         ...assignment,
