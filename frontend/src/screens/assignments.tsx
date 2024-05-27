@@ -142,7 +142,7 @@ export function AssigmentsScreen() {
     return acc;
   }, new Map());
 
-  const listData = (
+  const sectionedListData = (
     oneOffAssignments.length !== 0
       ? [{ title: "One-off assignments", data: oneOffAssignments }]
       : []
@@ -193,7 +193,7 @@ export function AssigmentsScreen() {
             stickySectionHeadersEnabled={false}
             keyExtractor={(item) => item.title}
             contentContainerStyle={{ gap: 12 }}
-            sections={listData}
+            sections={sectionedListData}
             renderSectionHeader={({ section }) => (
               <Text className="text-white font-semibold text-md">
                 {section.title}
