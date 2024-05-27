@@ -2,21 +2,20 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
 import {
-  FlatList,
   RefreshControl,
   SafeAreaView,
-  ScrollView,
+  SectionList,
   Text,
   View,
 } from "react-native";
 import { z } from "zod";
 import { AuthContext } from "../auth-context";
+import AnimatedView from "../components/animated-view";
 import { AssignmentItem } from "../components/assignment-item";
 import Loading from "../components/loading";
 import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
-import AnimatedView from "../components/animated-view";
 
 export const assignmentSchema = z.object({
   id: z.number(),
@@ -27,6 +26,7 @@ export const assignmentSchema = z.object({
   assigneeName: z.string(),
   createdAt: z.coerce.date(),
   isOneOff: z.boolean(),
+  dueDate: z.coerce.date(),
 });
 
 export const userSchema = z.object({
@@ -37,6 +37,7 @@ export const userSchema = z.object({
 });
 
 export type User = z.infer<typeof userSchema>;
+export type Assignment = z.infer<typeof assignmentSchema>;
 
 type AssignmentState = "pending" | "completed";
 
@@ -95,15 +96,31 @@ export function AssigmentsScreen() {
     return <Loading message="Loading your assignments..." />;
   }
 
-  const sortedAssignments = assignments.sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-  );
-
-  const filteredAssignments = sortedAssignments.filter(
+  const filteredAssignments = assignments.filter(
     (assignment) =>
       assignment.assigneeId === selectedUserId &&
       !(assignment.isOneOff && assignment.isCompleted)
   );
+
+  const assignmentsByDateTimestamp = filteredAssignments.reduce<
+    Map<number, Assignment[]>
+  >((acc, curr) => {
+    const currTime = curr.dueDate.getTime();
+    if (!acc.get(currTime)) {
+      acc.set(currTime, []);
+    }
+    acc.get(currTime)?.push(curr);
+    return acc;
+  }, new Map());
+
+  const listData = Array.from(assignmentsByDateTimestamp)
+    .sort(
+      ([dateTimeStampA], [dateTimeStampB]) => dateTimeStampA - dateTimeStampB
+    )
+    .map(([dateTimestamp, assignments]) => ({
+      title: `Due on ${new Date(dateTimestamp).toLocaleDateString("en-GB")}`,
+      data: assignments.sort((a, b) => a.title.localeCompare(b.title)),
+    }));
 
   async function refreshAssignments() {
     setRefreshing(true);
@@ -118,9 +135,7 @@ export function AssigmentsScreen() {
       <SafeAreaView className="text-black flex-1 bg-slate-900">
         <View className="p-4 w-full" style={{ gap: 20 }}>
           <View>
-            <Text className="text-white" style={{ fontSize: 16 }}>
-              From user
-            </Text>
+            <Text className="text-white font-semibold text-md">From user</Text>
             <UserDropdown
               data={users.map((user) => ({
                 label: user.username,
@@ -133,26 +148,30 @@ export function AssigmentsScreen() {
             />
           </View>
           <StatusBar style="auto" />
-          <FlatList
+          <SectionList
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={refreshAssignments}
               />
             }
+            stickySectionHeadersEnabled={false}
+            keyExtractor={(item) => item.title}
             contentContainerStyle={{ gap: 12 }}
-            data={filteredAssignments}
-            renderItem={({ item }) => (
+            sections={listData}
+            renderSectionHeader={({ section }) => (
+              <Text className="text-white font-semibold text-md">
+                {section.title}
+              </Text>
+            )}
+            renderItem={({ item: assignment }) => (
               <AssignmentItem
-                title={item.title}
-                description={item.description}
-                isCompleted={item.isCompleted}
-                id={item.id}
-                disabled={item.assigneeId !== userId}
+                assignment={assignment}
+                disabled={assignment.assigneeId !== userId}
                 onPress={() => {
                   mutate({
-                    assignmentId: item.id,
-                    state: item.isCompleted ? "pending" : "completed",
+                    assignmentId: assignment.id,
+                    state: assignment.isCompleted ? "pending" : "completed",
                   });
                   queryClient.refetchQueries({
                     queryKey: [queryKeys.assignments],
