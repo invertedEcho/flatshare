@@ -17,17 +17,36 @@ import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
 
-export const assignmentSchema = z.object({
-  id: z.number(),
-  title: z.string(),
-  description: z.string().nullable(),
-  isCompleted: z.boolean(),
-  assigneeId: z.number(),
-  assigneeName: z.string(),
-  createdAt: z.coerce.date(),
-  isOneOff: z.boolean(),
-  dueDate: z.coerce.date(),
-});
+export const assignmentSchema = z.discriminatedUnion("isOneOff", [
+  z.object({
+    id: z.number(),
+    title: z.string(),
+    description: z.string().nullable(),
+    isCompleted: z.boolean(),
+    assigneeId: z.number(),
+    assigneeName: z.string(),
+    createdAt: z.coerce.date(),
+    isOneOff: z.literal(false),
+    dueDate: z.coerce.date(),
+  }),
+  z.object({
+    id: z.number(),
+    title: z.string(),
+    description: z.string().nullable(),
+    isCompleted: z.boolean(),
+    assigneeId: z.number(),
+    assigneeName: z.string(),
+    createdAt: z.coerce.date(),
+    isOneOff: z.literal(true),
+    dueDate: z.coerce.date().nullable(),
+  }),
+]);
+
+function hasDueDate(
+  assignment: Assignment
+): assignment is Assignment & { dueDate: Date } {
+  return assignment.dueDate !== null;
+}
 
 export const userSchema = z.object({
   id: z.number(),
@@ -102,25 +121,41 @@ export function AssigmentsScreen() {
       !(assignment.isOneOff && assignment.isCompleted)
   );
 
-  const assignmentsByDateTimestamp = filteredAssignments.reduce<
+  const oneOffAssignments = filteredAssignments.filter(
+    (assignment) => assignment.isOneOff
+  );
+
+  const recurringAssignments = filteredAssignments.filter(
+    (assignment) => !assignment.isOneOff
+  );
+
+  const assignmentsByDateTimestamp = recurringAssignments.reduce<
     Map<number, Assignment[]>
   >((acc, curr) => {
-    const currTime = curr.dueDate.getTime();
-    if (!acc.get(currTime)) {
-      acc.set(currTime, []);
+    if (hasDueDate(curr)) {
+      const currTime = curr.dueDate.getTime();
+      if (!acc.get(currTime)) {
+        acc.set(currTime, []);
+      }
+      acc.get(currTime)?.push(curr);
     }
-    acc.get(currTime)?.push(curr);
     return acc;
   }, new Map());
 
-  const listData = Array.from(assignmentsByDateTimestamp)
-    .sort(
-      ([dateTimeStampA], [dateTimeStampB]) => dateTimeStampA - dateTimeStampB
-    )
-    .map(([dateTimestamp, assignments]) => ({
-      title: `Due on ${new Date(dateTimestamp).toLocaleDateString("en-GB")}`,
-      data: assignments.sort((a, b) => a.title.localeCompare(b.title)),
-    }));
+  const listData = (
+    oneOffAssignments.length !== 0
+      ? [{ title: "One-off assignments", data: oneOffAssignments }]
+      : []
+  ).concat(
+    Array.from(assignmentsByDateTimestamp)
+      .sort(
+        ([dateTimeStampA], [dateTimeStampB]) => dateTimeStampA - dateTimeStampB
+      )
+      .map(([dateTimestamp, assignments]) => ({
+        title: `Due on ${new Date(dateTimestamp).toLocaleDateString("en-GB")}`,
+        data: assignments.sort((a, b) => a.title.localeCompare(b.title)),
+      }))
+  );
 
   async function refreshAssignments() {
     setRefreshing(true);
