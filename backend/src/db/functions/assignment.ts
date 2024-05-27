@@ -12,22 +12,29 @@ import {
 export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
   try {
     const queryResult = await db
-      .select()
+      .select({
+        id: assignmentTable.id,
+        title: taskTable.title,
+        description: taskTable.description,
+        assigneeId: userTable.id,
+        assigneeName: userTable.username,
+        isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
+        createdAt: assignmentTable.createdAt,
+        isOneOff: sql<boolean>`${taskTable.taskGroupId} IS NULL`,
+        dueDate: sql<string>`${assignmentTable.createdAt} + (${taskGroupTable.interval} - interval '1 day')`,
+      })
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
-      .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id));
+      .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
+      .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id));
 
-    return queryResult.map((query) => {
+    return queryResult.map((assignment) => {
+      // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the 'Z' to make the date constructor interpret it as UTC.
+      const date = new Date(assignment.dueDate + 'Z');
       return {
-        title: query.task.title,
-        description: query.task.description,
-        id: query.assignment.id,
-        assigneeId: query.user.id,
-        assigneeName: query.user.email,
-        isCompleted: query.assignment.state === 'completed',
-        createdAt: query.assignment.createdAt,
-        isOneOff: !query.task.taskGroupId,
-      } satisfies AssignmentResponse;
+        ...assignment,
+        dueDate: assignment.isOneOff ? null : date,
+      };
     });
   } catch (error) {
     console.error({ error });

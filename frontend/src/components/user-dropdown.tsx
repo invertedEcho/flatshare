@@ -37,7 +37,7 @@ const UserDropdown = ({ data, selectedUserId, onChange }: Props) => {
         renderLeftIcon={() => (
           <AntDesign
             style={dropdownStyles.icon}
-            color={isFocus ? "blue" : "black"}
+            color="black"
             name="user"
             size={20}
           />

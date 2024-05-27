@@ -2,22 +2,17 @@ import React from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { Assignment } from "../screens/assignments";
+import { Ionicons } from "@expo/vector-icons";
 
 type ListItemProps = {
-  title: string;
-  description: string | null;
-  interval?: string | null;
-  isCompleted: boolean;
-  id: number;
+  assignment: Assignment;
   disabled?: boolean;
   onPress(id: number): void;
 };
 
 export function AssignmentItem({
-  title,
-  description,
-  isCompleted,
-  id,
+  assignment: { id, title, description, isCompleted, isOneOff },
   disabled = false,
   onPress,
 }: ListItemProps) {
@@ -51,13 +46,18 @@ export function AssignmentItem({
         disabled={disabled}
       >
         <View>
-          <Text
-            className={`font-semibold text-slate-900 text-lg ${
-              isCompleted && "line-through"
-            }`}
-          >
-            {title}
-          </Text>
+          <View className="flex flex-row items-center gap-1">
+            <Text
+              className={`font-semibold text-slate-900 text-lg ${
+                isCompleted && "line-through"
+              }`}
+            >
+              {title}
+            </Text>
+            {!isOneOff && (
+              <Ionicons name="repeat-outline" size={20} color="tomato" />
+            )}
+          </View>
           <Text className="text-slate-500 text-lg">{description}</Text>
         </View>
         <BouncyCheckbox
