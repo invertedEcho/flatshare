@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "engines": {
-    "pnpm": "~8"
+    "pnpm": "~9"
   },
   "scripts": {
     "start": "expo start",
