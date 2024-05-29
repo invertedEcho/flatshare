@@ -9,7 +9,9 @@ import {
   userTable,
 } from '../schema';
 
-export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
+export async function dbGetAssignmentsFromCurrentInterval(): Promise<
+  AssignmentResponse[]
+> {
   try {
     const queryResult = await db
       .select({
@@ -26,7 +28,11 @@ export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
       .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
-      .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id));
+      .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id))
+      // Only get assignments from the current interval
+      .where(
+        sql`current_date < (${assignmentTable.createdAt} + (${taskGroupTable.interval} - interval '1 day'))`,
+      );
 
     return queryResult.map((assignment) => {
       // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the 'Z' to make the date constructor interpret it as UTC.
