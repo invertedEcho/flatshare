@@ -37,30 +37,9 @@ import { Menu } from "react-native-material-menu";
 import { LogoutButton } from "./src/components/log-out-button";
 import { MenuAnchor } from "./src/components/burger-menu-content";
 import { GroupInviteScreen } from "./src/screens/group-invite-screen";
+import { getIconNameForRouteName } from "./src/utils/routes";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
-
-type IconGlyph = keyof typeof Ionicons.glyphMap;
-
-function getIconName(
-  routeName: string,
-  focused: boolean,
-): IconGlyph | undefined {
-  switch (routeName) {
-    case "MyAssignments":
-      return focused ? "home" : "home-outline";
-    case "AllTasks":
-      return focused ? "list" : "list-outline";
-    case "Login":
-      return focused ? "log-in" : "log-in-outline";
-    case "Register":
-      return focused ? "create" : "create-outline";
-    case "CreateTask":
-      return focused ? "add" : "add-outline";
-    default:
-      return undefined;
-  }
-}
 
 const profileSchema = z.object({
   userId: z.number(),
@@ -113,7 +92,7 @@ export default function App() {
               initialRouteName="MyAssignments"
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
-                  const iconName = getIconName(route.name, focused);
+                  const iconName = getIconNameForRouteName(route.name, focused);
                   if (route.name === "Group") {
                     return (
                       <FontAwesome6 name="user-group" size={24} color="black" />
@@ -156,7 +135,19 @@ export default function App() {
                 // unmountOnBlur: true,
               })}
             >
-              {user !== undefined && (
+              {user === undefined && (
+                <>
+                  <BottomTabNavigator.Screen
+                    name="Login"
+                    component={LoginScreen}
+                  />
+                  <BottomTabNavigator.Screen
+                    name="Register"
+                    component={RegisterScreen}
+                  />
+                </>
+              )}
+              {user !== undefined && user.groupId === null && (
                 <BottomTabNavigator.Screen
                   name="Group"
                   options={{ title: "Group" }}
@@ -166,7 +157,7 @@ export default function App() {
                   )}
                 </BottomTabNavigator.Screen>
               )}
-              {user?.userId !== undefined && user.groupId !== undefined ? (
+              {user !== undefined && user.groupId !== null ? (
                 <>
                   <BottomTabNavigator.Screen
                     name="MyAssignments"
@@ -190,18 +181,7 @@ export default function App() {
                   />
                 </>
               ) : (
-                <>
-                  <>
-                    <BottomTabNavigator.Screen
-                      name="Login"
-                      component={LoginScreen}
-                    />
-                    <BottomTabNavigator.Screen
-                      name="Register"
-                      component={RegisterScreen}
-                    />
-                  </>
-                </>
+                <></>
               )}
             </BottomTabNavigator.Navigator>
           </NavigationContainer>

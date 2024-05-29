@@ -2,9 +2,9 @@ import { Controller, Get, Param, Post } from '@nestjs/common';
 import {
   dbChangeAssignmentState,
   dbGetAllAssignments,
-} from './db/functions/assignment';
-import { AssignmentResponse } from './types';
-import { AssignmentState } from './db/schema';
+} from 'src/db/functions/assignment';
+import { AssignmentState } from 'src/db/schema';
+import { AssignmentResponse } from 'src/types';
 
 @Controller('assignments')
 export class AssignmentController {

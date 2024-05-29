@@ -1,16 +1,16 @@
 import { Module } from '@nestjs/common';
-import { TasksController } from './task.controller';
-import { AssignmentController } from './assignment.controller';
 import { AuthModule } from './auth/auth.module';
 import { AuthController } from './auth/auth.controller';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { TaskGroupController } from './task-group.controller';
 import { ScheduleModule } from '@nestjs/schedule';
-import { AssignmentsModule } from './assignment.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { UserGroupController } from './user-group.controller';
+import { AssignmentsModule } from './assignment/assignment.module';
+import { TasksController } from './tasks/task.controller';
+import { AssignmentController } from './assignment/assignment.controller';
+import { TaskGroupController } from './tasks/task-group.controller';
 
 const rootPathStatic = join(__dirname, '../../src/client/public/');
 

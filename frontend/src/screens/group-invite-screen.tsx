@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { Pressable, Text, TextInput, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { AuthContext } from "../auth-context";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { z } from "zod";
@@ -8,8 +8,16 @@ import Toast from "react-native-toast-message";
 import { queryKeys } from "../utils/queryKeys";
 import { getDefinedValueOrThrow } from "../utils/assert";
 import { GenerateInviteCode } from "../components/generate-invite-code";
+import FormTextInput from "../components/form-text-input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-async function tryJoinGroup(inviteCode: number | undefined, userId: number) {
+const groupInviteSchema = z.object({
+  inviteCode: z.string().length(8),
+});
+type GroupInvite = z.infer<typeof groupInviteSchema>;
+
+async function joinGroupByCode(inviteCode: string, userId: number) {
   const response = await fetchWrapper.post("user-group/join", {
     inviteCode,
     userId,
@@ -24,9 +32,14 @@ async function tryJoinGroup(inviteCode: number | undefined, userId: number) {
   return groupId;
 }
 
-async function generateInviteCode(groupId: number | undefined) {
+async function generateInviteCode(
+  groupId: number | undefined,
+): Promise<string | null> {
   if (groupId === undefined) return null;
-  return "123456";
+  const response = await fetchWrapper.get(`user-group/invite-code/${groupId}`);
+  const body = await response.json();
+  const { inviteCode } = groupInviteSchema.parse(body);
+  return inviteCode;
 }
 
 export function GroupInviteScreen({
@@ -34,15 +47,22 @@ export function GroupInviteScreen({
 }: {
   groupId: number | undefined;
 }) {
-  const [inviteCode] = React.useState<number | undefined>(undefined);
   const { user, setUser } = React.useContext(AuthContext);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GroupInvite>({
+    resolver: zodResolver(groupInviteSchema),
+  });
 
   // NOTE: The group screen should only be shown if the user is authenticated.
   const { userId } = getDefinedValueOrThrow(user);
 
   const { mutate } = useMutation({
     mutationKey: [queryKeys.groups],
-    mutationFn: async () => tryJoinGroup(inviteCode, userId),
+    mutationFn: async (inviteCode: string) =>
+      joinGroupByCode(inviteCode, userId),
     onSuccess: (groupId) => {
       const definedGroupId = getDefinedValueOrThrow(groupId);
       Toast.show({ type: "success", text1: "Joined group!" });
@@ -62,12 +82,8 @@ export function GroupInviteScreen({
     enabled: false,
   });
 
-  function handleJoinGroup() {
-    if (inviteCode === undefined) {
-      Toast.show({ type: "error", text1: "No invite code provided." });
-      return;
-    }
-    mutate();
+  function handleJoinGroup(data: GroupInvite) {
+    mutate(data.inviteCode);
   }
 
   return (
@@ -75,14 +91,17 @@ export function GroupInviteScreen({
       {groupId === undefined ? (
         <>
           <Text className="text-white">To continue, join a group</Text>
-          <TextInput
-            placeholder="Enter invitation code"
-            // FIXME: I dont like this number cast
-            keyboardType="numeric"
-            maxLength={6}
+          <FormTextInput
+            name="inviteCode"
+            control={control}
+            labelText="Join group"
+            textInputProps={{
+              placeholder: "Enter a code",
+            }}
+            errors={errors}
           />
           <Pressable
-            onPress={handleJoinGroup}
+            onPress={handleSubmit(handleJoinGroup)}
             className="font-bold text-center bg-blue-300 flex"
           >
             <Text>Join Group</Text>

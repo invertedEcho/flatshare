@@ -1,5 +1,4 @@
 import { eq } from 'drizzle-orm';
-import { CreateTaskGroup } from 'src/task-group.controller';
 import { db } from '..';
 import {
   taskGroupTable,
@@ -7,6 +6,7 @@ import {
   taskTable,
   userTable,
 } from '../schema';
+import { CreateTaskGroup } from 'src/tasks/task-group.controller';
 
 export async function dbGetTaskGroups() {
   return await db.select().from(taskGroupTable);

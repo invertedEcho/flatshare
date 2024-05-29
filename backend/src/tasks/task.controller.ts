@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { SelectTask } from './db/schema';
 import {
   dbCreateOneOffTask,
   dbCreateRecurringTask,
   dbGetAllTasks,
   dbUpdateTask,
-} from './db/functions/task';
+} from 'src/db/functions/task';
+import { SelectTask } from 'src/db/schema';
 
 export type CreateTask = {
   title: string;

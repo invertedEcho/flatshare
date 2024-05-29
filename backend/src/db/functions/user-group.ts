@@ -13,7 +13,7 @@ export async function dbGetGroupOfUser(userId: number) {
   return userGroups[0];
 }
 
-export async function dbGetInviteCode(inviteCode: number) {
+export async function dbGetInviteCode(inviteCode: string) {
   const inviteCodeRows = await db
     .select()
     .from(groupInviteTable)

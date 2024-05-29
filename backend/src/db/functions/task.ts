@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
-import { CreateTask, OneOffTask, UpdateTask } from 'src/task.controller';
 import { db } from '..';
 import { SelectTask, assignmentTable, taskTable } from '../schema';
+import { CreateTask, OneOffTask, UpdateTask } from 'src/tasks/task.controller';
 
 export async function dbGetAllTasks(): Promise<SelectTask[]> {
   return await db.select().from(taskTable);

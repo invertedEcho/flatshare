@@ -29,7 +29,7 @@ export const groupTable = pgTable('group', {
 
 export const groupInviteTable = pgTable('group_invite', {
   id: serial('id').primaryKey(),
-  code: integer('code').notNull(),
+  code: text('code').notNull(),
   groupId: integer('group_id')
     .references(() => groupTable.id)
     .notNull(),

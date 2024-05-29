@@ -1,5 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { dbCreateTaskGroup, dbGetTaskGroups } from './db/functions/task-group';
+import {
+  dbCreateTaskGroup,
+  dbGetTaskGroups,
+} from 'src/db/functions/task-group';
 
 export type CreateTaskGroup = {
   title: string;

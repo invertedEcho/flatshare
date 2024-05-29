@@ -60,7 +60,7 @@ export function LoginScreen({}: NativeStackScreenProps<
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ password: "", username: "" });
-      setUser({ userId: res.userId, groupId: res.groupId ?? undefined });
+      setUser({ userId: res.userId, groupId: res.groupId });
       StorageWrapper.setItem("jwt-token", res.accessToken);
     },
     onError: (err) => {
