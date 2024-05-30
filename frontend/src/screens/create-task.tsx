@@ -15,6 +15,7 @@ import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
 import { getUsers } from "./assignments";
 import AnimatedView from "../components/animated-view";
+import { DismissKeyboard } from "../components/dismiss-keyboard";
 
 const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -157,92 +158,94 @@ export function CreateTaskScreen() {
 
   return (
     <AnimatedView>
-      <View className=" bg-slate-900 p-4 flex-1 justify-between">
-        <View style={{ rowGap: 16 }}>
-          <FormTextInput
-            name="title"
-            labelText="Title"
-            textInputProps={{
-              placeholder: "Enter a title",
-            }}
-            control={control}
-            errors={errors}
-            rules={{ required: true }}
-          />
-          <FormTextInput
-            name="description"
-            labelText="Description"
-            textInputProps={{
-              placeholder: "Enter a description",
-            }}
-            control={control}
-            errors={errors}
-          />
-          <View className="flex flex-row items-center gap-2">
-            <Switch
-              value={taskType === "recurring"}
-              onValueChange={() =>
-                setTaskType(
-                  taskType === "recurring" ? "non-recurring" : "recurring"
-                )
-              }
-              trackColor={{ true: "#24a0ed" }}
+      <DismissKeyboard>
+        <View className=" bg-slate-900 p-4 flex-1 justify-between">
+          <View style={{ rowGap: 16 }}>
+            <FormTextInput
+              name="title"
+              labelText="Title"
+              textInputProps={{
+                placeholder: "Enter a title",
+              }}
+              control={control}
+              errors={errors}
+              rules={{ required: true }}
             />
-            <Text
-              className={
-                taskType === "recurring" ? "text-white" : "text-gray-500"
-              }
-            >
-              Recurring task
-            </Text>
-          </View>
-          {taskType === "recurring" ? (
-            <View>
-              <Text className="text-white mb-2">Select Task group</Text>
-              <Dropdown
-                data={taskGroups}
-                disable={noTaskGroupExist}
-                labelField="title"
-                valueField="id"
-                onChange={(item) => setSelectedTaskGroupId(item.id)}
-                style={dropdownStyles.dropdown}
-                placeholderStyle={dropdownStyles.placeholderStyle}
-                containerStyle={dropdownStyles.container}
-                selectedTextStyle={dropdownStyles.selectedTextStyle}
-                inputSearchStyle={dropdownStyles.inputSearchStyle}
-                iconStyle={dropdownStyles.iconStyle}
-                placeholder="Select a task group (optional)"
+            <FormTextInput
+              name="description"
+              labelText="Description"
+              textInputProps={{
+                placeholder: "Enter a description",
+              }}
+              control={control}
+              errors={errors}
+            />
+            <View className="flex flex-row items-center gap-2">
+              <Switch
+                value={taskType === "recurring"}
+                onValueChange={() =>
+                  setTaskType(
+                    taskType === "recurring" ? "non-recurring" : "recurring"
+                  )
+                }
+                trackColor={{ true: "#24a0ed" }}
               />
-              {noTaskGroupExist && (
-                <Text className="text-red-200">
-                  Currently, there are no task groups available. Please create a
-                  task group first in order to assign tasks to it.
-                </Text>
-              )}
+              <Text
+                className={
+                  taskType === "recurring" ? "text-white" : "text-gray-500"
+                }
+              >
+                Recurring task
+              </Text>
             </View>
-          ) : (
-            <UserMultiSelect
-              users={users}
-              selectedUserIds={selectedUserIds}
-              setSelectedUserIds={setSelectedUserIds}
-              header="Select users"
-            />
-          )}
+            {taskType === "recurring" ? (
+              <View>
+                <Text className="text-white mb-2">Select Task group</Text>
+                <Dropdown
+                  data={taskGroups}
+                  disable={noTaskGroupExist}
+                  labelField="title"
+                  valueField="id"
+                  onChange={(item) => setSelectedTaskGroupId(item.id)}
+                  style={dropdownStyles.dropdown}
+                  placeholderStyle={dropdownStyles.placeholderStyle}
+                  containerStyle={dropdownStyles.container}
+                  selectedTextStyle={dropdownStyles.selectedTextStyle}
+                  inputSearchStyle={dropdownStyles.inputSearchStyle}
+                  iconStyle={dropdownStyles.iconStyle}
+                  placeholder="Select a task group (optional)"
+                />
+                {noTaskGroupExist && (
+                  <Text className="text-red-200">
+                    Currently, there are no task groups available. Please create
+                    a task group first in order to assign tasks to it.
+                  </Text>
+                )}
+              </View>
+            ) : (
+              <UserMultiSelect
+                users={users}
+                selectedUserIds={selectedUserIds}
+                setSelectedUserIds={setSelectedUserIds}
+                header="Select users"
+              />
+            )}
+          </View>
+          <Pressable
+            // TODO: nativewind won't work here for some odd reason
+            style={({ pressed }) => ({
+              backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+              paddingHorizontal: 24,
+              paddingVertical: 12,
+              borderRadius: 5,
+            })}
+            onPress={handleSubmit(onSubmit)}
+            disabled={disableSubmit}
+          >
+            <Text className="font-bold text-center ">Submit</Text>
+          </Pressable>
         </View>
-        <Pressable
-          // TODO: nativewind won't work here for some odd reason
-          style={({ pressed }) => ({
-            backgroundColor: pressed ? "#24aeff" : "#24a0ed",
-            paddingHorizontal: 24,
-            paddingVertical: 12,
-            borderRadius: 5,
-          })}
-          onPress={handleSubmit(onSubmit)}
-          disabled={disableSubmit}
-        >
-          <Text className="font-bold text-center ">Submit</Text>
-        </Pressable>
-      </View>
+      </DismissKeyboard>
     </AnimatedView>
   );
 }
