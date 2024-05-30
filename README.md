@@ -60,7 +60,3 @@ The user flow should be the following
 - all tasks in the group will be assigned to the same user in one period
 
 This means we will remove the frequency column from the task table and add it to the task_group table.
-
-## How to build apk
-
-- `eas build --profile production --platform android --local`

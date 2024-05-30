@@ -20,13 +20,17 @@ export type RootStackParamList = {
   MyAssignments: undefined;
   AllTasks: undefined;
   CreateTaskGroup: undefined;
-  Group: undefined;
+  Group: { inviteCode: string };
 };
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./public/tailwind.css";
 import Toast from "react-native-toast-message";
-import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import {
+  DefaultTheme,
+  LinkingOptions,
+  NavigationContainer,
+} from "@react-navigation/native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AssigmentsScreen } from "./src/screens/assignments";
 import { CreateTaskScreen } from "./src/screens/create-task";
@@ -58,7 +62,12 @@ export default function App() {
 
   const linking = {
     prefixes: [prefix],
-  };
+    config: {
+      screens: {
+        Group: "group:/invitecode",
+      },
+    },
+  } satisfies LinkingOptions<ReactNavigation.RootParamList>;
 
   // TODO: I dont like this useEffect
   React.useEffect(() => {

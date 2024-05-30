@@ -11,6 +11,7 @@ import { GenerateInviteCode } from "../components/generate-invite-code";
 import FormTextInput from "../components/form-text-input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRoute } from "@react-navigation/native";
 
 const groupInviteSchema = z.object({
   inviteCode: z.string().length(8),
@@ -47,6 +48,8 @@ export function GroupInviteScreen({
 }: {
   groupId: number | undefined;
 }) {
+  const route = useRoute();
+  console.log({ params: route.params });
   const { user, setUser } = React.useContext(AuthContext);
   const {
     control,
