@@ -1,4 +1,4 @@
-import { count, desc, eq, or, sql } from 'drizzle-orm';
+import { count, desc, eq, isNull, or, sql } from 'drizzle-orm';
 import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
@@ -23,7 +23,8 @@ export async function dbGetAssignmentsFromCurrentInterval(): Promise<
         isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
         createdAt: assignmentTable.createdAt,
         isOneOff: sql<boolean>`${taskTable.taskGroupId} IS NULL`,
-        dueDate: sql<string>`${assignmentTable.createdAt} + (${taskGroupTable.interval} - interval '1 day')`,
+        // TODO: make timezone dynamic
+        dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
       })
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
@@ -31,7 +32,11 @@ export async function dbGetAssignmentsFromCurrentInterval(): Promise<
       .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id))
       // Only get assignments from the current interval
       .where(
-        sql`current_date < (${assignmentTable.createdAt} + (${taskGroupTable.interval} - interval '1 day'))`,
+        // TODO: make timezone dynamic
+        or(
+          sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
+          isNull(taskGroupTable.id),
+        ),
       );
 
     return queryResult.map((assignment) => {

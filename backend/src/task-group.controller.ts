@@ -4,7 +4,7 @@ import { dbCreateTaskGroup, dbGetTaskGroups } from './db/functions/task-group';
 export type CreateTaskGroup = {
   title: string;
   description?: string;
-  intervalDays: string;
+  interval: string;
   userIds: number[];
   initialStartDate: string;
 };
