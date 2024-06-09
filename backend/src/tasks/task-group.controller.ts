@@ -7,7 +7,7 @@ import {
 export type CreateTaskGroup = {
   title: string;
   description?: string;
-  intervalDays: string;
+  interval: string;
   userIds: number[];
   initialStartDate: string;
 };

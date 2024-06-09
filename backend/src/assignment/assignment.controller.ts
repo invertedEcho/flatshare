@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Post } from '@nestjs/common';
 import {
   dbChangeAssignmentState,
-  dbGetAllAssignments,
+  dbGetAssignmentsFromCurrentInterval,
 } from 'src/db/functions/assignment';
 import { AssignmentState } from 'src/db/schema';
 import { AssignmentResponse } from 'src/types';
@@ -10,7 +10,7 @@ import { AssignmentResponse } from 'src/types';
 export class AssignmentController {
   @Get()
   async getAllAssignments(): Promise<AssignmentResponse[]> {
-    return await dbGetAllAssignments();
+    return await dbGetAssignmentsFromCurrentInterval();
   }
 
   @Post('/:id/:state')

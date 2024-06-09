@@ -20,6 +20,7 @@ jobs:
         script: |
           export PATH=$PATH:~/.local/share/pnpm/
           cd ~/wg-app/backend
+          git pull
           pnpm i
           pnpm build
           pnpm start:prod

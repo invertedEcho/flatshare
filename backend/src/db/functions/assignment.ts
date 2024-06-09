@@ -1,4 +1,4 @@
-import { count, desc, eq, or, sql } from 'drizzle-orm';
+import { count, desc, eq, isNull, or, sql } from 'drizzle-orm';
 import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
@@ -9,25 +9,43 @@ import {
   userTable,
 } from '../schema';
 
-export async function dbGetAllAssignments(): Promise<AssignmentResponse[]> {
+export async function dbGetAssignmentsFromCurrentInterval(): Promise<
+  AssignmentResponse[]
+> {
   try {
     const queryResult = await db
-      .select()
+      .select({
+        id: assignmentTable.id,
+        title: taskTable.title,
+        description: taskTable.description,
+        assigneeId: userTable.id,
+        assigneeName: userTable.username,
+        isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
+        createdAt: assignmentTable.createdAt,
+        isOneOff: sql<boolean>`${taskTable.taskGroupId} IS NULL`,
+        // TODO: make timezone dynamic
+        dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
+      })
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
-      .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id));
+      .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
+      .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id))
+      // Only get assignments from the current interval
+      .where(
+        // TODO: make timezone dynamic
+        or(
+          sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
+          isNull(taskGroupTable.id),
+        ),
+      );
 
-    return queryResult.map((query) => {
+    return queryResult.map((assignment) => {
+      // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the 'Z' to make the date constructor interpret it as UTC.
+      const date = new Date(assignment.dueDate + 'Z');
       return {
-        title: query.task.title,
-        description: query.task.description,
-        id: query.assignment.id,
-        assigneeId: query.user.id,
-        assigneeName: query.user.email,
-        isCompleted: query.assignment.state === 'completed',
-        createdAt: query.assignment.createdAt,
-        isOneOff: !query.task.taskGroupId,
-      } satisfies AssignmentResponse;
+        ...assignment,
+        dueDate: assignment.isOneOff ? null : date,
+      };
     });
   } catch (error) {
     console.error({ error });

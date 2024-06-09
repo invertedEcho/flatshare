@@ -15,7 +15,7 @@ export async function dbGetTaskGroups() {
 export async function dbCreateTaskGroup({
   title,
   description,
-  intervalDays,
+  interval,
   userIds,
   initialStartDate,
 }: CreateTaskGroup) {
@@ -25,7 +25,7 @@ export async function dbCreateTaskGroup({
       .values({
         title,
         description,
-        interval: `${intervalDays} days`,
+        interval,
         initialStartDate: new Date(initialStartDate),
       })
       .returning({ taskGroupId: taskGroupTable.id });
