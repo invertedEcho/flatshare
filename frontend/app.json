@@ -30,12 +30,13 @@
       "package": "com.invertedEcho.wg_app",
       "intentFilters": [
         {
+	  "_comment": "See https://docs.expo.dev/versions/latest/config/app/#autoverify",
+	  "autoVerify": true,
           "action": "VIEW",
           "data": [
             {
-              "scheme": "https",
-              "host": "wg.mainfraeme.com",
-              "pathPrefix": "/group"
+              "scheme": "http",
+              "host": "192.168.178.53"
             }
           ],
           "category": [

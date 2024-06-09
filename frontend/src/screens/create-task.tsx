@@ -81,7 +81,7 @@ export function CreateTaskScreen() {
   >(undefined);
 
   const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
-    "recurring"
+    "recurring",
   );
   const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
 
@@ -183,7 +183,7 @@ export function CreateTaskScreen() {
               value={taskType === "recurring"}
               onValueChange={() =>
                 setTaskType(
-                  taskType === "recurring" ? "non-recurring" : "recurring"
+                  taskType === "recurring" ? "non-recurring" : "recurring",
                 )
               }
               trackColor={{ true: "#24a0ed" }}
@@ -240,7 +240,7 @@ export function CreateTaskScreen() {
           onPress={handleSubmit(onSubmit)}
           disabled={disableSubmit}
         >
-          <Text className="font-bold text-center ">Submit</Text>
+          <Text className="font-bold text-center">Submit</Text>
         </Pressable>
       </View>
     </AnimatedView>

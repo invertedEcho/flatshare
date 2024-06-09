@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import * as React from "react";
 import { Pressable, Text, View } from "react-native";
+import * as Linking from "expo-linking";
 import { AuthContext } from "../auth-context";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { z } from "zod";
@@ -43,18 +44,46 @@ async function generateInviteCode(
   return inviteCode;
 }
 
+// FIXME: rename me
+export const deepLinkInviteSchemaThing = z.object({
+  inviteCode: z.string(),
+});
+
 export function GroupInviteScreen({
   groupId,
 }: {
   groupId: number | undefined;
 }) {
   const route = useRoute();
-  console.log({ params: route.params });
+
+  React.useEffect(() => {
+    const handleInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        const { queryParams } = Linking.parse(url);
+        const parsed = deepLinkInviteSchemaThing.parse(queryParams);
+        console.log({ parsed });
+        setValue("inviteCode", parsed.inviteCode);
+        // move this somewhere else so we can actually navigate
+        // e.g. somewhere inside the NavigationContainer
+      }
+    };
+    const params = route.params;
+    if (params !== undefined) {
+      const parsed = deepLinkInviteSchemaThing.parse(params);
+      console.log({ parsed });
+      setValue("inviteCode", parsed.inviteCode);
+    } else {
+      handleInitialURL();
+    }
+  });
+
   const { user, setUser } = React.useContext(AuthContext);
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<GroupInvite>({
     resolver: zodResolver(groupInviteSchema),
   });

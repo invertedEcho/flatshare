@@ -64,7 +64,12 @@ export default function App() {
     prefixes: [prefix],
     config: {
       screens: {
-        Group: "group:/invitecode",
+        Group: {
+          path: "group/:inviteCode?",
+          parse: {
+            id: (id: String) => `${id}`,
+          },
+        },
       },
     },
   } satisfies LinkingOptions<ReactNavigation.RootParamList>;
@@ -98,7 +103,6 @@ export default function App() {
             linking={linking}
           >
             <BottomTabNavigator.Navigator
-              initialRouteName="MyAssignments"
               screenOptions={({ route }) => ({
                 tabBarIcon: ({ focused, color, size }) => {
                   const iconName = getIconNameForRouteName(route.name, focused);
