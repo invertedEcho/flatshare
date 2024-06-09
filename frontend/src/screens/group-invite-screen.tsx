@@ -62,16 +62,12 @@ export function GroupInviteScreen({
       if (url) {
         const { queryParams } = Linking.parse(url);
         const parsed = deepLinkInviteSchemaThing.parse(queryParams);
-        console.log({ parsed });
         setValue("inviteCode", parsed.inviteCode);
-        // move this somewhere else so we can actually navigate
-        // e.g. somewhere inside the NavigationContainer
       }
     };
     const params = route.params;
     if (params !== undefined) {
       const parsed = deepLinkInviteSchemaThing.parse(params);
-      console.log({ parsed });
       setValue("inviteCode", parsed.inviteCode);
     } else {
       handleInitialURL();
