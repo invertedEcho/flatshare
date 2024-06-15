@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "engines": {
-    "pnpm": "~9"
+    "pnpm": "~8"
   },
   "scripts": {
     "start": "expo start",
@@ -21,7 +21,7 @@
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@tanstack/react-query": "^5.32.0",
-    "expo": "51.0.9",
+    "expo": "51.0.11",
     "expo-dev-client": "4.0.15",
     "expo-linking": "~6.3.1",
     "expo-secure-store": "~13.0.1",
@@ -31,7 +31,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.51.4",
-    "react-native": "0.74.1",
+    "react-native": "0.74.2",
     "react-native-bouncy-checkbox": "^4.0.0",
     "react-native-element-dropdown": "^2.12.0",
     "react-native-material-menu": "^2.0.0",
@@ -52,7 +52,8 @@
     "@types/react": "18.2.79",
     "@types/react-test-renderer": "^18.3.0",
     "tailwindcss": "3.3.2",
-    "typescript": "^5.3.3"
+    "typescript": "5.3.3"
   },
-  "private": true
+  "private": true,
+  "packageManager": "pnpm@8.15.5+sha1.a58c038faac410c947dbdb93eb30994037d0fce2"
 }

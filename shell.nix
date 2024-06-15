@@ -16,12 +16,15 @@ let
     cmake-3-22-1
   ]);
 
-
+  nodejs = pkgs.nodejs_22;
+  pnpm = pkgs.nodejs_22.pkgs.pnpm;
 in
 mkShell {
   buildInputs = [
     android-studio
     android-sdk
+    nodejs
+    pnpm
   ];
 
   shellHook = ''

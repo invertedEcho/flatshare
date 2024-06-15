@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import {
   dbAddUserToGroup,
+  dbCreateUserGroup,
   dbGetGroupOfUser,
   dbGetInviteCode,
 } from './db/functions/user-group';
@@ -28,6 +29,7 @@ export class UserGroupController {
     };
   }
 
+  // TODO: returning success should not be needed. the response status should just not be status 2xx.
   @Post('join')
   async joinGroup(@Body() body: { userId: number; inviteCode: string }) {
     const { inviteCode, userId } = body;
@@ -37,6 +39,19 @@ export class UserGroupController {
     }
     await dbAddUserToGroup({ userId, groupId: maybeInviteCode.groupId });
     return { success: true, groupId: maybeInviteCode.groupId };
+  }
+
+  @Post('join-by-id')
+  async joinGroupById(@Body() body: { userId: number; groupId: number }) {
+    const { groupId, userId } = body;
+    await dbAddUserToGroup({ userId, groupId });
+    return { success: true, groupId };
+  }
+
+  @Post('create')
+  async createGroup(@Body() body: { groupName: string }) {
+    const { groupName } = body;
+    return (await dbCreateUserGroup({ groupName }))[0];
   }
 
   // TODO: yeaaahhh we definitely need to protect this route.

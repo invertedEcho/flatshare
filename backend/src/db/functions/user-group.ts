@@ -31,3 +31,7 @@ export async function dbAddUserToGroup({
 }) {
   await db.insert(userGroupTable).values({ userId, groupId });
 }
+
+export async function dbCreateUserGroup({ groupName }: { groupName: string }) {
+  return await db.insert(groupTable).values({ name: groupName }).returning();
+}

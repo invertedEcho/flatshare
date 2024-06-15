@@ -47,7 +47,7 @@ export function RegisterScreen({
         email: args.email,
       }),
     onSuccess: () => {
-      Toast.show({ type: "success", text1: "Succcessfully register" });
+      Toast.show({ type: "success", text1: "Succcessfully registered" });
       resetForm({ username: "", password: "", email: "" });
       navigation.navigate("Login");
     },

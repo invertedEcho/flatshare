@@ -30,7 +30,6 @@
       "package": "com.invertedEcho.wg_app",
       "intentFilters": [
         {
-	  "_comment": "See https://docs.expo.dev/versions/latest/config/app/#autoverify",
 	  "autoVerify": true,
           "action": "VIEW",
           "data": [

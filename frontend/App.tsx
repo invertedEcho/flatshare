@@ -21,6 +21,7 @@ export type RootStackParamList = {
   AllTasks: undefined;
   CreateTaskGroup: undefined;
   Group: { inviteCode: string };
+  GroupInvite: undefined;
 };
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,8 +41,10 @@ import { z } from "zod";
 import { Menu } from "react-native-material-menu";
 import { LogoutButton } from "./src/components/log-out-button";
 import { MenuAnchor } from "./src/components/burger-menu-content";
-import { GroupInviteScreen } from "./src/screens/group-invite-screen";
+import { GroupJoinScreen } from "./src/screens/group-join-create-screen";
 import { getIconNameForRouteName } from "./src/utils/routes";
+import { GroupInviteScreen } from "./src/screens/group-invite-screen";
+import { getDefinedValueOrThrow } from "./src/utils/assert";
 
 const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 
@@ -67,7 +70,7 @@ export default function App() {
         Group: {
           path: "group/:inviteCode?",
           parse: {
-            id: (id: String) => `${id}`,
+            inviteCode: (inviteCode: String) => `${inviteCode}`,
           },
         },
       },
@@ -164,13 +167,10 @@ export default function App() {
                 <BottomTabNavigator.Screen
                   name="Group"
                   options={{ title: "Group" }}
-                >
-                  {() => (
-                    <GroupInviteScreen groupId={user.groupId ?? undefined} />
-                  )}
-                </BottomTabNavigator.Screen>
+                  component={GroupJoinScreen}
+                />
               )}
-              {user !== undefined && user.groupId !== null ? (
+              {user !== undefined && user.groupId !== null && (
                 <>
                   <BottomTabNavigator.Screen
                     name="MyAssignments"
@@ -192,9 +192,18 @@ export default function App() {
                     component={CreateTaskGroupScreen}
                     options={{ title: "Create a Task Group" }}
                   />
+                  <BottomTabNavigator.Screen
+                    name="GroupInvite"
+                    options={{ title: "Group Invite" }}
+                  >
+                    {/* FIXME */}
+                    {() => (
+                      <GroupInviteScreen
+                        groupId={getDefinedValueOrThrow(user.groupId)}
+                      />
+                    )}
+                  </BottomTabNavigator.Screen>
                 </>
-              ) : (
-                <></>
               )}
             </BottomTabNavigator.Navigator>
           </NavigationContainer>
