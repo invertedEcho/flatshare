@@ -3,16 +3,18 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
 import { db } from 'src/db';
-import { userTable } from 'src/db/schema';
+import { userGroupTable, userTable } from 'src/db/schema';
 import { AuthService, User } from './auth.service';
 import { Public } from './public.decorators';
 import { dbGetGroupOfUser } from 'src/db/functions/user-group';
+import { eq } from 'drizzle-orm';
 
 class RegisterDto {
   username: string;
@@ -53,13 +55,24 @@ export class AuthController {
     };
   }
 
+  // TODO: should go into seperate user controller
   @Get('users')
-  async getUsers() {
-    const users = await db.select().from(userTable);
-    return users.map((user) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...rest } = user;
-      return rest;
-    });
+  async getUsers(@Query('groupId') groupId?: number) {
+    const users = db
+      .select({
+        id: userTable.id,
+        email: userTable.email,
+        username: userTable.username,
+        createdAt: userTable.createdAt,
+      })
+      .from(userTable);
+
+    if (groupId === undefined) {
+      return await users;
+    }
+
+    return await users
+      .innerJoin(userGroupTable, eq(userGroupTable.userId, userTable.id))
+      .where(eq(userGroupTable.groupId, groupId));
   }
 }

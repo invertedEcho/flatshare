@@ -13,9 +13,11 @@ import { dropdownStyles } from "../components/user-dropdown";
 import UserMultiSelect from "../components/user-multi-select";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
-import { getUsers } from "./assignments";
+import { getUsersOfCurrentGroup } from "./assignments";
 import AnimatedView from "../components/animated-view";
 import { DismissKeyboard } from "../components/dismiss-keyboard";
+import { AuthContext } from "../auth-context";
+import { getDefinedValueOrThrow } from "../utils/assert";
 
 const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
@@ -77,6 +79,10 @@ const defaultValues = {
 };
 
 export function CreateTaskScreen() {
+  const { user } = React.useContext(AuthContext);
+  // FIXME
+  const { groupId } = getDefinedValueOrThrow(user);
+  const actualGroupId = getDefinedValueOrThrow(groupId);
   const [selectedTaskGroupId, setSelectedTaskGroupId] = React.useState<
     number | undefined
   >(undefined);
@@ -133,7 +139,9 @@ export function CreateTaskScreen() {
 
   const { data: users, isLoading: isUsersLoading } = useQuery({
     queryKey: [queryKeys.users],
-    queryFn: getUsers,
+    queryFn: () => {
+      return getUsersOfCurrentGroup({ groupId: actualGroupId });
+    },
   });
 
   function onSubmit(data: CreateRecurringTask) {

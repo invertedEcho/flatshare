@@ -16,6 +16,7 @@ import Loading from "../components/loading";
 import UserDropdown from "../components/user-dropdown";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
+import { getDefinedValueOrThrow } from "../utils/assert";
 
 export const assignmentSchema = z.object({
   id: z.number(),
@@ -44,36 +45,46 @@ type AssignmentState = "pending" | "completed";
 const assignmentsResponse = z.array(assignmentSchema);
 const usersResponse = z.array(userSchema);
 
-async function getAssigments() {
-  const res = await fetchWrapper.get("assignments");
+async function getAssigments({ groupId }: { groupId: number }) {
+  const res = await fetchWrapper.get(`assignments?groupId=${groupId}`);
   const assignments = await res.json();
   return assignmentsResponse.parse(assignments);
 }
 
-export async function getUsers() {
-  const res = await fetchWrapper.get("users");
+export async function getUsersOfCurrentGroup({ groupId }: { groupId: number }) {
+  const res = await fetchWrapper.get(`users?groupId=${groupId}`);
   const users = await res.json();
   return usersResponse.parse(users);
 }
 
 async function updateAssignmentStatus(
   assignmentId: number,
-  state: AssignmentState
+  state: AssignmentState,
 ) {
+  // TODO: should be put
   await fetchWrapper.post(`assignments/${assignmentId}/${state}`);
 }
 
 export function AssigmentsScreen() {
+  const { user } = React.useContext(AuthContext);
+  // FIXME
+  const { userId, groupId } = getDefinedValueOrThrow(user);
+  const actualGroupId = getDefinedValueOrThrow(groupId);
+
   const queryClient = useQueryClient();
   const { data: assignments, isLoading } = useQuery({
     queryKey: [queryKeys.assignments],
-    queryFn: getAssigments,
+    queryFn: () => {
+      return getAssigments({ groupId: actualGroupId });
+    },
   });
-  const { userId } = React.useContext(AuthContext);
 
   const { data: users } = useQuery({
-    queryKey: [queryKeys.users],
-    queryFn: getUsers,
+    queryKey: [queryKeys.users, { groupId }],
+    queryFn: () => {
+      console.log({ actualGroupId });
+      return getUsersOfCurrentGroup({ groupId: actualGroupId });
+    },
   });
 
   const [selectedUserId, setSelectedUserId] = React.useState(userId);
@@ -91,6 +102,7 @@ export function AssigmentsScreen() {
       queryClient.refetchQueries({ queryKey: [queryKeys.assignments] });
     },
   });
+  console.log({ assignments, users });
 
   if (assignments === undefined || users === undefined || isLoading) {
     return <Loading message="Loading your assignments..." />;
@@ -99,15 +111,15 @@ export function AssigmentsScreen() {
   const filteredAssignments = assignments.filter(
     (assignment) =>
       assignment.assigneeId === selectedUserId &&
-      !(assignment.isOneOff && assignment.isCompleted)
+      !(assignment.isOneOff && assignment.isCompleted),
   );
 
   const oneOffAssignments = filteredAssignments.filter(
-    (assignment) => assignment.isOneOff
+    (assignment) => assignment.isOneOff,
   );
 
   const recurringAssignments = filteredAssignments.filter(
-    (assignment) => !assignment.isOneOff
+    (assignment) => !assignment.isOneOff,
   );
 
   const assignmentsByDateTimestamp = recurringAssignments.reduce<
@@ -130,12 +142,12 @@ export function AssigmentsScreen() {
   ).concat(
     Array.from(assignmentsByDateTimestamp)
       .sort(
-        ([dateTimeStampA], [dateTimeStampB]) => dateTimeStampA - dateTimeStampB
+        ([dateTimeStampA], [dateTimeStampB]) => dateTimeStampA - dateTimeStampB,
       )
       .map(([dateTimestamp, assignments]) => ({
         title: `Due on ${new Date(dateTimestamp).toLocaleDateString("en-GB")}`,
         data: assignments.sort((a, b) => a.title.localeCompare(b.title)),
-      }))
+      })),
   );
 
   async function refreshAssignments() {

@@ -20,7 +20,7 @@ export type OneOffTask = {
   userIds: number[];
 };
 
-// todo: this shouldnt be a seperate type
+// TODO: this shouldnt be a seperate type
 export type UpdateTask = {
   title: string;
   description: string;
@@ -32,25 +32,21 @@ export class TasksController {
   @Get()
   async getAll(): Promise<SelectTask[]> {
     const tasks = await dbGetAllTasks();
-    // console.log({ tasks });
     return tasks;
   }
 
   @Post('/recurring')
   async createRecurringTask(@Body() task: CreateTask) {
-    console.log({ task });
     await dbCreateRecurringTask(task);
   }
 
   @Put(':id')
   async updateTask(@Param('id') id: string, @Body() task: UpdateTask) {
-    console.log({ updatedTask: task });
     await dbUpdateTask({ ...task, id: Number(id) });
   }
 
   @Post('/one-off')
   async createOneOffTask(@Body() oneOffTask: OneOffTask) {
-    console.log(oneOffTask);
     await dbCreateOneOffTask(oneOffTask);
   }
 }

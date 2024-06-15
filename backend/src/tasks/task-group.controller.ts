@@ -22,7 +22,6 @@ export class TaskGroupController {
 
   @Post()
   async createTaskGroup(@Body() taskGroup: CreateTaskGroup) {
-    console.log({ taskGroup });
     await dbCreateTaskGroup(taskGroup);
   }
 }

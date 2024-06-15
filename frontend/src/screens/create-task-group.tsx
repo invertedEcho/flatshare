@@ -18,7 +18,9 @@ import WebDateTimerPicker from "../components/web-date-picker";
 import { addDays, addMonth, setTimeToZero } from "../utils/date";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
-import { getUsers } from "./assignments";
+import { getUsersOfCurrentGroup } from "./assignments";
+import { AuthContext } from "../auth-context";
+import { getDefinedValueOrThrow } from "../utils/assert";
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
@@ -69,10 +71,16 @@ export function CreateTaskGroupScreen() {
     defaultValues,
     resolver: zodResolver(createTaskGroupSchema),
   });
+  const { user } = React.useContext(AuthContext);
+  // FIXME
+  const { groupId } = getDefinedValueOrThrow(user);
+  const actualGroupId = getDefinedValueOrThrow(groupId);
 
   const { data: users, isLoading } = useQuery({
     queryKey: [queryKeys.users],
-    queryFn: getUsers,
+    queryFn: () => {
+      return getUsersOfCurrentGroup({ groupId: actualGroupId });
+    },
   });
 
   const queryClient = useQueryClient();

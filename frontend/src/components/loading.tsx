@@ -7,7 +7,7 @@ type Props = {
 export default function Loading({ message }: Props) {
   return (
     <View>
-      <Text>{message}</Text>
+      <Text className="text-white">{message}</Text>
     </View>
   );
 }

@@ -66,7 +66,6 @@ export class UserGroupController {
     // )[0];
 
     const inviteCode = generateRandomAlphanumericalCode(8);
-    console.log({ inviteCode });
     await db.insert(groupInviteTable).values({ code: inviteCode, groupId });
 
     return { inviteCode };
