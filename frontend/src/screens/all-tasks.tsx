@@ -1,26 +1,28 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
-import { RefreshControl, SafeAreaView, ScrollView } from "react-native";
+import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import { z } from "zod";
 import AnimatedView from "../components/animated-view";
 import Loading from "../components/loading";
 import { TaskItem } from "../components/task-item";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
+import { AuthContext } from "../auth-context";
+import { getDefinedValueOrThrow } from "../utils/assert";
 
 export const taskSchema = z.object({
   title: z.string(),
   description: z.string().nullable(),
   createdAt: z.coerce.date(),
-  taskGroupId: z.number().nullable(),
+  recurringTaskGroupId: z.number().nullable(),
   id: z.number(),
 });
 
 export type Task = z.infer<typeof taskSchema>;
 
-async function getAllTasks() {
-  const response = await fetchWrapper.get("tasks");
+async function getAllTasks({ groupId }: { groupId: number }) {
+  const response = await fetchWrapper.get(`tasks?groupId=${groupId}`);
   const body = await response.json();
   const parsed = z.array(taskSchema).safeParse(body);
   if (!parsed.success) {
@@ -31,20 +33,27 @@ async function getAllTasks() {
 }
 
 export default function AllTasksScreen() {
-  const { data, isLoading } = useQuery({
+  const { user } = React.useContext(AuthContext);
+  const groupId = getDefinedValueOrThrow(user?.groupId);
+  const {
+    data: tasks,
+    isLoading,
+    refetch: refetchAllTasks,
+  } = useQuery({
     queryKey: [queryKeys.tasks],
-    queryFn: getAllTasks,
+    queryFn: () => {
+      return getAllTasks({ groupId });
+    },
   });
   const [refreshing, setRefreshing] = React.useState(false);
-  const queryClient = useQueryClient();
 
-  if (data === undefined || isLoading) {
-    return <Loading message="Loading all tasks" />;
+  if (tasks === undefined || isLoading) {
+    return <Loading message="Loading all tasks..." />;
   }
 
   async function refreshTasks() {
     setRefreshing(true);
-    await queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
+    refetchAllTasks();
     setRefreshing(false);
   }
 
@@ -59,16 +68,22 @@ export default function AllTasksScreen() {
           contentContainerStyle={{ gap: 12 }}
         >
           <StatusBar style="auto" />
-          {data.map((task) => (
-            <TaskItem
-              title={task.title}
-              description={task.description}
-              createdAt={task.createdAt}
-              id={task.id}
-              taskGroupId={task.taskGroupId}
-              key={task.id}
-            />
-          ))}
+          {tasks.length > 0 ? (
+            tasks.map((task) => (
+              <TaskItem
+                title={task.title}
+                description={task.description}
+                createdAt={task.createdAt}
+                id={task.id}
+                recurringTaskGroupId={task.recurringTaskGroupId}
+                key={task.id}
+              />
+            ))
+          ) : (
+            <Text className="text-white">
+              Your current group does not have any tasks.
+            </Text>
+          )}
         </ScrollView>
       </SafeAreaView>
     </AnimatedView>

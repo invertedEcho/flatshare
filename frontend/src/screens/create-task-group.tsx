@@ -18,7 +18,9 @@ import WebDateTimerPicker from "../components/web-date-picker";
 import { addDays, addMonth, setTimeToZero } from "../utils/date";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
-import { getUsers } from "./assignments";
+import { getUsersOfCurrentGroup } from "./assignments";
+import { AuthContext } from "../auth-context";
+import { getDefinedValueOrThrow } from "../utils/assert";
 const createTaskGroupSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
@@ -69,17 +71,22 @@ export function CreateTaskGroupScreen() {
     defaultValues,
     resolver: zodResolver(createTaskGroupSchema),
   });
+  const { user } = React.useContext(AuthContext);
+  // FIXME
+  const groupId = getDefinedValueOrThrow(user?.groupId);
 
   const { data: users, isLoading } = useQuery({
     queryKey: [queryKeys.users],
-    queryFn: getUsers,
+    queryFn: () => {
+      return getUsersOfCurrentGroup({ groupId });
+    },
   });
 
   const queryClient = useQueryClient();
 
   const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
   const [date, setDate] = React.useState<Date | undefined>(
-    setTimeToZero(new Date())
+    setTimeToZero(new Date()),
   );
   const [selectedIntervalType, setSelectedIntervalType] = React.useState<
     "days" | "months" | "weeks"
@@ -233,7 +240,7 @@ export function CreateTaskGroupScreen() {
                     timeZoneName="Europe/Berlin"
                     minimumDate={getMinimumDate(
                       Number(intervalValue),
-                      selectedIntervalType
+                      selectedIntervalType,
                     )}
                   />
                 ),
@@ -259,7 +266,7 @@ export function CreateTaskGroupScreen() {
                         themeVariant="dark"
                         minimumDate={getMinimumDate(
                           Number(intervalValue),
-                          selectedIntervalType
+                          selectedIntervalType,
                         )}
                       />
                     )}
@@ -271,8 +278,8 @@ export function CreateTaskGroupScreen() {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setDate(
                         new Date(
-                          new Date(e.currentTarget.value).setHours(0, 0, 0, 0)
-                        )
+                          new Date(e.currentTarget.value).setHours(0, 0, 0, 0),
+                        ),
                       )
                     }
                     value={

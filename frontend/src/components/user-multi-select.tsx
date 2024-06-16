@@ -10,9 +10,8 @@ type MultiSelectItemProps = {
 
 function MultiSelectItem(
   { username }: MultiSelectItemProps,
-  selected?: boolean
+  selected?: boolean,
 ) {
-  console.debug({ selected });
   return (
     <View style={styles.item}>
       <Text style={selected ? styles.selectedTextStyle : styles.itemTextStyle}>
@@ -29,9 +28,9 @@ function MultiSelectItem(
 }
 
 type MultiSelectProps = {
-  users: { username: string; id: number }[];
-  selectedUserIds: string[];
-  setSelectedUserIds: React.Dispatch<React.SetStateAction<string[]>>;
+  users: { id: number; username: string }[];
+  selectedUserIds: number[];
+  setSelectedUserIds: React.Dispatch<React.SetStateAction<number[]>>;
   header: string;
 };
 
@@ -53,12 +52,10 @@ export default function UserMultiSelect({
         data={users}
         labelField="username"
         valueField="id"
-        placeholder="Select item"
+        placeholder="Select user"
         value={selectedUserIds}
         activeColor="white"
-        onChange={(userIds) => {
-          setSelectedUserIds(userIds);
-        }}
+        onChange={setSelectedUserIds}
         renderLeftIcon={() => (
           <Ionicons style={styles.icon} color="black" name="person" size={20} />
         )}

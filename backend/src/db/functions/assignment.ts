@@ -1,17 +1,19 @@
-import { count, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import { count, desc, eq, isNull, or, sql, and } from 'drizzle-orm';
 import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
   AssignmentState,
+  CreateAssignment,
   assignmentTable,
-  taskGroupTable,
+  recurringTaskGroupTable,
   taskTable,
+  userGroupTable,
   userTable,
 } from '../schema';
 
-export async function dbGetAssignmentsFromCurrentInterval(): Promise<
-  AssignmentResponse[]
-> {
+export async function dbGetAssignmentsFromCurrentInterval(
+  groupId: number,
+): Promise<AssignmentResponse[]> {
   try {
     const queryResult = await db
       .select({
@@ -22,20 +24,27 @@ export async function dbGetAssignmentsFromCurrentInterval(): Promise<
         assigneeName: userTable.username,
         isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
         createdAt: assignmentTable.createdAt,
-        isOneOff: sql<boolean>`${taskTable.taskGroupId} IS NULL`,
+        isOneOff: sql<boolean>`${taskTable.recurringTaskGroupId} IS NULL`,
         // TODO: make timezone dynamic
-        dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
+        dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
       })
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
       .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
-      .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id))
+      .innerJoin(userGroupTable, eq(userGroupTable.userId, userTable.id))
+      .leftJoin(
+        recurringTaskGroupTable,
+        eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
+      )
       // Only get assignments from the current interval
       .where(
         // TODO: make timezone dynamic
-        or(
-          sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
-          isNull(taskGroupTable.id),
+        and(
+          or(
+            sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
+            isNull(recurringTaskGroupTable.id),
+          ),
+          eq(userGroupTable.groupId, groupId),
         ),
       );
 
@@ -74,10 +83,13 @@ export async function dbGetAssignmentsForTaskGroup(
 ) {
   const result = db
     .select({ assignment: { ...assignmentTable } })
-    .from(taskGroupTable)
-    .innerJoin(taskTable, eq(taskGroupTable.id, taskTable.taskGroupId))
+    .from(recurringTaskGroupTable)
+    .innerJoin(
+      taskTable,
+      eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
+    )
     .innerJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
-    .where(eq(taskGroupTable.id, taskGroupId))
+    .where(eq(recurringTaskGroupTable.id, taskGroupId))
     .orderBy(desc(assignmentTable.createdAt));
   if (limit === undefined) {
     return await result;
@@ -90,9 +102,12 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
     .select()
     .from(assignmentTable)
     .innerJoin(taskTable, eq(taskTable.id, assignmentTable.taskId))
-    .innerJoin(taskGroupTable, eq(taskGroupTable.id, taskTable.taskGroupId))
+    .innerJoin(
+      recurringTaskGroupTable,
+      eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
+    )
     .where(
-      sql`${assignmentTable.createdAt} >= NOW() - ${taskGroupTable.interval} AND ${taskGroupTable.id} = ${taskGroupId}`,
+      sql`${assignmentTable.createdAt} >= NOW() - ${recurringTaskGroupTable.interval} AND ${recurringTaskGroupTable.id} = ${taskGroupId}`,
     );
 
   return currentAssignments;
@@ -104,19 +119,22 @@ export async function dbGetTasksToAssignForCurrentInterval() {
     const taskIdsToCreateAssignmentsFor = await db
       .select({
         taskId: taskTable.id,
-        taskGroupId: taskGroupTable.id,
-        taskGroupInitialStartDate: taskGroupTable.initialStartDate,
-        isInFirstInterval: sql<boolean>`NOW() < (${taskGroupTable.initialStartDate} + ${taskGroupTable.interval})`,
+        taskGroupId: recurringTaskGroupTable.id,
+        taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
+        isInFirstInterval: sql<boolean>`NOW() < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
       })
-      .from(taskGroupTable)
-      .innerJoin(taskTable, eq(taskGroupTable.id, taskTable.taskGroupId))
+      .from(recurringTaskGroupTable)
+      .innerJoin(
+        taskTable,
+        eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
+      )
       .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
-      .where(sql`${taskGroupTable.initialStartDate} <= NOW()`)
-      .groupBy(taskGroupTable.id, taskTable.id)
+      .where(sql`${recurringTaskGroupTable.initialStartDate} <= NOW()`)
+      .groupBy(recurringTaskGroupTable.id, taskTable.id)
       .having(
         or(
           eq(count(assignmentTable.id), 0),
-          sql`MAX(${assignmentTable.createdAt}) <= (NOW() - ${taskGroupTable.interval})`,
+          sql`MAX(${assignmentTable.createdAt}) <= (NOW() - ${recurringTaskGroupTable.interval})`,
         ),
       );
 
@@ -125,4 +143,12 @@ export async function dbGetTasksToAssignForCurrentInterval() {
     console.error({ error });
     throw error;
   }
+}
+
+export async function dbAddAssignments({
+  assignments,
+}: {
+  assignments: CreateAssignment[];
+}) {
+  await db.insert(assignmentTable).values(assignments);
 }

@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1715893544540,
-      "tag": "0000_glorious_betty_brant",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1715894454119,
-      "tag": "0001_cuddly_synch",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1715904770184,
-      "tag": "0002_oval_kid_colt",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1716208018244,
-      "tag": "0003_aspiring_the_hunter",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1716209187106,
-      "tag": "0004_flippant_black_bird",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1716209687796,
-      "tag": "0005_new_ultimatum",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1716234766177,
-      "tag": "0006_tough_pandemic",
+      "when": 1718537503994,
+      "tag": "0000_shallow_newton_destine",
       "breakpoints": true
     }
   ]

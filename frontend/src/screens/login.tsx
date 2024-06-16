@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -9,13 +9,18 @@ import Toast from "react-native-toast-message";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { AuthContext } from "../auth-context";
 import StorageWrapper from "../utils/StorageWrapper";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App";
 import FormTextInput from "../components/form-text-input";
 
 const loginFormSchema = z.object({
   username: z.string(),
   password: z.string(),
+});
+
+const loginSchema = z.object({
+  accessToken: z.string(),
+  userId: z.number(),
+  groupId: z.number().optional(),
+  email: z.string(),
 });
 
 type LoginFormData = z.infer<typeof loginFormSchema>;
@@ -25,14 +30,17 @@ async function login({ username, password }: LoginFormData) {
     username,
     password,
   });
+  if (res.status === 401) {
+    throw new Error("Invalid Username/Password");
+  }
+  if (!res.ok) {
+    throw new Error("Failed to login");
+  }
   const json = await res.json();
-  return json["access_token"];
+  return loginSchema.parse(json);
 }
 
-export function LoginScreen({}: NativeStackScreenProps<
-  RootStackParamList,
-  "Login"
->) {
+export function LoginScreen() {
   const {
     control,
     handleSubmit,
@@ -43,7 +51,7 @@ export function LoginScreen({}: NativeStackScreenProps<
     resolver: zodResolver(loginFormSchema),
   });
 
-  const { isAuthorized, setIsAuthorized } = React.useContext(AuthContext);
+  const { setUser } = React.useContext(AuthContext);
 
   const { mutate } = useMutation({
     mutationFn: ({ ...args }: LoginFormData) =>
@@ -54,15 +62,21 @@ export function LoginScreen({}: NativeStackScreenProps<
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ password: "", username: "" });
-      setIsAuthorized(true);
-      console.log({ res });
-      StorageWrapper.setItem("jwt-token", res);
+      setUser({
+        userId: res.userId,
+        groupId: res.groupId ?? null,
+        email: res.email,
+      });
+      StorageWrapper.setItem("jwt-token", res.accessToken);
     },
     onError: (err) => {
       console.error(err);
       resetField("password");
-      Toast.show({ type: "error", text1: "Failed to log in" });
-      setIsAuthorized(false);
+      if (err instanceof Error) {
+        Toast.show({ type: "error", text1: err.message });
+      } else {
+        Toast.show({ type: "error", text1: "Failed to log in" });
+      }
     },
   });
 

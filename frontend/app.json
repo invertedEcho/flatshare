@@ -6,11 +6,11 @@
       "ios"
     ],
     "name": "WG-Tasks",
-    "slug": "frontend",
+    "slug": "WG",
     "version": "1.0.0",
+    "scheme": "wg-app",
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
-    "userInterfaceStyle": "light",
     "splash": {
       "image": "./src/assets/splash.png",
       "resizeMode": "contain",
@@ -27,7 +27,23 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.invertedEcho.wg_app"
+      "package": "com.invertedEcho.wg_app",
+      "intentFilters": [
+        {
+	  "autoVerify": true,
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "wg.mainfraeme.com"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "favicon": "./src/assets/favicon.png"
@@ -37,7 +53,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "4c4ae101-99c9-4338-a54f-3a4c2b35d0fc"
+        "projectId": "b05f4a7d-aeba-43e6-ac8c-38d70767e527"
       }
     }
   }

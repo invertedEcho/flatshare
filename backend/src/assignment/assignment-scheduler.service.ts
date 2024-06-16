@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { db } from './db';
 import {
+  dbAddAssignments,
   dbGetAssignmentsForTaskGroup,
   dbGetCurrentAssignmentsForTaskGroup,
   dbGetTasksToAssignForCurrentInterval,
-} from './db/functions/assignment';
-import { dbGetTaskGroupUsers } from './db/functions/task-group';
-import { assignmentTable } from './db/schema';
-import { randomFromArray } from './utils/array';
+} from 'src/db/functions/assignment';
+import { dbGetTaskGroupUsers } from 'src/db/functions/task-group';
+import { randomFromArray } from 'src/utils/array';
 
+// TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
@@ -51,17 +51,16 @@ export class AssignmentSchedulerService {
         userIds.map(({ userId }) => userId),
       );
 
-      await db.insert(assignmentTable).values(
-        tasks.map(
-          ({ taskId, isInFirstInterval, taskGroupInitialStartDate }) => ({
-            taskId,
-            userId: nextResponsibleUserId,
-            createdAt: isInFirstInterval
-              ? taskGroupInitialStartDate
-              : new Date(new Date().setHours(0, 0, 0, 0)),
-          }),
-        ),
+      const hydratedAssignments = tasks.map(
+        ({ taskId, isInFirstInterval, taskGroupInitialStartDate }) => ({
+          taskId,
+          userId: nextResponsibleUserId,
+          createdAt: isInFirstInterval
+            ? taskGroupInitialStartDate
+            : new Date(new Date().setHours(0, 0, 0, 0)),
+        }),
       );
+      await dbAddAssignments({ assignments: hydratedAssignments });
     }
   }
 }
@@ -74,7 +73,7 @@ async function getNextResponsibleUserId(
     await dbGetCurrentAssignmentsForTaskGroup(taskGroupId);
 
   /* If there already are current assignments, return the userId of one of the current assignments
-   (It doesn't matter which one, they should all be assigned to the same user) */
+       (It doesn't matter which one, they should all be assigned to the same user) */
   if (currentAssignments.length != 0) {
     return currentAssignments[0].assignment.userId;
   }
@@ -89,7 +88,7 @@ async function getNextResponsibleUserId(
   );
 
   /* If all users were already assigned the task, the next responsible user is the one who was assigned the task the longest ago.
-    Otherwise it is randomly chosen from the users that were not assigned the task yet */
+        Otherwise it is randomly chosen from the users that were not assigned the task yet */
   if (userIdsWithoutAnyAssignments.length === 0) {
     return lastAssignments[lastAssignments.length - 1].assignment.userId;
   } else {
