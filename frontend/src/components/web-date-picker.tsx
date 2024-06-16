@@ -1,14 +1,14 @@
-import { createElement } from "react";
+import { createElement } from 'react';
 
 type Props = {
   value: string;
-  onChange(e: React.ChangeEvent<HTMLInputElement>): void;
+  onChange(event: React.ChangeEvent<HTMLInputElement>): void;
 };
 
 export default function WebDateTimerPicker({ value, onChange }: Props) {
-  return createElement("input", {
-    type: "date",
+  return createElement('input', {
+    type: 'date',
     value,
-    onInput: onChange,
+    onChange,
   });
 }

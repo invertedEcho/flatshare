@@ -1,26 +1,26 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
-import { Pressable, Switch, Text, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import Toast from "react-native-toast-message";
-import { z } from "zod";
-import FormTextInput from "../components/form-text-input";
-import Loading from "../components/loading";
-import { dropdownStyles } from "../components/user-dropdown";
-import UserMultiSelect from "../components/user-multi-select";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { queryKeys } from "../utils/queryKeys";
-import { getUsersOfCurrentGroup } from "./assignments";
-import AnimatedView from "../components/animated-view";
-import { DismissKeyboard } from "../components/dismiss-keyboard";
-import { AuthContext } from "../auth-context";
-import { getDefinedValueOrThrow } from "../utils/assert";
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { Pressable, Switch, Text, View } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import Toast from 'react-native-toast-message';
+import { z } from 'zod';
+import FormTextInput from '../components/form-text-input';
+import Loading from '../components/loading';
+import { dropdownStyles } from '../components/user-dropdown';
+import UserMultiSelect from '../components/user-multi-select';
+import { fetchWrapper } from '../utils/fetchWrapper';
+import { queryKeys } from '../utils/queryKeys';
+import { getUsersOfCurrentGroup } from './assignments';
+import AnimatedView from '../components/animated-view';
+import { DismissKeyboard } from '../components/dismiss-keyboard';
+import { AuthContext } from '../auth-context';
+import { getDefinedValueOrThrow } from '../utils/assert';
 
 const createRecurringTaskSchema = z.object({
-  title: z.string().min(1, { message: "Title is missing" }),
+  title: z.string().min(1, { message: 'Title is missing' }),
   description: z.string().optional(),
   // TODO: this shouldnt be optional, but we mark it is so we can use this schema in the create task mutation
   // we should instead use the correct schema depending if user selected recurring on/off
@@ -30,7 +30,7 @@ const createRecurringTaskSchema = z.object({
 type CreateRecurringTask = z.infer<typeof createRecurringTaskSchema>;
 
 const createOneOffTaskSchema = z.object({
-  title: z.string().min(1, { message: "Title is missing" }),
+  title: z.string().min(1, { message: 'Title is missing' }),
   description: z.string().optional(),
   userIds: z.number().array(),
 });
@@ -43,11 +43,13 @@ async function createOneOffTask({
   userIds,
   groupId,
 }: CreateOneOffTask & { groupId: number }) {
-  await fetchWrapper.post("tasks/one-off/", {
-    title,
-    description,
-    userIds,
-    groupId,
+  await fetchWrapper.post('tasks/one-off/', {
+    body: JSON.stringify({
+      title,
+      description,
+      userIds,
+      groupId,
+    }),
   });
 }
 
@@ -63,25 +65,27 @@ async function createRecurringTask({
   recurringTaskGroupId,
   groupId,
 }: CreateRecurringTask & { groupId: number }) {
-  await fetchWrapper.post("tasks/recurring", {
-    title,
-    description,
-    recurringTaskGroupId,
-    groupId,
+  await fetchWrapper.post('tasks/recurring', {
+    body: JSON.stringify({
+      title,
+      description,
+      recurringTaskGroupId,
+      groupId,
+    }),
   });
 }
 
 // TODO: Should be moved inside task group list screen when it exists
 async function getTaskGroups() {
-  const response = await fetchWrapper.get("task-group");
+  const response = await fetchWrapper.get('task-group');
   const json = await response.json();
   const parsed = z.array(taskGroupSchema).parse(json);
   return parsed;
 }
 
 const defaultValues = {
-  title: "",
-  description: "",
+  title: '',
+  description: '',
 };
 
 export function CreateTaskScreen() {
@@ -91,9 +95,11 @@ export function CreateTaskScreen() {
   const [selectedTaskGroupId, setSelectedTaskGroupId] = React.useState<
     number | undefined
   >(undefined);
-  const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
-    "recurring",
+  const [taskType, setTaskType] = React.useState<'recurring' | 'non-recurring'>(
+    'recurring',
   );
+  // TODO: Shouldnt exist but react-dropdown expects a string for the value prop
+  // for some reason
   const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
 
   const queryClient = useQueryClient();
@@ -125,7 +131,7 @@ export function CreateTaskScreen() {
           });
     },
     onSuccess: () => {
-      Toast.show({ type: "success", text1: "Succcessfully created task" });
+      Toast.show({ type: 'success', text1: 'Succcessfully created task' });
       resetForm({ ...defaultValues });
       queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
       queryClient.refetchQueries({ queryKey: [queryKeys.assignments] });
@@ -134,7 +140,7 @@ export function CreateTaskScreen() {
     },
     onError: (err) => {
       console.error(err);
-      Toast.show({ type: "error", text1: "Failed creating task" });
+      Toast.show({ type: 'error', text1: 'Failed creating task' });
     },
     mutationKey: [queryKeys.tasks],
   });
@@ -169,7 +175,7 @@ export function CreateTaskScreen() {
 
   const noTaskGroupExist = taskGroups.length === 0;
   const disableSubmit =
-    taskType === "non-recurring" && selectedUserIds.length === 0;
+    taskType === 'non-recurring' && selectedUserIds.length === 0;
 
   return (
     <AnimatedView>
@@ -180,7 +186,7 @@ export function CreateTaskScreen() {
               name="title"
               labelText="Title"
               textInputProps={{
-                placeholder: "Enter a title",
+                placeholder: 'Enter a title',
               }}
               control={control}
               errors={errors}
@@ -190,30 +196,30 @@ export function CreateTaskScreen() {
               name="description"
               labelText="Description"
               textInputProps={{
-                placeholder: "Enter a description",
+                placeholder: 'Enter a description',
               }}
               control={control}
               errors={errors}
             />
             <View className="flex flex-row items-center gap-2">
               <Switch
-                value={taskType === "recurring"}
+                value={taskType === 'recurring'}
                 onValueChange={() =>
                   setTaskType(
-                    taskType === "recurring" ? "non-recurring" : "recurring",
+                    taskType === 'recurring' ? 'non-recurring' : 'recurring',
                   )
                 }
-                trackColor={{ true: "#24a0ed" }}
+                trackColor={{ true: '#24a0ed' }}
               />
               <Text
                 className={
-                  taskType === "recurring" ? "text-white" : "text-gray-500"
+                  taskType === 'recurring' ? 'text-white' : 'text-gray-500'
                 }
               >
                 Recurring task
               </Text>
             </View>
-            {taskType === "recurring" ? (
+            {taskType === 'recurring' ? (
               <View>
                 <Text className="text-white mb-2">Select Task group</Text>
                 <Dropdown
@@ -249,7 +255,7 @@ export function CreateTaskScreen() {
           <Pressable
             // TODO: nativewind won't work here for some odd reason
             style={({ pressed }) => ({
-              backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+              backgroundColor: pressed ? '#24aeff' : '#24a0ed',
               paddingHorizontal: 24,
               paddingVertical: 12,
               borderRadius: 5,

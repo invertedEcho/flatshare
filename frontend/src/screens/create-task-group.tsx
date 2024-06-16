@@ -1,35 +1,35 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import RNDateTimePicker from "@react-native-community/datetimepicker";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Controller, useForm } from "react-hook-form";
-import { Platform, Pressable, Text, TextInput, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import Toast from "react-native-toast-message";
-import { z } from "zod";
-import AnimatedView from "../components/animated-view";
-import { DismissKeyboard } from "../components/dismiss-keyboard";
-import FormTextInput from "../components/form-text-input";
-import Loading from "../components/loading";
-import { dropdownStyles } from "../components/user-dropdown";
-import UserMultiSelect from "../components/user-multi-select";
-import WebDateTimerPicker from "../components/web-date-picker";
-import { addDays, addMonth, setTimeToZero } from "../utils/date";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { queryKeys } from "../utils/queryKeys";
-import { getUsersOfCurrentGroup } from "./assignments";
-import { AuthContext } from "../auth-context";
-import { getDefinedValueOrThrow } from "../utils/assert";
+import { zodResolver } from '@hookform/resolvers/zod';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Controller, useForm } from 'react-hook-form';
+import { Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import Toast from 'react-native-toast-message';
+import { z } from 'zod';
+import AnimatedView from '../components/animated-view';
+import { DismissKeyboard } from '../components/dismiss-keyboard';
+import FormTextInput from '../components/form-text-input';
+import Loading from '../components/loading';
+import { dropdownStyles } from '../components/user-dropdown';
+import UserMultiSelect from '../components/user-multi-select';
+import WebDateTimerPicker from '../components/web-date-picker';
+import { addDays, addMonth, setTimeToZero } from '../utils/date';
+import { fetchWrapper } from '../utils/fetchWrapper';
+import { queryKeys } from '../utils/queryKeys';
+import { getUsersOfCurrentGroup } from './assignments';
+import { AuthContext } from '../auth-context';
+import { getDefinedValueOrThrow } from '../utils/assert';
 const createTaskGroupSchema = z.object({
-  title: z.string().min(1, { message: "Title is missing" }),
+  title: z.string().min(1, { message: 'Title is missing' }),
   description: z.string().optional(),
   intervalValue: z.string(),
 });
 
 type CreateTaskGroup = z.infer<typeof createTaskGroupSchema>;
 
-type IntervalType = "days" | "weeks" | "months";
+type IntervalType = 'days' | 'weeks' | 'months';
 
 async function createTaskGroup({
   title,
@@ -45,19 +45,21 @@ async function createTaskGroup({
   userIds: number[];
 }) {
   console.debug({ interval });
-  await fetchWrapper.post("task-group", {
-    title,
-    description,
-    interval,
-    initialStartDate,
-    userIds,
+  await fetchWrapper.post('task-group', {
+    body: JSON.stringify({
+      title,
+      description,
+      interval,
+      initialStartDate,
+      userIds,
+    }),
   });
 }
 
 const defaultValues = {
-  title: "",
-  description: "",
-  intervalValue: "1",
+  title: '',
+  description: '',
+  intervalValue: '1',
 };
 
 export function CreateTaskGroupScreen() {
@@ -84,17 +86,17 @@ export function CreateTaskGroupScreen() {
 
   const queryClient = useQueryClient();
 
-  const [selectedUserIds, setSelectedUserIds] = React.useState<string[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
   const [date, setDate] = React.useState<Date | undefined>(
     setTimeToZero(new Date()),
   );
   const [selectedIntervalType, setSelectedIntervalType] = React.useState<
-    "days" | "months" | "weeks"
-  >("weeks");
+    'days' | 'months' | 'weeks'
+  >('weeks');
 
   const [showDatePicker, setShowDatePicker] = React.useState(false);
 
-  const intervalValue = watch("intervalValue");
+  const intervalValue = watch('intervalValue');
 
   const { mutate } = useMutation({
     mutationFn: ({ ...args }: CreateTaskGroup) =>
@@ -107,8 +109,8 @@ export function CreateTaskGroupScreen() {
       }),
     onSuccess: () => {
       Toast.show({
-        type: "success",
-        text1: "Succcessfully created task group",
+        type: 'success',
+        text1: 'Succcessfully created task group',
       });
       resetForm({ ...defaultValues });
       setSelectedUserIds([]);
@@ -117,7 +119,7 @@ export function CreateTaskGroupScreen() {
     },
     onError: (err) => {
       console.error(err);
-      Toast.show({ type: "error", text1: "Failed creating task group" });
+      Toast.show({ type: 'error', text1: 'Failed creating task group' });
     },
     mutationKey: [queryKeys.tasks],
   });
@@ -132,12 +134,12 @@ export function CreateTaskGroupScreen() {
     const date = new Date();
 
     switch (intervalType) {
-      case "days":
+      case 'days':
         return addDays(date, -(intervalValue - 1));
-      case "weeks":
+      case 'weeks':
         return addDays(date, -(intervalValue * 7 - 1));
       // Not sure if this logic makes sense due to how JS handles months differently from postgres -> look into it
-      case "months":
+      case 'months':
         return addMonth(date, -intervalValue);
     }
   }
@@ -155,8 +157,8 @@ export function CreateTaskGroupScreen() {
               name="title"
               labelText="Title"
               textInputProps={{
-                placeholder: "Enter a title",
-                returnKeyType: "next",
+                placeholder: 'Enter a title',
+                returnKeyType: 'next',
               }}
               control={control}
               errors={errors}
@@ -166,8 +168,8 @@ export function CreateTaskGroupScreen() {
               name="description"
               labelText="Description"
               textInputProps={{
-                placeholder: "Enter a description",
-                returnKeyType: "next",
+                placeholder: 'Enter a description',
+                returnKeyType: 'next',
               }}
               control={control}
               errors={errors}
@@ -196,9 +198,9 @@ export function CreateTaskGroupScreen() {
                   iconStyle={dropdownStyles.iconStyle}
                   containerStyle={dropdownStyles.container}
                   data={[
-                    { intervalType: "days" },
-                    { intervalType: "weeks" },
-                    { intervalType: "months" },
+                    { intervalType: 'days' },
+                    { intervalType: 'weeks' },
+                    { intervalType: 'months' },
                   ]}
                   maxHeight={300}
                   labelField="intervalType"
@@ -213,7 +215,7 @@ export function CreateTaskGroupScreen() {
                   autoScroll={false}
                 />
               </View>
-              {errors["intervalValue"] && (
+              {errors['intervalValue'] && (
                 <Text className="text-red-300">Interval is required</Text>
               )}
             </View>
@@ -251,7 +253,7 @@ export function CreateTaskGroupScreen() {
                       className="bg-slate-700 p-2 rounded-lg"
                     >
                       <Text className="text-xl text-white">
-                        {date?.toLocaleDateString("de-DE")}
+                        {date?.toLocaleDateString('de-DE')}
                       </Text>
                     </Pressable>
                     {showDatePicker && (
@@ -275,16 +277,22 @@ export function CreateTaskGroupScreen() {
                 web: (
                   // TODO: add mindate
                   <WebDateTimerPicker
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                       setDate(
                         new Date(
-                          new Date(e.currentTarget.value).setHours(0, 0, 0, 0),
+                          // @ts-expect-error Why does this not exist
+                          new Date(event.currentTarget.value).setHours(
+                            0,
+                            0,
+                            0,
+                            0,
+                          ),
                         ),
                       )
                     }
                     value={
-                      date?.toLocaleDateString("en-CA") ??
-                      new Date().toLocaleDateString("en-CA")
+                      date?.toLocaleDateString('en-CA') ??
+                      new Date().toLocaleDateString('en-CA')
                     }
                   />
                 ),
@@ -294,7 +302,7 @@ export function CreateTaskGroupScreen() {
           <Pressable
             // TODO: nativewind won't work here for some odd reason
             style={({ pressed }) => ({
-              backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+              backgroundColor: pressed ? '#24aeff' : '#24a0ed',
               paddingHorizontal: 24,
               paddingVertical: 12,
               borderRadius: 5,

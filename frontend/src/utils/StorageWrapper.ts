@@ -1,14 +1,14 @@
-import { Platform } from "react-native";
+import { Platform } from 'react-native';
 import AsyncStorage, {
   AsyncStorageStatic,
-} from "@react-native-async-storage/async-storage";
-import * as SecureStore from "expo-secure-store";
+} from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 class StorageWrapper {
   private static storage: AsyncStorageStatic | typeof SecureStore;
 
   static {
-    if (Platform.OS === "web") {
+    if (Platform.OS === 'web') {
       StorageWrapper.storage = AsyncStorage;
     } else {
       StorageWrapper.storage = SecureStore;
@@ -17,7 +17,7 @@ class StorageWrapper {
 
   static async getItem(key: string): Promise<string | null> {
     try {
-      if (Platform.OS === "web") {
+      if (Platform.OS === 'web') {
         return await (StorageWrapper.storage as AsyncStorageStatic).getItem(
           key,
         );
@@ -36,7 +36,7 @@ class StorageWrapper {
 
   static async setItem(key: string, value: string): Promise<void> {
     try {
-      if (Platform.OS === "web") {
+      if (Platform.OS === 'web') {
         return await StorageWrapper.storage.setItem(key, value);
       } else {
         return await (
@@ -44,12 +44,12 @@ class StorageWrapper {
         ).setItemAsync(key, value);
       }
     } catch (error) {
-      console.error({ loc: "setItem failed", error });
+      console.error({ loc: 'setItem failed', error });
     }
   }
 
   static async deleteItem(key: string): Promise<void> {
-    if (Platform.OS === "web") {
+    if (Platform.OS === 'web') {
       return await (StorageWrapper.storage as AsyncStorageStatic).removeItem(
         key,
       );

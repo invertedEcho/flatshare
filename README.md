@@ -1,9 +1,5 @@
 # wg-app WIP
 
-## (OUTDATED): User flow
-
-https://excalidraw.com/#room=2a90cf068f4d87bce613,24I3dxykUBivS35QOdgTqw
-
 ## setup
 
 - Install all dependencies
