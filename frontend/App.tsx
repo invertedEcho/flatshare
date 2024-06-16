@@ -6,7 +6,7 @@ import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
 import AuthContextProvider from "./src/auth-context";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
 import * as Linking from "expo-linking";
 import { FontAwesome6 } from "@expo/vector-icons";
@@ -41,7 +41,10 @@ import { z } from "zod";
 import { Menu } from "react-native-material-menu";
 import { LogoutButton } from "./src/components/log-out-button";
 import { MenuAnchor } from "./src/components/burger-menu-content";
-import { GroupJoinScreen } from "./src/screens/group-join-create-screen";
+import {
+  GroupJoinScreen,
+  groupInviteSchema,
+} from "./src/screens/group-join-create-screen";
 import { getIconNameForRouteName } from "./src/utils/routes";
 import { GroupInviteScreen } from "./src/screens/group-invite-screen";
 import { getDefinedValueOrThrow } from "./src/utils/assert";
@@ -63,6 +66,9 @@ export default function App() {
     { userId: number; email: string; groupId: number | null } | undefined
   >();
   const [menuVisible, setMenuVisible] = React.useState(false);
+  const [inviteCode, setInviteCode] = React.useState<string | undefined>(
+    undefined,
+  );
 
   const linking = {
     prefixes: [prefix],
@@ -91,6 +97,21 @@ export default function App() {
           setUser(parsed);
         } catch (error) {
           console.error({ loc: "Failed to get profile" }, error);
+        }
+      } else {
+        const parsedInitialUrl = await Linking.parseInitialURLAsync();
+        console.log({ parsedInitialUrl });
+        const parsed = groupInviteSchema.safeParse(
+          parsedInitialUrl.queryParams,
+        );
+        if (parsed.success) {
+          const { inviteCode } = parsed.data;
+          console.log({ inviteCode });
+          setInviteCode(inviteCode);
+        } else {
+          console.log(
+            "No groupInvite thing, ignoring. If you see this often you should fix this code.",
+          );
         }
       }
     })();
@@ -156,10 +177,9 @@ export default function App() {
             >
               {user === undefined && (
                 <>
-                  <BottomTabNavigator.Screen
-                    name="Login"
-                    component={LoginScreen}
-                  />
+                  <BottomTabNavigator.Screen name="Login">
+                    {() => <LoginScreen maybeInviteCode={inviteCode} />}
+                  </BottomTabNavigator.Screen>
                   <BottomTabNavigator.Screen
                     name="Register"
                     component={RegisterScreen}
@@ -199,7 +219,6 @@ export default function App() {
                     name="GroupInvite"
                     options={{ title: "Group Invite" }}
                   >
-                    {/* FIXME */}
                     {() => (
                       <GroupInviteScreen
                         groupId={getDefinedValueOrThrow(user.groupId)}

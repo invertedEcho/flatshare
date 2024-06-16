@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRoute } from "@react-navigation/native";
 
-const groupInviteSchema = z.object({
+export const groupInviteSchema = z.object({
   inviteCode: z.string().length(8),
 });
 type GroupInvite = z.infer<typeof groupInviteSchema>;
@@ -68,28 +68,29 @@ async function createGroup({ groupName }: { groupName: string }) {
   return id;
 }
 
-// FIXME: rename me
-const deepLinkInviteSchemaThing = z.object({
-  inviteCode: z.string(),
-});
-
 export function GroupJoinScreen() {
   const route = useRoute();
 
   React.useEffect(() => {
     const handleInitialURL = async () => {
+      console.log("Hello from handleInitialURL in Group screen");
       const url = await Linking.getInitialURL();
       if (url) {
+        console.log("Got initial url in group screen");
         const { queryParams } = Linking.parse(url);
-        const parsed = deepLinkInviteSchemaThing.parse(queryParams);
+        console.log({ loc: "queryParams in Group screen", queryParams });
+        const parsed = groupInviteSchema.parse(queryParams);
         setValue("inviteCode", parsed.inviteCode);
       }
     };
     const params = route.params;
     if (params !== undefined) {
-      const parsed = deepLinkInviteSchemaThing.parse(params);
+      console.log("got actual params");
+      const parsed = groupInviteSchema.parse(params);
+      console.log({ parsed, loc: "parsed" });
       setValue("inviteCode", parsed.inviteCode);
     } else {
+      console.log("Going to call handleInitialURL");
       handleInitialURL();
     }
   });
@@ -119,7 +120,11 @@ export function GroupJoinScreen() {
     onSuccess: (groupId) => {
       const definedGroupId = getDefinedValueOrThrow(groupId);
       Toast.show({ type: "success", text1: "Joined group!" });
-      setUser({ userId, groupId: definedGroupId });
+      setUser((prev) => ({
+        userId,
+        groupId: definedGroupId,
+        email: getDefinedValueOrThrow(prev?.email),
+      }));
     },
     onError: () => {
       Toast.show({
@@ -145,7 +150,11 @@ export function GroupJoinScreen() {
           throw new Error("Failed to create group");
         }
         await joinGroupById(group, userId);
-        setUser({ userId, groupId: group });
+        setUser((prev) => ({
+          userId,
+          groupId: group,
+          email: getDefinedValueOrThrow(prev?.email),
+        }));
       } catch (error) {
         console.error({ error });
         throw new Error("you suck very badlyt");

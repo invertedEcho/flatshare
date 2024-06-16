@@ -36,10 +36,11 @@ async function login({ username, password }: LoginFormData) {
   return loginSchema.parse(json);
 }
 
-export function LoginScreen({}: NativeStackScreenProps<
-  RootStackParamList,
-  "Login"
->) {
+export function LoginScreen({
+  maybeInviteCode,
+}: {
+  maybeInviteCode: string | undefined;
+}) {
   const {
     control,
     handleSubmit,
@@ -81,6 +82,12 @@ export function LoginScreen({}: NativeStackScreenProps<
   return (
     <View className=" bg-slate-900 p-4   flex-1 justify-between">
       <View style={{ rowGap: 16 }}>
+        {maybeInviteCode !== undefined && (
+          <Text className="text-white">
+            Note: After logging in, you will auto join a group by invite code:{" "}
+            {maybeInviteCode}
+          </Text>
+        )}
         <FormTextInput
           name="username"
           labelText="Username"
