@@ -73,13 +73,12 @@ export function CreateTaskGroupScreen() {
   });
   const { user } = React.useContext(AuthContext);
   // FIXME
-  const { groupId } = getDefinedValueOrThrow(user);
-  const actualGroupId = getDefinedValueOrThrow(groupId);
+  const groupId = getDefinedValueOrThrow(user?.groupId);
 
   const { data: users, isLoading } = useQuery({
     queryKey: [queryKeys.users],
     queryFn: () => {
-      return getUsersOfCurrentGroup({ groupId: actualGroupId });
+      return getUsersOfCurrentGroup({ groupId });
     },
   });
 

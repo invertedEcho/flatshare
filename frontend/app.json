@@ -34,8 +34,8 @@
           "action": "VIEW",
           "data": [
             {
-              "scheme": "http",
-              "host": "192.168.178.53"
+              "scheme": "https",
+              "host": "wg.mainfraeme.com"
             }
           ],
           "category": [

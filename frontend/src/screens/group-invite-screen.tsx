@@ -28,6 +28,7 @@ export function GroupInviteScreen({ groupId }: { groupId: number }) {
   });
 
   async function onShare(inviteCode: string) {
+    // TODO: env var
     const inviteLink = `https://wg.mainfraeme.com/?inviteCode=${inviteCode}`;
     await Share.share({
       message: `Join my Group on WG-Tasks App!\n${inviteLink}`,

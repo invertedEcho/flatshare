@@ -21,7 +21,6 @@ const rootPathStatic = join(__dirname, '../../src/client/public/');
     AssignmentsModule,
     ServeStaticModule.forRoot({
       rootPath: rootPathStatic,
-      // TODO: What exactly does this?
       exclude: ['/api/(.*)'],
     }),
   ],

@@ -4,6 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login via Invite Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1560BD;
+            margin-bottom: 20px;
+        }
+        a#invite-link {
+            display: inline-block;
+            background: #1560BD;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        a#invite-link:hover {
+            background: #1E90FF;
+        }
+        p#warning {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
     <script>
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -13,7 +52,7 @@
 
             if (inviteCode) {
                 linkElement.href = `wg-app://group?inviteCode=${inviteCode}`;
-                linkElement.style.display = 'inline';
+                linkElement.style.display = 'inline-block';
                 warningElement.style.display = 'none';
             } else {
                 linkElement.style.display = 'none';
@@ -23,8 +62,10 @@
     </script>
 </head>
 <body>
-    <h1>Login via Invite Code</h1>
-    <a id="invite-link" href="wg-app://group?inviteCode=12345" style="display: none;">Open in app</a>
-    <p id="warning" style="display: none; color: red;">Warning: Broken link, no invite code provided.</p>
+    <div class="container">
+        <h1>Login via Invite Code</h1>
+        <a id="invite-link" href="#" style="display: none;">Open in app</a>
+        <p id="warning" style="display: none;">Warning: Broken link, no invite code provided.</p>
+    </div>
 </body>
 </html>

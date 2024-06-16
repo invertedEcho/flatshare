@@ -67,7 +67,7 @@ async function updateAssignmentStatus(
 
 export function AssigmentsScreen() {
   const { user } = React.useContext(AuthContext);
-  // FIXME
+  // FIXME: add nested function
   const { userId, groupId } = getDefinedValueOrThrow(user);
   const actualGroupId = getDefinedValueOrThrow(groupId);
 

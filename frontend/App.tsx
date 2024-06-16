@@ -93,7 +93,6 @@ export default function App() {
           const res = await fetchWrapper.get("profile");
           const body = await res.json();
           const parsed = profileSchema.parse(body);
-          console.log({ parsed });
           setUser(parsed);
         } catch (error) {
           console.error({ loc: "Failed to get profile" }, error);
@@ -102,14 +101,11 @@ export default function App() {
         // TODO: This always gets executed, but it should only be executed
         // if there is an invitation code.
         const parsedInitialUrl = await Linking.parseInitialURLAsync();
-        console.log({ parsedInitialUrl });
         const parsed = groupInviteSchema.safeParse(
           parsedInitialUrl.queryParams,
         );
         if (parsed.success) {
           const { inviteCode } = parsed.data;
-          console.log({ inviteCode });
-          console.log("Setting invitecode, should be there");
           setInviteCode(inviteCode);
         }
       }

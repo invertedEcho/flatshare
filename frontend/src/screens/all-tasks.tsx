@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as React from "react";
 import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
@@ -22,7 +22,6 @@ export const taskSchema = z.object({
 export type Task = z.infer<typeof taskSchema>;
 
 async function getAllTasks({ groupId }: { groupId: number }) {
-  console.log("getting all tasks");
   const response = await fetchWrapper.get(`tasks?groupId=${groupId}`);
   const body = await response.json();
   const parsed = z.array(taskSchema).safeParse(body);

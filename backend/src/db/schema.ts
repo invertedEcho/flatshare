@@ -116,6 +116,7 @@ export const assignmentTable = pgTable('assignment', {
   state: assigmentStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type CreateAssignment = typeof assignmentTable.$inferInsert;
 
 /**
  * This table stores information about which tasks belong to a user group.

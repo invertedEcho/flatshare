@@ -73,24 +73,18 @@ export function GroupJoinScreen() {
 
   React.useEffect(() => {
     const handleInitialURL = async () => {
-      console.log("Hello from handleInitialURL in Group screen");
       const url = await Linking.getInitialURL();
       if (url) {
-        console.log("Got initial url in group screen");
         const { queryParams } = Linking.parse(url);
-        console.log({ loc: "queryParams in Group screen", queryParams });
         const parsed = groupInviteSchema.parse(queryParams);
         setValue("inviteCode", parsed.inviteCode);
       }
     };
     const params = route.params;
     if (params !== undefined) {
-      console.log("got actual params");
       const parsed = groupInviteSchema.parse(params);
-      console.log({ parsed, loc: "parsed" });
       setValue("inviteCode", parsed.inviteCode);
     } else {
-      console.log("Going to call handleInitialURL");
       handleInitialURL();
     }
   });
@@ -110,7 +104,6 @@ export function GroupJoinScreen() {
     formState: { errors: groupCreateErrors },
   } = useForm<GroupCreate>({ resolver: zodResolver(groupCreateSchema) });
 
-  // NOTE: The group screen should only be shown if the user is authenticated.
   const { userId } = getDefinedValueOrThrow(user);
 
   const { mutate: mutateJoinGroup } = useMutation({
@@ -136,7 +129,7 @@ export function GroupJoinScreen() {
 
   const { mutate: mutateCreateGroup, status } = useMutation({
     mutationKey: [queryKeys.groups],
-    // TODO: lets not mix these, all functions should accept object instead of positional arguments
+    // TODO: lets not mix these, all functions like these should accept object instead of positional arguments
     mutationFn: async ({
       groupName,
       userId,
@@ -157,7 +150,7 @@ export function GroupJoinScreen() {
         }));
       } catch (error) {
         console.error({ error });
-        throw new Error("you suck very badlyt");
+        throw new Error("you suck very bad");
       }
     },
   });

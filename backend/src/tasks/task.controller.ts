@@ -25,6 +25,7 @@ export type UpdateTask = {
 @Controller('tasks')
 export class TasksController {
   @Get()
+  // TODO: should be optional, query param
   async getAll(@Query('groupId') groupId: number): Promise<SelectTask[]> {
     const tasks = await dbGetAllTasks({ groupId });
     return tasks;

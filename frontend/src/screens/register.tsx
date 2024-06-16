@@ -47,7 +47,6 @@ export function RegisterScreen({
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   });
-  console.log({ loc: "inviteCode in RegisterScreen", inviteCode });
 
   const { mutate: registerMutation } = useMutation({
     mutationFn: ({ ...args }: RegisterFormData) =>

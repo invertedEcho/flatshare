@@ -5,6 +5,7 @@ with pkgs;
 
 let
   android-nixpkgs = callPackage (import (builtins.fetchGit {
+    # TODO: Switch to non-fork when https://github.com/tadfisher/android-nixpkgs/pull/104 is merged
     url = "https://github.com/HPRIOR/android-nixpkgs.git";
   })) {
     channel = "stable";

@@ -9,17 +9,6 @@ import {
 } from '../schema';
 import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
 
-/**
-  *
-(alias) type SelectTask = {
-    id: number;
-    title: string;
-    description: string | null;
-    createdAt: Date;
-    recurringTaskGroupId: number | null;
-}
-*/
-
 export async function dbGetAllTasks({
   groupId,
 }: {

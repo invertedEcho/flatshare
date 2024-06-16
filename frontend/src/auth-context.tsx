@@ -1,17 +1,14 @@
 import * as React from "react";
 
+type User = {
+  userId: number;
+  email: string;
+  groupId: number | null;
+};
+
 export const AuthContext = React.createContext<{
-  user: { userId: number; email: string; groupId: number | null } | undefined;
-  setUser: React.Dispatch<
-    React.SetStateAction<
-      | {
-          userId: number;
-          email: string;
-          groupId: number | null;
-        }
-      | undefined
-    >
-  >;
+  user: User | undefined;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
 }>({
   user: undefined,
   setUser: () => {},
@@ -23,17 +20,8 @@ export default function AuthContextProvider({
   setUser,
 }: {
   children: React.ReactNode;
-  user: { userId: number; email: string; groupId: number | null } | undefined;
-  setUser: React.Dispatch<
-    React.SetStateAction<
-      | {
-          userId: number;
-          email: string;
-          groupId: number | null;
-        }
-      | undefined
-    >
-  >;
+  user: User | undefined;
+  setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
 }) {
   const contextValue = React.useMemo(() => {
     return { user, setUser };

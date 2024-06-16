@@ -3,6 +3,7 @@ import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
   AssignmentState,
+  CreateAssignment,
   assignmentTable,
   recurringTaskGroupTable,
   taskTable,
@@ -142,4 +143,12 @@ export async function dbGetTasksToAssignForCurrentInterval() {
     console.error({ error });
     throw error;
   }
+}
+
+export async function dbAddAssignments({
+  assignments,
+}: {
+  assignments: CreateAssignment[];
+}) {
+  await db.insert(assignmentTable).values(assignments);
 }
