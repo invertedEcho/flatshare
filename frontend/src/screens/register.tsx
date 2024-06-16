@@ -1,7 +1,7 @@
 import * as React from "react";
 
-import { Pressable, SafeAreaView, Text, TextInput, View } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import { Pressable, Text, View } from "react-native";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -19,17 +19,26 @@ const registerFormSchema = z.object({
 
 type RegisterFormData = z.infer<typeof registerFormSchema>;
 
-async function register({ username, password, email }: RegisterFormData) {
+async function register({
+  username,
+  password,
+  email,
+  inviteCode,
+}: RegisterFormData & { inviteCode: string | undefined }) {
   await fetchWrapper.post("register", {
     username,
     password,
     email,
+    inviteCode,
   });
 }
 
 export function RegisterScreen({
   navigation,
-}: NativeStackScreenProps<RootStackParamList, "Register">) {
+  inviteCode,
+}: NativeStackScreenProps<RootStackParamList, "Register"> & {
+  inviteCode: string | undefined;
+}) {
   const {
     control,
     handleSubmit,
@@ -38,6 +47,7 @@ export function RegisterScreen({
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
   });
+  console.log({ loc: "inviteCode in RegisterScreen", inviteCode });
 
   const { mutate: registerMutation } = useMutation({
     mutationFn: ({ ...args }: RegisterFormData) =>
@@ -45,6 +55,7 @@ export function RegisterScreen({
         username: args.username,
         password: args.password,
         email: args.email,
+        inviteCode,
       }),
     onSuccess: () => {
       Toast.show({ type: "success", text1: "Succcessfully registered" });
@@ -66,6 +77,12 @@ export function RegisterScreen({
   return (
     <View className=" bg-slate-900 p-4 flex-1 justify-between">
       <View style={{ rowGap: 16 }}>
+        {inviteCode !== undefined && (
+          <Text className="text-white">
+            Note: After registration, you will auto join a group by invite code:{" "}
+            {inviteCode}
+          </Text>
+        )}
         <FormTextInput
           name="username"
           labelText="Username"

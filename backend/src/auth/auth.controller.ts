@@ -13,7 +13,11 @@ import { db } from 'src/db';
 import { userGroupTable, userTable } from 'src/db/schema';
 import { AuthService, User } from './auth.service';
 import { Public } from './public.decorators';
-import { dbGetGroupOfUser } from 'src/db/functions/user-group';
+import {
+  dbAddUserToGroup,
+  dbGetGroupOfUser,
+  dbGetInviteCode,
+} from 'src/db/functions/user-group';
 import { eq } from 'drizzle-orm';
 import { dbGetUserById } from 'src/db/functions/user';
 
@@ -21,6 +25,7 @@ class RegisterDto {
   username: string;
   email: string;
   password: string;
+  inviteCode?: string;
 }
 
 const SALT_ROUNDS = 10;
@@ -35,7 +40,7 @@ export class AuthController {
   async login(@Request() req: { user: User }) {
     const result = await this.authService.login(req.user);
     const maybeGroupId = await dbGetGroupOfUser(result.userId);
-    return { ...result, groupId: maybeGroupId?.group.id };
+    return { ...result, groupId: maybeGroupId?.group.id ?? null };
   }
 
   @Public()
@@ -43,7 +48,24 @@ export class AuthController {
   async register(@Body() registerDto: RegisterDto) {
     const { username, email, password } = registerDto;
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
-    await db.insert(userTable).values({ email, username, password: hash });
+    const newUser = (
+      await db
+        .insert(userTable)
+        .values({ email, username, password: hash })
+        .returning()
+    )[0];
+    if (registerDto.inviteCode !== undefined) {
+      try {
+        const maybeGroup = await dbGetInviteCode(registerDto.inviteCode);
+        await dbAddUserToGroup({
+          userId: newUser.id,
+          groupId: maybeGroup.groupId,
+        });
+      } catch (error) {
+        console.error({ error });
+      }
+    }
+    // TODO: Should we return the data from our incoming request, or what actually got inserted into the database?
     return { username, email };
   }
 

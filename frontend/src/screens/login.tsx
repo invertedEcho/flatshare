@@ -9,8 +9,6 @@ import Toast from "react-native-toast-message";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { AuthContext } from "../auth-context";
 import StorageWrapper from "../utils/StorageWrapper";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../App";
 import FormTextInput from "../components/form-text-input";
 
 const loginFormSchema = z.object({
@@ -21,7 +19,7 @@ const loginFormSchema = z.object({
 const loginSchema = z.object({
   accessToken: z.string(),
   userId: z.number(),
-  groupId: z.number().nullable(),
+  groupId: z.number().optional(),
   email: z.string(),
 });
 
@@ -32,15 +30,17 @@ async function login({ username, password }: LoginFormData) {
     username,
     password,
   });
+  if (res.status === 401) {
+    throw new Error("Invalid Username/Password");
+  }
+  if (!res.ok) {
+    throw new Error("Failed to login");
+  }
   const json = await res.json();
   return loginSchema.parse(json);
 }
 
-export function LoginScreen({
-  maybeInviteCode,
-}: {
-  maybeInviteCode: string | undefined;
-}) {
+export function LoginScreen() {
   const {
     control,
     handleSubmit,
@@ -62,14 +62,21 @@ export function LoginScreen({
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ password: "", username: "" });
-      console.log({ loc: "logging in", res });
-      setUser({ userId: res.userId, groupId: res.groupId, email: res.email });
+      setUser({
+        userId: res.userId,
+        groupId: res.groupId ?? null,
+        email: res.email,
+      });
       StorageWrapper.setItem("jwt-token", res.accessToken);
     },
     onError: (err) => {
       console.error(err);
       resetField("password");
-      Toast.show({ type: "error", text1: "Failed to log in" });
+      if (err instanceof Error) {
+        Toast.show({ type: "error", text1: err.message });
+      } else {
+        Toast.show({ type: "error", text1: "Failed to log in" });
+      }
     },
   });
 
@@ -82,12 +89,6 @@ export function LoginScreen({
   return (
     <View className=" bg-slate-900 p-4   flex-1 justify-between">
       <View style={{ rowGap: 16 }}>
-        {maybeInviteCode !== undefined && (
-          <Text className="text-white">
-            Note: After logging in, you will auto join a group by invite code:{" "}
-            {maybeInviteCode}
-          </Text>
-        )}
         <FormTextInput
           name="username"
           labelText="Username"

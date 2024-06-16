@@ -13,7 +13,8 @@ function getAuthorizedFetcher(
 ) {
   return async (endpoint: string, data?: any, options?: RequestInit) => {
     const jwtToken = await StorageWrapper.getItem("jwt-token");
-    const url = `http://192.168.178.53:3000/api/${endpoint}`;
+    const url = `http://192.168.178.98:3000/api/${endpoint}`;
+    console.log({ url });
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${jwtToken}`,
@@ -24,12 +25,6 @@ function getAuthorizedFetcher(
       body: data ? JSON.stringify(data) : undefined,
       ...options,
     });
-    if (!response.ok) {
-      throw new Error(
-        `Request failed: ${response.status} ${await response.text()}`,
-      );
-    }
-
     return response;
   };
 }

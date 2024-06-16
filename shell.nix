@@ -4,7 +4,11 @@ with pkgs;
 
 
 let
-  android-nixpkgs = callPackage <android-nixpkgs> { };
+  android-nixpkgs = callPackage (import (builtins.fetchGit {
+    url = "https://github.com/HPRIOR/android-nixpkgs.git";
+  })) {
+    channel = "stable";
+  };
 
   android-sdk = android-nixpkgs.sdk (sdkPkgs: with sdkPkgs; [
     cmdline-tools-latest
@@ -28,7 +32,7 @@ mkShell {
   ];
 
   shellHook = ''
-    export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${android-sdk}/share/android-sdk/build-tools/34.0.0/aapt2";
+    export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=/run/current-system/sw/bin/aapt2";
     echo "Please make sure you have setup /tmp"
     export TMPDIR=/tmp
   '';

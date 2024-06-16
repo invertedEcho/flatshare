@@ -6,7 +6,7 @@ import StorageWrapper from "./src/utils/StorageWrapper";
 import { fetchWrapper } from "./src/utils/fetchWrapper";
 import { LoginScreen } from "./src/screens/login";
 import AuthContextProvider from "./src/auth-context";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { RegisterScreen } from "./src/screens/register";
 import * as Linking from "expo-linking";
 import { FontAwesome6 } from "@expo/vector-icons";
@@ -15,7 +15,7 @@ export type RootStackParamList = {
   Home: undefined;
   AssignTask: undefined;
   CreateTask: undefined;
-  Register: undefined;
+  Register: { inviteCode: string | undefined };
   Login: undefined;
   MyAssignments: undefined;
   AllTasks: undefined;
@@ -99,6 +99,8 @@ export default function App() {
           console.error({ loc: "Failed to get profile" }, error);
         }
       } else {
+        // TODO: This always gets executed, but it should only be executed
+        // if there is an invitation code.
         const parsedInitialUrl = await Linking.parseInitialURLAsync();
         console.log({ parsedInitialUrl });
         const parsed = groupInviteSchema.safeParse(
@@ -107,11 +109,8 @@ export default function App() {
         if (parsed.success) {
           const { inviteCode } = parsed.data;
           console.log({ inviteCode });
+          console.log("Setting invitecode, should be there");
           setInviteCode(inviteCode);
-        } else {
-          console.log(
-            "No groupInvite thing, ignoring. If you see this often you should fix this code.",
-          );
         }
       }
     })();
@@ -177,13 +176,19 @@ export default function App() {
             >
               {user === undefined && (
                 <>
-                  <BottomTabNavigator.Screen name="Login">
-                    {() => <LoginScreen maybeInviteCode={inviteCode} />}
-                  </BottomTabNavigator.Screen>
                   <BottomTabNavigator.Screen
-                    name="Register"
-                    component={RegisterScreen}
+                    name="Login"
+                    component={LoginScreen}
                   />
+                  <BottomTabNavigator.Screen name="Register">
+                    {(somethingInTheWaaaay) => (
+                      <RegisterScreen
+                        navigation={somethingInTheWaaaay.navigation}
+                        route={somethingInTheWaaaay.route}
+                        inviteCode={inviteCode}
+                      />
+                    )}
+                  </BottomTabNavigator.Screen>
                 </>
               )}
               {user !== undefined && user.groupId === null && (

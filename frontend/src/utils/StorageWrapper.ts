@@ -27,7 +27,7 @@ class StorageWrapper {
         ).getItemAsync(key);
       }
     } catch (error) {
-      console.error({ loc: "getItem failed", error });
+      // console.error({ loc: "getItem failed", error });
       // TODO: See https://github.com/expo/expo/issues/23426
       this.deleteItem(key);
       return null;
