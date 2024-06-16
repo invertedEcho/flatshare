@@ -3,21 +3,21 @@ import { useForm, Controller } from "react-hook-form";
 import { View, Text, TextInput, Pressable } from "react-native";
 import Toast from "react-native-toast-message";
 import { Task } from "../screens/all-tasks";
-import { modalStyles } from "./task-item";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { queryKeys } from "../utils/queryKeys";
+import { modalStyles } from "../styles/modal";
 
 async function updateTask({
   id,
   title,
   description,
-  taskGroupId,
+  recurringTaskGroupId,
 }: Omit<Task, "createdAt">) {
   await fetchWrapper.put(`tasks/${id}`, {
     taskId: id,
     title: title,
-    description: description,
-    taskGroupId: taskGroupId,
+    description,
+    recurringTaskGroupId,
   });
 }
 
@@ -31,7 +31,7 @@ export function EditTaskForm({
   defaultValues: {
     title: string;
     description: string | null;
-    taskGroupId: number | null;
+    recurringTaskGroupId: number | null;
   };
 }) {
   const queryClient = useQueryClient();
@@ -49,12 +49,7 @@ export function EditTaskForm({
   });
 
   function onSave(data: Omit<Task, "createAt">) {
-    mutate({
-      id: data.id,
-      title: data.title,
-      description: data.description,
-      taskGroupId: data.taskGroupId,
-    });
+    mutate({ ...data });
   }
 
   const { control, handleSubmit } = useForm<Omit<Task, "id">>({

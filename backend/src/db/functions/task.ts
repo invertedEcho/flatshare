@@ -1,10 +1,45 @@
 import { eq } from 'drizzle-orm';
 import { db } from '..';
-import { SelectTask, assignmentTable, taskTable } from '../schema';
-import { CreateTask, OneOffTask, UpdateTask } from 'src/tasks/task.controller';
+import {
+  InsertTask,
+  SelectTask,
+  assignmentTable,
+  taskGroupTable,
+  taskTable,
+} from '../schema';
+import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
 
-export async function dbGetAllTasks(): Promise<SelectTask[]> {
-  return await db.select().from(taskTable);
+/**
+  *
+(alias) type SelectTask = {
+    id: number;
+    title: string;
+    description: string | null;
+    createdAt: Date;
+    recurringTaskGroupId: number | null;
+}
+*/
+
+export async function dbGetAllTasks({
+  groupId,
+}: {
+  groupId?: number;
+}): Promise<SelectTask[]> {
+  const query = db
+    .select({
+      id: taskTable.id,
+      title: taskTable.title,
+      description: taskTable.description,
+      createdAt: taskTable.createdAt,
+      recurringTaskGroupId: taskTable.recurringTaskGroupId,
+    })
+    .from(taskTable);
+  if (groupId === undefined) {
+    return await query;
+  }
+  return await query
+    .innerJoin(taskGroupTable, eq(taskGroupTable.taskId, taskTable.id))
+    .where(eq(taskGroupTable.groupId, groupId));
 }
 
 export async function dbGetTaskById(taskId: number) {
@@ -23,14 +58,19 @@ export async function dbGetTaskById(taskId: number) {
 export async function dbCreateRecurringTask({
   title,
   description,
-  taskGroupId,
-}: CreateTask) {
+  recurringTaskGroupId,
+  groupId,
+}: InsertTask & { groupId: number }) {
   try {
-    await db.insert(taskTable).values({
-      title,
-      description,
-      taskGroupId,
-    });
+    const tasks = await db
+      .insert(taskTable)
+      .values({
+        title,
+        description,
+        recurringTaskGroupId,
+      })
+      .returning();
+    await db.insert(taskGroupTable).values({ taskId: tasks[0].id, groupId });
   } catch (error) {
     console.error({ error });
     throw error;
@@ -46,7 +86,7 @@ export async function dbUpdateTask({
   try {
     await db
       .update(taskTable)
-      .set({ title, description, taskGroupId })
+      .set({ title, description, recurringTaskGroupId: taskGroupId })
       .where(eq(taskTable.id, id));
   } catch (error) {
     console.error({ error });
@@ -58,7 +98,8 @@ export async function dbCreateOneOffTask({
   title,
   description,
   userIds,
-}: OneOffTask) {
+  groupId,
+}: OneOffTask & { groupId: number }) {
   const tasks = await db
     .insert(taskTable)
     .values({ title, description })
@@ -71,6 +112,7 @@ export async function dbCreateOneOffTask({
       userId,
     };
   });
+  await db.insert(taskGroupTable).values({ taskId: task.taskId, groupId });
 
   await db.insert(assignmentTable).values(hydratedAssignments);
 }

@@ -22,7 +22,9 @@ import { getDefinedValueOrThrow } from "../utils/assert";
 const createRecurringTaskSchema = z.object({
   title: z.string().min(1, { message: "Title is missing" }),
   description: z.string().optional(),
-  taskGroupId: z.number().optional(),
+  // TODO: this shouldnt be optional, but we mark it is so we can use this schema in the create task mutation
+  // we should instead use the correct schema depending if user selected recurring on/off
+  recurringTaskGroupId: z.number().optional(),
 });
 
 type CreateRecurringTask = z.infer<typeof createRecurringTaskSchema>;
@@ -39,11 +41,13 @@ async function createOneOffTask({
   title,
   description,
   userIds,
-}: CreateOneOffTask) {
+  groupId,
+}: CreateOneOffTask & { groupId: number }) {
   await fetchWrapper.post("tasks/one-off/", {
     title,
     description,
     userIds,
+    groupId,
   });
 }
 
@@ -56,12 +60,14 @@ const taskGroupSchema = z.object({
 async function createRecurringTask({
   title,
   description,
-  taskGroupId,
-}: CreateRecurringTask) {
+  recurringTaskGroupId,
+  groupId,
+}: CreateRecurringTask & { groupId: number }) {
   await fetchWrapper.post("tasks/recurring", {
     title,
     description,
-    taskGroupId,
+    recurringTaskGroupId,
+    groupId,
   });
 }
 
@@ -80,19 +86,18 @@ const defaultValues = {
 
 export function CreateTaskScreen() {
   const { user } = React.useContext(AuthContext);
-  // FIXME
-  const { groupId } = getDefinedValueOrThrow(user);
-  const actualGroupId = getDefinedValueOrThrow(groupId);
+  const groupId = getDefinedValueOrThrow(user?.groupId);
+
   const [selectedTaskGroupId, setSelectedTaskGroupId] = React.useState<
     number | undefined
   >(undefined);
-
   const [taskType, setTaskType] = React.useState<"recurring" | "non-recurring">(
     "recurring",
   );
   const [selectedUserIds, setSelectedUserIds] = React.useState<number[]>([]);
 
   const queryClient = useQueryClient();
+
   const {
     control,
     handleSubmit,
@@ -110,11 +115,13 @@ export function CreateTaskScreen() {
             title: args.title,
             description: args.description,
             userIds: selectedUserIds,
+            groupId,
           })
         : createRecurringTask({
             title: args.title,
             description: args.description,
-            taskGroupId: selectedTaskGroupId,
+            recurringTaskGroupId: selectedTaskGroupId,
+            groupId,
           });
     },
     onSuccess: () => {
@@ -140,7 +147,7 @@ export function CreateTaskScreen() {
   const { data: users, isLoading: isUsersLoading } = useQuery({
     queryKey: [queryKeys.users],
     queryFn: () => {
-      return getUsersOfCurrentGroup({ groupId: actualGroupId });
+      return getUsersOfCurrentGroup({ groupId });
     },
   });
 

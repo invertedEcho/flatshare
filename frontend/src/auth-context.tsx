@@ -1,11 +1,12 @@
 import * as React from "react";
 
 export const AuthContext = React.createContext<{
-  user: { userId: number; groupId: number | null } | undefined;
+  user: { userId: number; email: string; groupId: number | null } | undefined;
   setUser: React.Dispatch<
     React.SetStateAction<
       | {
           userId: number;
+          email: string;
           groupId: number | null;
         }
       | undefined
@@ -22,11 +23,12 @@ export default function AuthContextProvider({
   setUser,
 }: {
   children: React.ReactNode;
-  user: { userId: number; groupId: number | null } | undefined;
+  user: { userId: number; email: string; groupId: number | null } | undefined;
   setUser: React.Dispatch<
     React.SetStateAction<
       | {
           userId: number;
+          email: string;
           groupId: number | null;
         }
       | undefined

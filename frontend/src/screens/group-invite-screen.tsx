@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import * as React from "react";
-import { Text, View } from "react-native";
+import { Pressable, Share, Text, View } from "react-native";
 import { fetchWrapper } from "../utils/fetchWrapper";
 import { z } from "zod";
 import { queryKeys } from "../utils/queryKeys";
@@ -27,6 +27,13 @@ export function GroupInviteScreen({ groupId }: { groupId: number }) {
     enabled: false,
   });
 
+  async function onShare(inviteCode: string) {
+    const inviteLink = `https://wg.mainfraeme.com/?inviteCode=${inviteCode}`;
+    await Share.share({
+      message: `Join my Group on WG-Tasks App!\n${inviteLink}`,
+    });
+  }
+
   return (
     <View>
       <View>
@@ -34,6 +41,12 @@ export function GroupInviteScreen({ groupId }: { groupId: number }) {
           <>
             <Text className="text-white">Generated invite code:</Text>
             <Text className="text-white">{generatedInviteCode}</Text>
+            <Pressable
+              className="font-bold text-center bg-blue-300 flex rounded"
+              onPress={() => onShare(generatedInviteCode)}
+            >
+              <Text>Share</Text>
+            </Pressable>
           </>
         ) : (
           <GenerateInviteCode onPress={() => refetch()} />

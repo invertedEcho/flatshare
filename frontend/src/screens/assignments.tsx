@@ -72,17 +72,20 @@ export function AssigmentsScreen() {
   const actualGroupId = getDefinedValueOrThrow(groupId);
 
   const queryClient = useQueryClient();
-  const { data: assignments, isLoading } = useQuery({
+  const {
+    data: assignments,
+    isLoading,
+    refetch: refetchAssignments,
+  } = useQuery({
     queryKey: [queryKeys.assignments],
     queryFn: () => {
       return getAssigments({ groupId: actualGroupId });
     },
   });
 
-  const { data: users } = useQuery({
+  const { data: users, refetch: refetchUsers } = useQuery({
     queryKey: [queryKeys.users, { groupId }],
     queryFn: () => {
-      console.log({ actualGroupId });
       return getUsersOfCurrentGroup({ groupId: actualGroupId });
     },
   });
@@ -102,16 +105,13 @@ export function AssigmentsScreen() {
       queryClient.refetchQueries({ queryKey: [queryKeys.assignments] });
     },
   });
-  console.log({ assignments, users });
 
   if (assignments === undefined || users === undefined || isLoading) {
     return <Loading message="Loading your assignments..." />;
   }
 
   const filteredAssignments = assignments.filter(
-    (assignment) =>
-      assignment.assigneeId === selectedUserId &&
-      !(assignment.isOneOff && assignment.isCompleted),
+    (assignment) => assignment.assigneeId === selectedUserId,
   );
 
   const oneOffAssignments = filteredAssignments.filter(
@@ -152,9 +152,8 @@ export function AssigmentsScreen() {
 
   async function refreshAssignments() {
     setRefreshing(true);
-    await queryClient.refetchQueries({
-      queryKey: [queryKeys.assignments],
-    });
+    refetchUsers();
+    refetchAssignments();
     setRefreshing(false);
   }
 

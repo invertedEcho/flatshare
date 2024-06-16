@@ -25,7 +25,7 @@ type GroupCreate = z.infer<typeof groupCreateSchema>;
 
 async function joinGroupByCode(inviteCode: string, userId: number) {
   const response = await fetchWrapper.post("user-group/join", {
-    inviteCode,
+    inviteCode: inviteCode.toUpperCase(),
     userId,
   });
   const body = await response.json();
@@ -129,7 +129,7 @@ export function GroupJoinScreen() {
     },
   });
 
-  const { mutate: mutateCreateGroup } = useMutation({
+  const { mutate: mutateCreateGroup, status } = useMutation({
     mutationKey: [queryKeys.groups],
     // TODO: lets not mix these, all functions should accept object instead of positional arguments
     mutationFn: async ({
@@ -145,6 +145,7 @@ export function GroupJoinScreen() {
           throw new Error("Failed to create group");
         }
         await joinGroupById(group, userId);
+        setUser({ userId, groupId: group });
       } catch (error) {
         console.error({ error });
         throw new Error("you suck very badlyt");
@@ -161,8 +162,7 @@ export function GroupJoinScreen() {
   }
 
   return (
-    <View className="gap-8 p-16">
-      <Text className="text-white">To continue, join a group</Text>
+    <View className="p-2">
       <FormTextInput
         name="inviteCode"
         control={control}
@@ -178,7 +178,13 @@ export function GroupJoinScreen() {
       >
         <Text className="p-2">Join Group</Text>
       </Pressable>
-      <Text className="text-white">Or, create a new group</Text>
+      <View
+        style={{
+          borderBottomColor: "white",
+          borderBottomWidth: 3,
+          margin: 16,
+        }}
+      />
       <FormTextInput
         name="groupName"
         labelText="Create a new group"
@@ -191,6 +197,7 @@ export function GroupJoinScreen() {
       <Pressable
         className="font-bold text-center bg-blue-300 flex rounded"
         onPress={handleCreateSubmit(handleCreateGroup)}
+        disabled={status === "pending"}
       >
         <Text className="p-2">Create Group</Text>
       </Pressable>

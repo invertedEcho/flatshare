@@ -90,7 +90,7 @@ export function RegisterScreen({
           name="email"
           labelText="Email"
           textInputProps={{
-            placeholder: "email@web.de",
+            placeholder: "example@domain.com",
             textContentType: "emailAddress",
           }}
           control={control}

@@ -1,15 +1,15 @@
 import { eq } from 'drizzle-orm';
 import { db } from '..';
 import {
-  taskGroupTable,
-  taskGroupUserTable,
+  recurringTaskGroupTable,
+  recurringTaskGroupUserTable,
   taskTable,
   userTable,
 } from '../schema';
 import { CreateTaskGroup } from 'src/tasks/task-group.controller';
 
 export async function dbGetTaskGroups() {
-  return await db.select().from(taskGroupTable);
+  return await db.select().from(recurringTaskGroupTable);
 }
 
 export async function dbCreateTaskGroup({
@@ -21,20 +21,20 @@ export async function dbCreateTaskGroup({
 }: CreateTaskGroup) {
   try {
     const res = await db
-      .insert(taskGroupTable)
+      .insert(recurringTaskGroupTable)
       .values({
         title,
         description,
         interval,
         initialStartDate: new Date(initialStartDate),
       })
-      .returning({ taskGroupId: taskGroupTable.id });
+      .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
 
-    const { taskGroupId } = res[0];
+    const { recurringTaskGroupId } = res[0];
 
-    await db.insert(taskGroupUserTable).values(
+    await db.insert(recurringTaskGroupUserTable).values(
       userIds.map((userId) => ({
-        taskGroupId,
+        recurringTaskGroupId,
         userId,
       })),
     );
@@ -48,9 +48,12 @@ export async function dbGetTaskGroupUsers(taskGroupId: number) {
   try {
     const taskGroupUsers = await db
       .select({ userId: userTable.id })
-      .from(taskGroupUserTable)
-      .innerJoin(userTable, eq(taskGroupUserTable.userId, userTable.id))
-      .where(eq(taskGroupUserTable.taskGroupId, taskGroupId));
+      .from(recurringTaskGroupUserTable)
+      .innerJoin(
+        userTable,
+        eq(recurringTaskGroupUserTable.userId, userTable.id),
+      )
+      .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId));
 
     return taskGroupUsers;
   } catch (error) {
@@ -63,5 +66,5 @@ export async function dbGetTasksOfTaskGroup(taskGroupId: number) {
   return await db
     .select()
     .from(taskTable)
-    .where(eq(taskTable.taskGroupId, taskGroupId));
+    .where(eq(taskTable.recurringTaskGroupId, taskGroupId));
 }

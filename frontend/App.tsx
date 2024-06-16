@@ -51,6 +51,7 @@ const BottomTabNavigator = createBottomTabNavigator<RootStackParamList>();
 const profileSchema = z.object({
   userId: z.number(),
   groupId: z.number().nullable(),
+  email: z.string(),
 });
 
 const prefix = Linking.createURL("/");
@@ -59,7 +60,7 @@ const queryClient = new QueryClient();
 
 export default function App() {
   const [user, setUser] = React.useState<
-    { userId: number; groupId: number | null } | undefined
+    { userId: number; email: string; groupId: number | null } | undefined
   >();
   const [menuVisible, setMenuVisible] = React.useState(false);
 
@@ -86,6 +87,7 @@ export default function App() {
           const res = await fetchWrapper.get("profile");
           const body = await res.json();
           const parsed = profileSchema.parse(body);
+          console.log({ parsed });
           setUser(parsed);
         } catch (error) {
           console.error({ loc: "Failed to get profile" }, error);
@@ -140,6 +142,7 @@ export default function App() {
                               StorageWrapper.deleteItem("jwt-token");
                               setUser(undefined);
                             }}
+                            email={user.email}
                           />
                         </View>
                       </Menu>

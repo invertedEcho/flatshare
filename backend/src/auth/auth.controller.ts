@@ -15,6 +15,7 @@ import { AuthService, User } from './auth.service';
 import { Public } from './public.decorators';
 import { dbGetGroupOfUser } from 'src/db/functions/user-group';
 import { eq } from 'drizzle-orm';
+import { dbGetUserById } from 'src/db/functions/user';
 
 class RegisterDto {
   username: string;
@@ -44,14 +45,17 @@ export class AuthController {
     return { username, email };
   }
 
+  // TODO: This endpoint doesnt seem right...
   @Get('profile')
   async getProfile(
     @Request() req: { user: { userId: number; username: string } },
   ) {
+    const user = await dbGetUserById(req.user.userId);
     const group = await dbGetGroupOfUser(req.user.userId);
     return {
       userId: req.user.userId,
       groupId: group?.user_group.groupId ?? null,
+      email: user.email,
     };
   }
 

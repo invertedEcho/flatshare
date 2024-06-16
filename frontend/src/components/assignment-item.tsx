@@ -16,8 +16,6 @@ export function AssignmentItem({
   disabled = false,
   onPress,
 }: ListItemProps) {
-  const [isPressed, setIsPressed] = React.useState(false);
-
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   const scaleIn = () => {

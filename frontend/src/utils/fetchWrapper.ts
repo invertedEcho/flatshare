@@ -25,7 +25,9 @@ function getAuthorizedFetcher(
       ...options,
     });
     if (!response.ok) {
-      throw new Error("response was not ok");
+      throw new Error(
+        `Request failed: ${response.status} ${await response.text()}`,
+      );
     }
 
     return response;

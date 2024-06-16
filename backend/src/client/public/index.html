@@ -1,2 +1,30 @@
-<h1>Login via Invite Code</h1>
-<a href="wg-app://group?inviteCode=12345">Open in app</>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login via Invite Code</title>
+    <script>
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const inviteCode = urlParams.get('inviteCode');
+            const linkElement = document.getElementById('invite-link');
+            const warningElement = document.getElementById('warning');
+
+            if (inviteCode) {
+                linkElement.href = `wg-app://group?inviteCode=${inviteCode}`;
+                linkElement.style.display = 'inline';
+                warningElement.style.display = 'none';
+            } else {
+                linkElement.style.display = 'none';
+                warningElement.style.display = 'block';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Login via Invite Code</h1>
+    <a id="invite-link" href="wg-app://group?inviteCode=12345" style="display: none;">Open in app</a>
+    <p id="warning" style="display: none; color: red;">Warning: Broken link, no invite code provided.</p>
+</body>
+</html>
