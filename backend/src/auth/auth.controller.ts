@@ -33,7 +33,9 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req: { user: User }) {
-    return this.authService.login(req.user);
+    const result = await this.authService.login(req.user);
+    const maybeGroupId = await dbGetGroupOfUser(result.userId);
+    return { ...result, groupId: maybeGroupId?.group.id };
   }
 
   @Public()

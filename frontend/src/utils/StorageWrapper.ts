@@ -16,23 +16,35 @@ class StorageWrapper {
   }
 
   static async getItem(key: string): Promise<string | null> {
-    if (Platform.OS === "web") {
-      return await (StorageWrapper.storage as AsyncStorageStatic).getItem(key);
-    } else {
-      return await (StorageWrapper.storage as typeof SecureStore).getItemAsync(
-        key,
-      );
+    try {
+      if (Platform.OS === "web") {
+        return await (StorageWrapper.storage as AsyncStorageStatic).getItem(
+          key,
+        );
+      } else {
+        return await (
+          StorageWrapper.storage as typeof SecureStore
+        ).getItemAsync(key);
+      }
+    } catch (error) {
+      console.error({ loc: "getItem failed", error });
+      // TODO: See https://github.com/expo/expo/issues/23426
+      this.deleteItem(key);
+      return null;
     }
   }
 
   static async setItem(key: string, value: string): Promise<void> {
-    if (Platform.OS === "web") {
-      return await StorageWrapper.storage.setItem(key, value);
-    } else {
-      return await (StorageWrapper.storage as typeof SecureStore).setItemAsync(
-        key,
-        value,
-      );
+    try {
+      if (Platform.OS === "web") {
+        return await StorageWrapper.storage.setItem(key, value);
+      } else {
+        return await (
+          StorageWrapper.storage as typeof SecureStore
+        ).setItemAsync(key, value);
+      }
+    } catch (error) {
+      console.error({ loc: "setItem failed", error });
     }
   }
 

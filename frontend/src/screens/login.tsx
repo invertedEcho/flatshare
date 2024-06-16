@@ -22,6 +22,7 @@ const loginSchema = z.object({
   accessToken: z.string(),
   userId: z.number(),
   groupId: z.number().nullable(),
+  email: z.string(),
 });
 
 type LoginFormData = z.infer<typeof loginFormSchema>;
@@ -60,7 +61,8 @@ export function LoginScreen({}: NativeStackScreenProps<
     onSuccess: (res) => {
       Toast.show({ type: "success", text1: "Succcessfully logged in" });
       resetForm({ password: "", username: "" });
-      setUser({ userId: res.userId, groupId: res.groupId });
+      console.log({ loc: "logging in", res });
+      setUser({ userId: res.userId, groupId: res.groupId, email: res.email });
       StorageWrapper.setItem("jwt-token", res.accessToken);
     },
     onError: (err) => {

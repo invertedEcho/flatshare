@@ -29,5 +29,7 @@ mkShell {
 
   shellHook = ''
     export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${android-sdk}/share/android-sdk/build-tools/34.0.0/aapt2";
+    echo "Please make sure you have setup /tmp"
+    export TMPDIR=/tmp
   '';
 }
