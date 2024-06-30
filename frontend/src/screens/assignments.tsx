@@ -1,22 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { StatusBar } from "expo-status-bar";
-import * as React from "react";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { StatusBar } from 'expo-status-bar';
+import * as React from 'react';
 import {
   RefreshControl,
   SafeAreaView,
   SectionList,
   Text,
   View,
-} from "react-native";
-import { z } from "zod";
-import { AuthContext } from "../auth-context";
-import AnimatedView from "../components/animated-view";
-import { AssignmentItem } from "../components/assignment-item";
-import Loading from "../components/loading";
-import UserDropdown from "../components/user-dropdown";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { queryKeys } from "../utils/queryKeys";
-import { getDefinedValueOrThrow } from "../utils/assert";
+} from 'react-native';
+import { z } from 'zod';
+import { AuthContext } from '../auth-context';
+import AnimatedView from '../components/animated-view';
+import { AssignmentItem } from '../components/assignment-item';
+import Loading from '../components/loading';
+import UserDropdown from '../components/user-dropdown';
+import { fetchWrapper } from '../utils/fetchWrapper';
+import { queryKeys } from '../utils/queryKeys';
+import { getDefinedValueOrThrow } from '../utils/assert';
 
 export const assignmentSchema = z.object({
   id: z.number(),
@@ -40,7 +40,7 @@ export const userSchema = z.object({
 export type User = z.infer<typeof userSchema>;
 export type Assignment = z.infer<typeof assignmentSchema>;
 
-type AssignmentState = "pending" | "completed";
+type AssignmentState = 'pending' | 'completed';
 
 const assignmentsResponse = z.array(assignmentSchema);
 const usersResponse = z.array(userSchema);
@@ -137,7 +137,7 @@ export function AssigmentsScreen() {
 
   const sectionedListData = (
     oneOffAssignments.length !== 0
-      ? [{ title: "One-off assignments", data: oneOffAssignments }]
+      ? [{ title: 'One-off assignments', data: oneOffAssignments }]
       : []
   ).concat(
     Array.from(assignmentsByDateTimestamp)
@@ -145,7 +145,7 @@ export function AssigmentsScreen() {
         ([dateTimeStampA], [dateTimeStampB]) => dateTimeStampA - dateTimeStampB,
       )
       .map(([dateTimestamp, assignments]) => ({
-        title: `Due on ${new Date(dateTimestamp).toLocaleDateString("en-GB")}`,
+        title: `Due on ${new Date(dateTimestamp).toLocaleDateString('en-GB')}`,
         data: assignments.sort((a, b) => a.title.localeCompare(b.title)),
       })),
   );
@@ -159,7 +159,7 @@ export function AssigmentsScreen() {
 
   return (
     <AnimatedView>
-      <SafeAreaView className="text-black flex-1 bg-slate-900">
+      <SafeAreaView className="flex-1 bg-slate-900">
         <View className="p-4 w-full" style={{ gap: 20 }}>
           <View>
             <Text className="text-white font-semibold text-md">From user</Text>
@@ -198,7 +198,7 @@ export function AssigmentsScreen() {
                 onPress={() => {
                   mutate({
                     assignmentId: assignment.id,
-                    state: assignment.isCompleted ? "pending" : "completed",
+                    state: assignment.isCompleted ? 'pending' : 'completed',
                   });
                   queryClient.refetchQueries({
                     queryKey: [queryKeys.assignments],

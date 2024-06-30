@@ -10,7 +10,10 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "types": "pnpm tsc"
+    "types": "pnpm tsc",
+    "format": "prettier -w \"src/**/*.ts\"",
+    "format:check": "prettier -c \"src/**/*.ts\"",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
   },
   "dependencies": {
     "@expo/metro-runtime": "~3.2.1",
@@ -46,13 +49,21 @@
   "devDependencies": {
     "@babel/core": "^7.24.4",
     "@babel/plugin-transform-class-static-block": "^7.24.4",
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.6.0",
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@tsconfig/react-native": "^3.0.5",
     "@types/jest": "^29.5.12",
     "@types/react": "18.2.79",
     "@types/react-test-renderer": "^18.3.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-unused-imports": "^4.0.0",
+    "globals": "^15.7.0",
+    "prettier": "^3.3.2",
     "tailwindcss": "3.3.2",
-    "typescript": "5.3.3"
+    "typescript": "5.3.3",
+    "typescript-eslint": "^7.14.1"
   },
   "private": true,
   "packageManager": "pnpm@8.15.5+sha1.a58c038faac410c947dbdb93eb30994037d0fce2"

@@ -1,23 +1,25 @@
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
-import { View, Text, TextInput, Pressable } from "react-native";
-import Toast from "react-native-toast-message";
-import { Task } from "../screens/all-tasks";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { queryKeys } from "../utils/queryKeys";
-import { modalStyles } from "../styles/modal";
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useForm, Controller } from 'react-hook-form';
+import { View, Text, TextInput, Pressable } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { Task } from '../screens/all-tasks';
+import { fetchWrapper } from '../utils/fetchWrapper';
+import { queryKeys } from '../utils/queryKeys';
+import { modalStyles } from '../styles/modal';
 
 async function updateTask({
   id,
   title,
   description,
   recurringTaskGroupId,
-}: Omit<Task, "createdAt">) {
+}: Omit<Task, 'createdAt'>) {
   await fetchWrapper.put(`tasks/${id}`, {
-    taskId: id,
-    title: title,
-    description,
-    recurringTaskGroupId,
+    body: JSON.stringify({
+      taskId: id,
+      title: title,
+      description,
+      recurringTaskGroupId,
+    }),
   });
 }
 
@@ -39,20 +41,20 @@ export function EditTaskForm({
   const { mutate } = useMutation({
     mutationFn: updateTask,
     onSuccess: () => {
-      Toast.show({ type: "success", text1: "Successfully updated task" });
+      Toast.show({ type: 'success', text1: 'Successfully updated task' });
       queryClient.refetchQueries({ queryKey: [queryKeys.tasks] });
     },
     onError: () => {
-      Toast.show({ type: "error", text1: "Failed updated task" });
+      Toast.show({ type: 'error', text1: 'Failed updated task' });
     },
     onSettled: closeModal,
   });
 
-  function onSave(data: Omit<Task, "createAt">) {
+  function onSave(data: Omit<Task, 'createAt'>) {
     mutate({ ...data });
   }
 
-  const { control, handleSubmit } = useForm<Omit<Task, "id">>({
+  const { control, handleSubmit } = useForm<Omit<Task, 'id'>>({
     defaultValues,
   });
   return (
@@ -68,7 +70,7 @@ export function EditTaskForm({
               }}
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  style={{ color: "white" }}
+                  style={{ color: 'white' }}
                   onChangeText={onChange}
                   value={value}
                   className="p-4 rounded-lg bg-slate-900 text-lg"
@@ -83,7 +85,7 @@ export function EditTaskForm({
               control={control}
               render={({ field: { onChange, value } }) => (
                 <TextInput
-                  style={{ color: "white" }}
+                  style={{ color: 'white' }}
                   onChangeText={onChange}
                   // @ts-expect-error FIXME: later
                   value={value}

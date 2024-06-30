@@ -1,15 +1,15 @@
-import * as React from "react";
+import * as React from 'react';
 
-import { Pressable, Text, View } from "react-native";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
-import Toast from "react-native-toast-message";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { AuthContext } from "../auth-context";
-import StorageWrapper from "../utils/StorageWrapper";
-import FormTextInput from "../components/form-text-input";
+import { Pressable, Text, View } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useMutation } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
+import { fetchWrapper } from '../utils/fetchWrapper';
+import { AuthContext } from '../auth-context';
+import StorageWrapper from '../utils/StorageWrapper';
+import FormTextInput from '../components/form-text-input';
 
 const loginFormSchema = z.object({
   username: z.string(),
@@ -26,15 +26,17 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginFormSchema>;
 
 async function login({ username, password }: LoginFormData) {
-  const res = await fetchWrapper.post("login", {
-    username,
-    password,
+  const res = await fetchWrapper.post('login', {
+    body: JSON.stringify({
+      username,
+      password,
+    }),
   });
   if (res.status === 401) {
-    throw new Error("Invalid Username/Password");
+    throw new Error('Invalid Username/Password');
   }
   if (!res.ok) {
-    throw new Error("Failed to login");
+    throw new Error('Failed to login');
   }
   const json = await res.json();
   return loginSchema.parse(json);
@@ -60,22 +62,22 @@ export function LoginScreen() {
         password: args.password,
       }),
     onSuccess: (res) => {
-      Toast.show({ type: "success", text1: "Succcessfully logged in" });
-      resetForm({ password: "", username: "" });
+      Toast.show({ type: 'success', text1: 'Succcessfully logged in' });
+      resetForm({ password: '', username: '' });
       setUser({
         userId: res.userId,
         groupId: res.groupId ?? null,
         email: res.email,
       });
-      StorageWrapper.setItem("jwt-token", res.accessToken);
+      StorageWrapper.setItem('jwt-token', res.accessToken);
     },
     onError: (err) => {
       console.error(err);
-      resetField("password");
+      resetField('password');
       if (err instanceof Error) {
-        Toast.show({ type: "error", text1: err.message });
+        Toast.show({ type: 'error', text1: err.message });
       } else {
-        Toast.show({ type: "error", text1: "Failed to log in" });
+        Toast.show({ type: 'error', text1: 'Failed to log in' });
       }
     },
   });
@@ -92,7 +94,7 @@ export function LoginScreen() {
         <FormTextInput
           name="username"
           labelText="Username"
-          textInputProps={{ placeholder: "Username" }}
+          textInputProps={{ placeholder: 'Username' }}
           control={control}
           errors={errors}
           rules={{ required: true }}
@@ -101,9 +103,9 @@ export function LoginScreen() {
           name="password"
           labelText="Password"
           textInputProps={{
-            placeholder: "Password",
+            placeholder: 'Password',
             secureTextEntry: true,
-            textContentType: "password",
+            textContentType: 'password',
           }}
           control={control}
           errors={errors}
@@ -113,7 +115,7 @@ export function LoginScreen() {
       <Pressable
         // TODO: nativewind won't work here for some odd reason
         style={({ pressed }) => ({
-          backgroundColor: pressed ? "#24aeff" : "#24a0ed",
+          backgroundColor: pressed ? '#24aeff' : '#24a0ed',
           paddingHorizontal: 24,
           paddingVertical: 12,
           borderRadius: 5,

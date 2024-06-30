@@ -1,17 +1,17 @@
-import { useMutation } from "@tanstack/react-query";
-import * as React from "react";
-import { Pressable, Text, View } from "react-native";
-import * as Linking from "expo-linking";
-import { AuthContext } from "../auth-context";
-import { fetchWrapper } from "../utils/fetchWrapper";
-import { z } from "zod";
-import Toast from "react-native-toast-message";
-import { queryKeys } from "../utils/queryKeys";
-import { getDefinedValueOrThrow } from "../utils/assert";
-import FormTextInput from "../components/form-text-input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRoute } from "@react-navigation/native";
+import { useMutation } from '@tanstack/react-query';
+import * as React from 'react';
+import { Pressable, Text, View } from 'react-native';
+import * as Linking from 'expo-linking';
+import { AuthContext } from '../auth-context';
+import { fetchWrapper } from '../utils/fetchWrapper';
+import { z } from 'zod';
+import Toast from 'react-native-toast-message';
+import { queryKeys } from '../utils/queryKeys';
+import { getDefinedValueOrThrow } from '../utils/assert';
+import FormTextInput from '../components/form-text-input';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRoute } from '@react-navigation/native';
 
 export const groupInviteSchema = z.object({
   inviteCode: z.string().length(8),
@@ -24,39 +24,45 @@ const groupCreateSchema = z.object({
 type GroupCreate = z.infer<typeof groupCreateSchema>;
 
 async function joinGroupByCode(inviteCode: string, userId: number) {
-  const response = await fetchWrapper.post("user-group/join", {
-    inviteCode: inviteCode.toUpperCase(),
-    userId,
+  const response = await fetchWrapper.post('user-group/join', {
+    body: JSON.stringify({
+      inviteCode: inviteCode.toUpperCase(),
+      userId,
+    }),
   });
   const body = await response.json();
   const { success, groupId } = z
     .object({ success: z.boolean(), groupId: z.number().nullable() })
     .parse(body);
   if (!success) {
-    throw new Error("Could not join group.");
+    throw new Error('Could not join group.');
   }
   return groupId;
 }
 
 async function joinGroupById(groupId: number, userId: number) {
   // TODO: ugly endpoint
-  const response = await fetchWrapper.post("user-group/join-by-id", {
-    groupId,
-    userId,
+  const response = await fetchWrapper.post('user-group/join-by-id', {
+    body: JSON.stringify({
+      groupId,
+      userId,
+    }),
   });
   const body = await response.json();
   const { success } = z
     .object({ success: z.boolean(), groupId: z.number().nullable() })
     .parse(body);
   if (!success) {
-    throw new Error("Could not join group.");
+    throw new Error('Could not join group.');
   }
   return groupId;
 }
 
 async function createGroup({ groupName }: { groupName: string }) {
-  const response = await fetchWrapper.post("user-group/create", {
-    groupName,
+  const response = await fetchWrapper.post('user-group/create', {
+    body: JSON.stringify({
+      groupName,
+    }),
   });
   const body = await response.json();
   const { id } = z
@@ -77,13 +83,13 @@ export function GroupJoinScreen() {
       if (url) {
         const { queryParams } = Linking.parse(url);
         const parsed = groupInviteSchema.parse(queryParams);
-        setValue("inviteCode", parsed.inviteCode);
+        setValue('inviteCode', parsed.inviteCode);
       }
     };
     const params = route.params;
     if (params !== undefined) {
       const parsed = groupInviteSchema.parse(params);
-      setValue("inviteCode", parsed.inviteCode);
+      setValue('inviteCode', parsed.inviteCode);
     } else {
       handleInitialURL();
     }
@@ -112,7 +118,7 @@ export function GroupJoinScreen() {
       joinGroupByCode(inviteCode, userId),
     onSuccess: (groupId) => {
       const definedGroupId = getDefinedValueOrThrow(groupId);
-      Toast.show({ type: "success", text1: "Joined group!" });
+      Toast.show({ type: 'success', text1: 'Joined group!' });
       setUser((prev) => ({
         userId,
         groupId: definedGroupId,
@@ -121,8 +127,8 @@ export function GroupJoinScreen() {
     },
     onError: () => {
       Toast.show({
-        type: "error",
-        text1: "Could not join group. Invalid invite code?",
+        type: 'error',
+        text1: 'Could not join group. Invalid invite code?',
       });
     },
   });
@@ -140,7 +146,7 @@ export function GroupJoinScreen() {
       try {
         const group = await createGroup({ groupName });
         if (group === undefined) {
-          throw new Error("Failed to create group");
+          throw new Error('Failed to create group');
         }
         await joinGroupById(group, userId);
         setUser((prev) => ({
@@ -150,7 +156,7 @@ export function GroupJoinScreen() {
         }));
       } catch (error) {
         console.error({ error });
-        throw new Error("you suck very bad");
+        throw new Error('you suck very bad');
       }
     },
   });
@@ -170,7 +176,7 @@ export function GroupJoinScreen() {
         control={control}
         labelText="Join group"
         textInputProps={{
-          placeholder: "Enter a code",
+          placeholder: 'Enter a code',
         }}
         errors={errors}
       />
@@ -182,7 +188,7 @@ export function GroupJoinScreen() {
       </Pressable>
       <View
         style={{
-          borderBottomColor: "white",
+          borderBottomColor: 'white',
           borderBottomWidth: 3,
           margin: 16,
         }}
@@ -191,7 +197,7 @@ export function GroupJoinScreen() {
         name="groupName"
         labelText="Create a new group"
         textInputProps={{
-          placeholder: "Enter a name",
+          placeholder: 'Enter a name',
         }}
         errors={groupCreateErrors}
         control={groupCreateControl}
@@ -199,7 +205,7 @@ export function GroupJoinScreen() {
       <Pressable
         className="font-bold text-center bg-blue-300 flex rounded"
         onPress={handleCreateSubmit(handleCreateGroup)}
-        disabled={status === "pending"}
+        disabled={status === 'pending'}
       >
         <Text className="p-2">Create Group</Text>
       </Pressable>

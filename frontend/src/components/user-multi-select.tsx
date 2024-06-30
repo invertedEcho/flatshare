@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { MultiSelect } from "react-native-element-dropdown";
-import { Ionicons } from "@expo/vector-icons";
-import { dropdownStyles } from "./user-dropdown";
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { MultiSelect } from 'react-native-element-dropdown';
+import { Ionicons } from '@expo/vector-icons';
+import { dropdownStyles } from './user-dropdown';
 
 type MultiSelectItemProps = {
   username: string;
@@ -19,7 +19,7 @@ function MultiSelectItem(
       </Text>
       <Ionicons
         style={styles.icon}
-        color={selected ? "#24a0ed" : "black"}
+        color={selected ? '#24a0ed' : 'black'}
         name="person"
         size={20}
       />
@@ -53,8 +53,10 @@ export default function UserMultiSelect({
         labelField="username"
         valueField="id"
         placeholder="Select user"
+        // @ts-expect-error FIXME: why the fuck does it want a string here
         value={selectedUserIds}
         activeColor="white"
+        // @ts-expect-error FIXME: why the fuck does it want a string here
         onChange={setSelectedUserIds}
         renderLeftIcon={() => (
           <Ionicons style={styles.icon} color="black" name="person" size={20} />
@@ -76,10 +78,10 @@ export default function UserMultiSelect({
 const styles = StyleSheet.create({
   dropdown: {
     height: 50,
-    backgroundColor: "white",
+    backgroundColor: 'white',
     borderRadius: 12,
     padding: 12,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
@@ -93,10 +95,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   selectedTextStyle: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   itemTextStyle: {
-    fontWeight: "normal",
+    fontWeight: 'normal',
   },
 
   iconStyle: {
@@ -112,17 +114,17 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 17,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   selectedStyle: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
-    backgroundColor: "white",
-    shadowColor: "#000",
+    backgroundColor: 'white',
+    shadowColor: '#000',
     marginTop: 8,
     marginRight: 12,
     paddingHorizontal: 12,

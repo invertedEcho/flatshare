@@ -1,19 +1,18 @@
-import React from "react";
+import React from 'react';
 import {
   Control,
   Controller,
   FieldErrors,
   FieldValues,
-  InputValidationRules,
   Path,
   RegisterOptions,
-} from "react-hook-form";
-import { View, Text, TextInput, TextInputProps } from "react-native";
+} from 'react-hook-form';
+import { View, Text, TextInput, TextInputProps } from 'react-native';
 
 type Props<T extends FieldValues> = {
   name: Path<T>;
   labelText: string;
-  textInputProps: Omit<TextInputProps, "onChangeText" | "value">;
+  textInputProps: Omit<TextInputProps, 'onChangeText' | 'value'>;
   control: Control<T>;
   errors: FieldErrors<T>;
   rules?: RegisterOptions<T>;
@@ -30,7 +29,7 @@ function FormTextInput<T extends FieldValues>({
   return (
     <View>
       <Text className="text-white mb-2">
-        {labelText} {rules?.required && "*"}
+        {labelText} {rules?.required && '*'}
       </Text>
       <Controller
         control={control}
