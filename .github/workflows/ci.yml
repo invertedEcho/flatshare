@@ -11,34 +11,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-frontend:
-    name: Format, Lint, Types (Frontend)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 8
-
-      - name: Install deps
-        run: pnpm i
-        working-directory: ./frontend
-
-      - name: Check Format
-        run: pnpm format:check
-        working-directory: ./frontend
-
-      - name: Check Lint
-        run: pnpm lint
-        working-directory: ./frontend
-
-      - name: Check Types
-        run: pnpm types
-        working-directory: ./frontend
-
+  # TODO: Adapt to new flutter
+  # check-frontend:
+  #   name: Format, Lint, Types (Frontend)
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
+  #
+  #     - uses: pnpm/action-setup@v4
+  #       with:
+  #         version: 8
+  #
+  #     - name: Install deps
+  #       run: pnpm i
+  #       working-directory: ./frontend
+  #
+  #     - name: Check Format
+  #       run: pnpm format:check
+  #       working-directory: ./frontend
+  #
+  #     - name: Check Lint
+  #       run: pnpm lint
+  #       working-directory: ./frontend
+  #
+  #     - name: Check Types
+  #       run: pnpm types
+  #       working-directory: ./frontend
+  #
   check-backend:
     name: Format, Lint, Types (Backend)
     runs-on: ubuntu-latest
