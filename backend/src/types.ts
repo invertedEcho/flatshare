@@ -9,4 +9,5 @@ export type AssignmentResponse = {
   isCompleted: boolean;
   createdAt: Date;
   isOneOff: boolean;
+  dueDate: Date | null;
 };
