@@ -80,6 +80,7 @@ export class AuthController {
       userId: req.user.userId,
       groupId: group?.user_group.groupId ?? null,
       email: user.email,
+      username: user.username,
     };
   }
 
