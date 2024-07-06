@@ -26,10 +26,14 @@ Future<AuthResponse> login(String username, String password) async {
       'password': password,
     }),
   );
-  if (response.statusCode == 201) {
-    return AuthResponse.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to login');
+
+  switch (response.statusCode) {
+    case 201:
+      return AuthResponse.fromJson(jsonDecode(response.body));
+    case 401:
+      throw Exception("Incorrect credentials");
+    default:
+      throw Exception("Failed to login");
   }
 }
 
