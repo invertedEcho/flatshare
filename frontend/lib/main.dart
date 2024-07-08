@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
+import 'package:wg_app/assignments_widget.dart';
 import 'package:wg_app/authenticated_client.dart';
 import 'package:wg_app/login_form.dart';
 import 'package:wg_app/register_form.dart';
@@ -108,7 +109,6 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    // final ThemeData theme = Theme.of(context);
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
@@ -116,7 +116,7 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.amber,
+        indicatorColor: Colors.blue,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -139,6 +139,8 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
 }
 
 class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Accessing the UserProvider and getting the user data
@@ -163,12 +165,11 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    print(currentPageIndex);
     final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Wg app"),
+        title: const Text("Wg app"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -187,7 +188,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.amber,
+        indicatorColor: Colors.blue,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -196,21 +197,13 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             label: 'Assignments',
           ),
           NavigationDestination(
-            icon: Badge(child: Icon(Icons.notifications_sharp)),
+            icon: Icon(Icons.notifications_sharp),
             label: 'Tasks',
           ),
         ],
       ),
       body: <Widget>[
-        /// Home page
-        ListView.builder(
-            itemCount: 3,
-            itemBuilder: (BuildContext context, int index) {
-              if (index == 0) {
-                return const Text("Staubsaugen");
-              }
-              return const Text("Wischen");
-            }),
+	const AssignmentsWidget(),
 
         /// Messages page
         ListView.builder(

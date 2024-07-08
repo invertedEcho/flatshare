@@ -14,7 +14,7 @@ class RegisterForm extends StatefulWidget {
 
 Future<http.Response> register(String username, String password, String email) {
   return http.post(
-    Uri.parse('http://localhost:3000/api/register'),
+    Uri.parse('http://192.168.178.114:3000/api/register'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
