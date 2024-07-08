@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'dart:convert';
+import 'package:wg_app/fetch/auth.dart';
 
 import 'package:wg_app/main.dart';
 
@@ -15,27 +14,6 @@ class LoginForm extends StatefulWidget {
   }
 }
 
-Future<AuthResponse> login(String username, String password) async {
-  final response = await http.post(
-    Uri.parse('http://localhost:3000/api/login'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'username': username,
-      'password': password,
-    }),
-  );
-
-  switch (response.statusCode) {
-    case 201:
-      return AuthResponse.fromJson(jsonDecode(response.body));
-    case 401:
-      throw Exception("Incorrect credentials");
-    default:
-      throw Exception("Failed to login");
-  }
-}
 
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
