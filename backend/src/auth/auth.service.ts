@@ -30,6 +30,7 @@ export class AuthService {
       userId: user.id,
       groupId: null,
       email: user.email,
+      username: user.username,
     };
   }
 }
