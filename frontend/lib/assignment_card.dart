@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wg_app/fetch/assignments.dart';
 import 'package:wg_app/utils/date.dart';
 
 class Assignment {
@@ -6,9 +7,9 @@ class Assignment {
   final String title;
   final String description;
   final DateTime? dueDate;
-  final bool isCompleted;
+  bool isCompleted;
 
-  const Assignment(
+  Assignment(
       {required this.id,
       required this.title,
       required this.description,
@@ -39,39 +40,87 @@ class Assignment {
   }
 }
 
-class AssignmentCard extends StatelessWidget {
-  final Assignment assignment;
+class AssignmentsWidget extends StatefulWidget {
+  const AssignmentsWidget({super.key});
 
-  const AssignmentCard({super.key, required this.assignment});
+  @override
+  AssignmentsWidgetState createState() => AssignmentsWidgetState();
+}
+
+class AssignmentsWidgetState extends State<AssignmentsWidget> {
+  late Future<List<Assignment>> _assignmentsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _assignmentsFuture = fetchAssignments();
+  }
+
+  Future<void> updateAssignment(Assignment assignment) async {
+    setState(() {
+      assignment.isCompleted = !assignment.isCompleted;
+    });
+
+    try {
+      updateAssignmentState(assignment.id, !assignment.isCompleted);
+    } catch (error) {
+      setState(() {
+        assignment.isCompleted = !assignment.isCompleted;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update assignment: $error')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final title = assignment.title;
-    final description = assignment.description;
-    final String? dueDate =
-        assignment.dueDate != null ? parseToDueDate(assignment.dueDate!) : null;
-    final isCompleted = assignment.isCompleted;
+    return FutureBuilder<List<Assignment>>(
+        future: _assignmentsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data!.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text("No assigments."),
+              );
+            }
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final assignment = snapshot.data![index];
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(13),
-      ),
-      elevation: 1,
-      shadowColor: Colors.black,
-      child: ListTile(
-        title: Text(title),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(description),
-            if (dueDate != null) Text(dueDate),
-          ],
-        ),
-        trailing: Checkbox(
-          onChanged: (bool? value) => print(value),
-          value: isCompleted,
-        ),
-      ),
-    );
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    elevation: 1,
+                    shadowColor: Colors.black,
+                    child: ListTile(
+                      title: Text(assignment.title),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(assignment.description),
+                          if (assignment.dueDate != null)
+                            Text(parseToDueDate(assignment.dueDate!)),
+                        ],
+                      ),
+                      trailing: Checkbox(
+                        onChanged: (bool? value) =>
+                            updateAssignment(assignment),
+                        value: assignment.isCompleted,
+                      ),
+                    ),
+                  );
+                });
+          } else if (snapshot.hasError) {
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text('${snapshot.error}'),
+            );
+          }
+          return const CircularProgressIndicator();
+        });
   }
 }

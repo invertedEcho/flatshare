@@ -59,30 +59,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: <Widget>[
         /// Assignments page
-        FutureBuilder<List<Assignment>>(
-            future: futureAssignments,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text("No assigments."),
-                  );
-                }
-                return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final assignment = snapshot.data![index];
-                      return AssignmentCard(assignment: assignment);
-                    });
-              } else if (snapshot.hasError) {
-                return Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text('${snapshot.error}'),
-                );
-              }
-              return const CircularProgressIndicator();
-            }),
+        const AssignmentsWidget(),
 
         /// Messages page
         ListView.builder(
