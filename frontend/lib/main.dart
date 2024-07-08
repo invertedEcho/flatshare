@@ -46,29 +46,24 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    // Call the asynchronous method to determine if the user is logged in
-    checkLoginStatus();
     getUserInfo();
   }
 
   Future<void> getUserInfo() async {
-    var profileRes = await authenticatedClient
-        .get(Uri.parse('http://localhost:3000/api/profile'));
+    try {
+      var profileRes = await authenticatedClient
+          .get(Uri.parse('http://localhost:3000/api/profile'));
 
-    final profile = AuthResponse.fromJson(jsonDecode(profileRes.body));
-    Provider.of<UserProvider>(context, listen: false).setUser(profile);
-    print(profile.email);
-  }
-
-  // Method to check login status asynchronously
-  Future<void> checkLoginStatus() async {
-    var maybeAuthToken = await storage.read(key: 'jwt-token');
-    bool loggedIn = maybeAuthToken != null;
-
-    // Update the state with the login status
-    setState(() {
-      isLoggedIn = loggedIn;
-    });
+      final profile = AuthResponse.fromJson(jsonDecode(profileRes.body));
+      Provider.of<UserProvider>(context, listen: false).setUser(profile);
+      setState(() {
+        isLoggedIn = true;
+      });
+    } catch (err) {
+      setState(() {
+        isLoggedIn = false;
+      });
+    }
   }
 
   void handleLogout() async {
@@ -113,7 +108,7 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    // final ThemeData theme = Theme.of(context);
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
