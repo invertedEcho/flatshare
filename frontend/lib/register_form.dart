@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:wg_app/fetch/url.dart';
+
 // Define a custom Form widget.
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -13,8 +15,9 @@ class RegisterForm extends StatefulWidget {
 }
 
 Future<http.Response> register(String username, String password, String email) {
+  var apiBaseUrl = getApiBaseUrl();
   return http.post(
-    Uri.parse('http://192.168.178.114:3000/api/register'),
+    Uri.parse('$apiBaseUrl/register'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },

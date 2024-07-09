@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/auth.dart';
 
 import 'package:wg_app/main.dart';
+import 'package:wg_app/user_provider.dart';
 
 class LoginForm extends StatefulWidget {
   final VoidCallback onLogin;
@@ -13,7 +14,6 @@ class LoginForm extends StatefulWidget {
     return LoginFormState();
   }
 }
-
 
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
@@ -36,10 +36,8 @@ class LoginFormState extends State<LoginForm> {
           passwordController.text,
         );
 
-        // Check if the widget is still mounted before performing UI updates
         if (!mounted) return;
 
-        // Store user data in the provider
         AuthResponse user = AuthResponse(
           username: usernameController.text,
           email: authRes.email,
@@ -48,21 +46,16 @@ class LoginFormState extends State<LoginForm> {
           groupId: authRes.groupId,
         );
 
-        // Access the UserProvider and set the user data
         Provider.of<UserProvider>(context, listen: false).setUser(user);
 
-        // Store JWT token securely
         await storage.write(key: 'jwt-token', value: authRes.accessToken);
 
-        // Notify parent about successful login
         widget.onLogin();
 
-        // Display success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login Successful!')),
         );
       } catch (e) {
-        // Handle login failure (e.g., show error message)
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to login: $e')),

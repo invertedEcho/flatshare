@@ -5,31 +5,19 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/assignments_widget.dart';
 import 'package:wg_app/authenticated_client.dart';
+import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/login_form.dart';
 import 'package:wg_app/register_form.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:wg_app/user_provider.dart';
 
-// user_provider.dart
-
-class UserProvider with ChangeNotifier {
-  AuthResponse? _user;
-
-  AuthResponse? get user => _user;
-
-  void setUser(AuthResponse newUser) {
-    _user = newUser;
-    notifyListeners();
-  }
-
-  void clearUser() {
-    _user = null;
-    notifyListeners();
-  }
+Future main() async {
+  await dotenv.load(fileName: '.env');
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+    child: const App(),
+  ));
 }
-
-void main() => runApp(MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
-      child: const App(),
-    ));
 
 const storage = FlutterSecureStorage();
 final authenticatedClient = AuthenticatedClient(storage);
@@ -52,8 +40,9 @@ class _AppState extends State<App> {
 
   Future<void> getUserInfo() async {
     try {
+      var apiBaseUrl = getApiBaseUrl();
       var profileRes = await authenticatedClient
-          .get(Uri.parse('http://localhost:3000/api/profile'));
+          .get(Uri.parse('$apiBaseUrl/profile'));
 
       final profile = AuthResponse.fromJson(jsonDecode(profileRes.body));
       Provider.of<UserProvider>(context, listen: false).setUser(profile);
@@ -82,8 +71,6 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    print(isLoggedIn);
-
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(useMaterial3: true),
@@ -138,8 +125,8 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
   }
 }
 
-class MyWidget extends StatelessWidget {
-  const MyWidget({super.key});
+class UserWidget extends StatelessWidget {
+  const UserWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +156,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Wg app"),
+        title: const Text("WG App"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -203,7 +190,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         ],
       ),
       body: <Widget>[
-	const AssignmentsWidget(),
+        const AssignmentsWidget(),
 
         /// Messages page
         ListView.builder(
@@ -237,7 +224,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                     color: theme.colorScheme.primary,
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  child: MyWidget()),
+                  child: const UserWidget()),
             );
           },
         ),
