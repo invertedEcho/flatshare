@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:wg_app/assignments_widget.dart';
+import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/main.dart';
 
 Future<List<Assignment>> fetchAssignments() async {
+  var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
-      .get(Uri.parse('http://192.168.178.114:3000/api/assignments?groupId=4'));
+      .get(Uri.parse('$apiBaseUrl/assignments?groupId=4'));
 
   if (response.statusCode == 200) {
     List<dynamic> assignments = jsonDecode(response.body);
@@ -19,8 +21,9 @@ Future<List<Assignment>> fetchAssignments() async {
 
 void updateAssignmentState(int assignmentId, bool newAssignmentState) async {
   var assignmentState = newAssignmentState ? "pending" : 'completed';
+  var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient.post(Uri.parse(
-      'http://192.168.178.114:3000/api/assignments/$assignmentId/$assignmentState'));
+      '$apiBaseUrl/assignments/$assignmentId/$assignmentState'));
   if (response.statusCode != 200) {
     throw Exception("Failed to update assignment state");
   }

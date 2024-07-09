@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/login_form.dart';
 import 'package:http/http.dart' as http;
 
 Future<AuthResponse> login(String username, String password) async {
+  var apiBaseUrl = getApiBaseUrl();
   final response = await http.post(
-    Uri.parse('http://192.168.178.114:3000/api/login'),
+    Uri.parse('$apiBaseUrl/login'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
