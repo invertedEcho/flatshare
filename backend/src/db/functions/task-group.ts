@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { db } from '..';
 import {
   recurringTaskGroupTable,
@@ -9,7 +9,20 @@ import {
 import { CreateTaskGroup } from 'src/tasks/task-group.controller';
 
 export async function dbGetTaskGroups() {
-  return await db.select().from(recurringTaskGroupTable);
+  return await db
+    .select({
+      id: recurringTaskGroupTable.id,
+      title: recurringTaskGroupTable.title,
+      description: recurringTaskGroupTable.description,
+      interval: recurringTaskGroupTable.interval,
+      numberOfTasks: count(taskTable.id),
+    })
+    .from(recurringTaskGroupTable)
+    .leftJoin(
+      taskTable,
+      eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
+    )
+    .groupBy(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id);
 }
 
 export async function dbCreateTaskGroup({
