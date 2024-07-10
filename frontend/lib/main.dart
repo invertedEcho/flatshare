@@ -74,7 +74,9 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(useMaterial3: true),
+        theme: ThemeData(useMaterial3: true, brightness: Brightness.light),
+        darkTheme: ThemeData(brightness: Brightness.dark),
+        themeMode: ThemeMode.system,
         home: isLoggedIn
             ? AuthenticatedNavigation(
                 onLogout: handleLogout,
@@ -104,7 +106,7 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.blue,
+        indicatorColor: Colors.blueAccent,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -161,7 +163,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Open shopping cart',
+            tooltip: 'Logout',
             onPressed: () {
               storage.delete(key: 'jwt-token');
               widget.onLogout();
@@ -176,7 +178,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.blue,
+        indicatorColor: Colors.blueAccent,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
