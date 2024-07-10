@@ -1,4 +1,4 @@
-name: update backend deployment
+name: (re)-deploy backend
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
 
 # Let's do this via a docker container in the future, this is pretty ugly.
 jobs:
-  build:
-    name: Build
+  deploy:
+    name: (Re)-Deploy backend
     runs-on: ubuntu-latest
     steps:
     - name: update deployment
@@ -18,10 +18,11 @@ jobs:
         username: ${{ secrets.DEPLOY_SSH_USERNAME }}
         password: ${{ secrets.DEPLOY_SSH_PASSWORD }}
         port: ${{ secrets.PORT }}
+        # TODO: lets move the cd into working-directory
         script: |
-          export PATH=$PATH:~/.local/share/pnpm/
-          cd ~/wg-app/backend
+          cd ${{ secrets.DEPLOY_SSH_REPO_DIRECTORY}}
           git pull
+          cd backend/
           pnpm i
           pnpm build
           pnpm start:prod
