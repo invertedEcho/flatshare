@@ -2,41 +2,32 @@
 
 ## setup
 
-- Install all dependencies
+- Install all dependencies for backend
 
 ```bash
 cd backend && pnpm i
-cd frontend && pnpm i
 ```
 
 - setup environment variables
 
 ```bash
-touch frontend/.env
-
-# file content
-EXPO_PUBLIC_API_URL=http://localhost:3000
-
-touch backend/.env
-
-# file content
-DATABASE_URL=****
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 ```
+adjust the values as needed.
 
-## start the apps
+- start the apps
 
 ```bash
 cd backend && pnpm dev
-cd frontend && pnpm start
+cd frontend && flutter run
 ```
 
-### The Stack:
+## The Stack:
 
 - Backend:
-
   - NestJS
   - drizzle
 
 - Frontend:
-  - React native
-  - Tanstack usequery
+  - flutter
