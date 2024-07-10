@@ -17,8 +17,6 @@ Future<AuthResponse> login(String username, String password) async {
     }),
   );
 
-  print(response.statusCode);
-  print(response.body);
   switch (response.statusCode) {
     case 201:
       return AuthResponse.fromJson(jsonDecode(response.body));

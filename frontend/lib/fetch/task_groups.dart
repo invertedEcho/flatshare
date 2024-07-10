@@ -8,8 +8,6 @@ Future<List<TaskGroup>> fetchTaskGroups() async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
       await authenticatedClient.get(Uri.parse('$apiBaseUrl/task-group'));
-  print(response.statusCode);
-  print(response.body);
   if (response.statusCode == 200) {
     List<dynamic> assignments = jsonDecode(response.body);
     return assignments
