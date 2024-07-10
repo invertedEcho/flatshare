@@ -4,7 +4,7 @@ import 'package:wg_app/assignments_widget.dart';
 import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/main.dart';
 
-Future<List<Assignment>> fetchAssignments() async {
+Future<List<Assignment>> fetchAssignments({required int groupId}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
       .get(Uri.parse('$apiBaseUrl/assignments?groupId=4'));
