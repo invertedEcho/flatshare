@@ -44,8 +44,7 @@ class RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
+    return SafeArea(
       child: Form(
         key: _formKey,
         child: Column(
