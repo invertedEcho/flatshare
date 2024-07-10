@@ -27,6 +27,8 @@ export async function dbGetAssignmentsFromCurrentInterval(
         isOneOff: sql<boolean>`${taskTable.recurringTaskGroupId} IS NULL`,
         // TODO: make timezone dynamic
         dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
+        taskGroupId: recurringTaskGroupTable.id,
+        taskGroupTitle: recurringTaskGroupTable.title,
       })
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))

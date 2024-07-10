@@ -41,8 +41,8 @@ class _AppState extends State<App> {
   Future<void> getUserInfo() async {
     try {
       var apiBaseUrl = getApiBaseUrl();
-      var profileRes = await authenticatedClient
-          .get(Uri.parse('$apiBaseUrl/profile'));
+      var profileRes =
+          await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
 
       final profile = AuthResponse.fromJson(jsonDecode(profileRes.body));
       Provider.of<UserProvider>(context, listen: false).setUser(profile);
@@ -73,7 +73,12 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(useMaterial3: true),
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.purpleAccent, brightness: Brightness.dark),
+        ),
         home: isLoggedIn
             ? AuthenticatedNavigation(
                 onLogout: handleLogout,

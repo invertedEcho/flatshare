@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/assignments.dart';
+import 'package:wg_app/login_form.dart';
+import 'package:wg_app/user_provider.dart';
 import 'package:wg_app/utils/date.dart';
+import "package:collection/collection.dart";
 
 class Assignment {
   final int id;
@@ -12,6 +16,8 @@ class Assignment {
   bool isCompleted;
   final String? description;
   final DateTime? dueDate;
+  final int? taskGroupId;
+  final String? taskGroupTitle;
 
   Assignment({
     required this.id,
@@ -21,6 +27,8 @@ class Assignment {
     required this.createdAt,
     required this.isOneOff,
     required this.isCompleted,
+    this.taskGroupId,
+    this.taskGroupTitle,
     this.description,
     this.dueDate,
   });
@@ -38,6 +46,8 @@ class Assignment {
       dueDate: json['dueDate'] != null
           ? DateTime.parse(json['dueDate'] as String)
           : null,
+      taskGroupId: json['taskGroupId'] as int?,
+      taskGroupTitle: json['taskGroupTitle'] as String?,
     );
   }
 }
@@ -55,7 +65,19 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
   @override
   void initState() {
     super.initState();
-    _assignmentsFuture = fetchAssignments();
+    _assignmentsFuture = Future.value([]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    AuthResponse? user = userProvider.user;
+    final groupId = user?.groupId;
+
+    if (groupId != null) {
+      _assignmentsFuture = fetchAssignments(groupId: groupId);
+    }
   }
 
   Future<void> updateAssignment(Assignment assignment) async {
@@ -77,6 +99,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FutureBuilder<List<Assignment>>(
         future: _assignmentsFuture,
         builder: (context, snapshot) {
@@ -84,49 +107,85 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
             if (snapshot.data!.isEmpty) {
               return const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text("No assigments."),
+                child: Text("No assignments."),
               );
             }
-            return ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: snapshot.data!.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final assignment = snapshot.data![index];
-                  final description = assignment.description;
+            var groupedAssignments = groupBy(
+                snapshot.data!, (assignment) => assignment.taskGroupTitle);
 
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    elevation: 1,
-                    shadowColor: Colors.black,
-                    child: ListTile(
-                      title: Row(
+            return ListView.builder(
+              itemCount: groupedAssignments.length,
+              itemBuilder: (BuildContext context, int index) {
+                final section = groupedAssignments.entries.elementAt(index);
+                final sectionTitle = section.key;
+                final sectionAssignments = section.value;
+
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Text(assignment.title),
+                          Text(sectionTitle ?? 'One-off tasks',
+                              style: theme.textTheme.titleLarge),
                           const SizedBox(width: 8),
-                          if (!assignment.isOneOff)
-                            Icon(Icons.repeat,
-                                color: Theme.of(context).colorScheme.onSurface,
-                                size: 16)
+                          Icon(Icons.arrow_right_alt, color: theme.hintColor),
+                          const SizedBox(width: 8),
+                          Text(sectionAssignments[0].assigneeName,
+                              style: theme.textTheme.titleLarge!.merge(
+                                  const TextStyle(color: Colors.blueAccent)))
                         ],
                       ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          if (description != null) Text(description),
-                          if (assignment.dueDate != null)
-                            Text(parseToDueDate(assignment.dueDate!)),
-                        ],
-                      ),
-                      trailing: Checkbox(
-                        onChanged: (bool? value) =>
-                            updateAssignment(assignment),
-                        value: assignment.isCompleted,
-                      ),
-                    ),
-                  );
-                });
+                      const SizedBox(height: 8),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          itemCount: sectionAssignments.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final assignment = sectionAssignments[index];
+                            final description = assignment.description;
+
+                            return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(13),
+                              ),
+                              elevation: 1,
+                              shadowColor: Colors.black,
+                              child: ListTile(
+                                title: Row(
+                                  children: [
+                                    Text(assignment.title),
+                                    const SizedBox(width: 8),
+                                    if (!assignment.isOneOff)
+                                      Icon(Icons.repeat,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          size: 16)
+                                  ],
+                                ),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    if (description != null) Text(description),
+                                    if (assignment.dueDate != null)
+                                      Text(parseToDueDate(assignment.dueDate!)),
+                                  ],
+                                ),
+                                trailing: Checkbox(
+                                  onChanged: (bool? value) =>
+                                      updateAssignment(assignment),
+                                  value: assignment.isCompleted,
+                                ),
+                              ),
+                            );
+                          })
+                    ],
+                  ),
+                );
+              },
+            );
           } else if (snapshot.hasError) {
             return Padding(
               padding: const EdgeInsets.all(20.0),
