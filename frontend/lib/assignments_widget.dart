@@ -128,8 +128,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                   );
                 });
           } else if (snapshot.hasError) {
-            return Padding(
-              padding: const EdgeInsets.all(20.0),
+            return SafeArea(
               child: Text('${snapshot.error}'),
             );
           }

@@ -58,7 +58,7 @@ class LoginFormState extends State<LoginForm> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to login: $e')),
+            SnackBar(content: Text('$e')),
           );
         }
       }

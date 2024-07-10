@@ -9,6 +9,7 @@ import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/login_form.dart';
 import 'package:wg_app/register_form.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:wg_app/tasks_widget.dart';
 import 'package:wg_app/user_provider.dart';
 
 Future main() async {
@@ -41,8 +42,8 @@ class _AppState extends State<App> {
   Future<void> getUserInfo() async {
     try {
       var apiBaseUrl = getApiBaseUrl();
-      var profileRes = await authenticatedClient
-          .get(Uri.parse('$apiBaseUrl/profile'));
+      var profileRes =
+          await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
 
       final profile = AuthResponse.fromJson(jsonDecode(profileRes.body));
       Provider.of<UserProvider>(context, listen: false).setUser(profile);
@@ -73,7 +74,9 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(useMaterial3: true),
+        theme: ThemeData(useMaterial3: true, brightness: Brightness.light),
+        darkTheme: ThemeData(brightness: Brightness.dark),
+        themeMode: ThemeMode.system,
         home: isLoggedIn
             ? AuthenticatedNavigation(
                 onLogout: handleLogout,
@@ -103,15 +106,15 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.blue,
+        indicatorColor: Colors.blueAccent,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            icon: Badge(child: Icon(Icons.login)),
+            icon: Icon(Icons.login),
             label: 'Login',
           ),
           NavigationDestination(
-            icon: Badge(child: Icon(Icons.app_registration)),
+            icon: Icon(Icons.app_registration),
             label: 'Register',
           ),
         ],
@@ -160,7 +163,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            tooltip: 'Open shopping cart',
+            tooltip: 'Logout',
             onPressed: () {
               storage.delete(key: 'jwt-token');
               widget.onLogout();
@@ -175,7 +178,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             currentPageIndex = index;
           });
         },
-        indicatorColor: Colors.blue,
+        indicatorColor: Colors.blueAccent,
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
@@ -184,50 +187,14 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             label: 'Assignments',
           ),
           NavigationDestination(
-            icon: Icon(Icons.notifications_sharp),
+            icon: Icon(Icons.app_registration),
             label: 'Tasks',
           ),
         ],
       ),
       body: <Widget>[
         const AssignmentsWidget(),
-
-        /// Messages page
-        ListView.builder(
-          reverse: true,
-          itemCount: 2,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'Hello',
-                    style: theme.textTheme.bodyLarge!
-                        .copyWith(color: theme.colorScheme.onPrimary),
-                  ),
-                ),
-              );
-            }
-            return Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                  margin: const EdgeInsets.all(8.0),
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: const UserWidget()),
-            );
-          },
-        ),
+        const TasksWidget(),
       ][currentPageIndex],
     );
   }
