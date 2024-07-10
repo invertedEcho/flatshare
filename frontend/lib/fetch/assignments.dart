@@ -24,7 +24,7 @@ void updateAssignmentState(int assignmentId, bool newAssignmentState) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient.post(
       Uri.parse('$apiBaseUrl/assignments/$assignmentId/$assignmentState'));
-  if (response.statusCode != 200) {
+  if (response.statusCode != 201) {
     throw Exception("Failed to update assignment state");
   }
 }

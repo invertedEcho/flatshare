@@ -5,38 +5,40 @@ import 'package:wg_app/utils/date.dart';
 class Assignment {
   final int id;
   final String title;
-  final String description;
-  final DateTime? dueDate;
+  final int assigneeId;
+  final String assigneeName;
+  final DateTime createdAt;
+  final bool isOneOff;
   bool isCompleted;
+  final String? description;
+  final DateTime? dueDate;
 
-  Assignment(
-      {required this.id,
-      required this.title,
-      required this.description,
-      this.dueDate,
-      required this.isCompleted});
+  Assignment({
+    required this.id,
+    required this.title,
+    required this.assigneeId,
+    required this.assigneeName,
+    required this.createdAt,
+    required this.isOneOff,
+    required this.isCompleted,
+    this.description,
+    this.dueDate,
+  });
 
   factory Assignment.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'title': String title,
-        'description': String description,
-        // TODO: Is this right?
-        'dueDate': dynamic dueDateStr,
-        'isCompleted': bool isCompleted
-      } =>
-        Assignment(
-            id: id,
-            title: title,
-            description: description,
-            dueDate: dueDateStr == null
-                ? null
-                // TODO: feels weird
-                : DateTime.parse(dueDateStr.toString()),
-            isCompleted: isCompleted),
-      _ => throw const FormatException("Failed to load assignments.")
-    };
+    return Assignment(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      isCompleted: json['isCompleted'] as bool,
+      assigneeId: json['assigneeId'] as int,
+      assigneeName: json['assigneeName'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      isOneOff: json['isOneOff'] as bool,
+      description: json['description'] as String?,
+      dueDate: json['dueDate'] != null
+          ? DateTime.parse(json['dueDate'] as String)
+          : null,
+    );
   }
 }
 
@@ -86,9 +88,11 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
               );
             }
             return ListView.builder(
+                padding: const EdgeInsets.all(8.0),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (BuildContext context, int index) {
                   final assignment = snapshot.data![index];
+                  final description = assignment.description;
 
                   return Card(
                     shape: RoundedRectangleBorder(
@@ -97,11 +101,20 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                     elevation: 1,
                     shadowColor: Colors.black,
                     child: ListTile(
-                      title: Text(assignment.title),
+                      title: Row(
+                        children: [
+                          Text(assignment.title),
+                          const SizedBox(width: 8),
+                          if (!assignment.isOneOff)
+                            Icon(Icons.repeat,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                size: 16)
+                        ],
+                      ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(assignment.description),
+                          if (description != null) Text(description),
                           if (assignment.dueDate != null)
                             Text(parseToDueDate(assignment.dueDate!)),
                         ],
