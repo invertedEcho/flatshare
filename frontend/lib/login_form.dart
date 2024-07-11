@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/auth.dart';
 
 import 'package:wg_app/main.dart';
+import 'package:wg_app/models/user.dart';
 import 'package:wg_app/user_provider.dart';
 
 class LoginForm extends StatefulWidget {
@@ -38,7 +39,7 @@ class LoginFormState extends State<LoginForm> {
 
         if (!mounted) return;
 
-        AuthResponse user = AuthResponse(
+        User user = User(
           username: usernameController.text,
           email: authRes.email,
           accessToken: authRes.accessToken,
@@ -111,46 +112,4 @@ class LoginFormState extends State<LoginForm> {
       ),
     );
   }
-}
-
-class AuthResponse {
-  final String? accessToken;
-  final int userId;
-  final int? groupId; // Mark groupId as nullable
-  final String email;
-  final String username;
-
-  const AuthResponse(
-      {required this.accessToken,
-      required this.userId,
-      this.groupId, // No need for required here, as it's nullable
-      required this.email,
-      required this.username});
-
-  factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    return AuthResponse(
-      accessToken: json['accessToken'] as String?,
-      userId: json['userId'] as int,
-      groupId: json['groupId'] as int?, // Handle null case by casting to int?
-      email: json['email'] as String,
-      username: json['username'] as String,
-    );
-  }
-}
-
-// user_model.dart
-class User {
-  final String username;
-  final String email;
-  final String? accessToken;
-  final int userId;
-  final int? groupId;
-
-  User({
-    required this.username,
-    required this.email,
-    required this.accessToken,
-    required this.userId,
-    this.groupId,
-  });
 }

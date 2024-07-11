@@ -1,56 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/assignments.dart';
-import 'package:wg_app/login_form.dart';
+import 'package:wg_app/models/assignment.dart';
+import 'package:wg_app/models/user.dart';
 import 'package:wg_app/user_provider.dart';
 import 'package:wg_app/utils/date.dart';
 import "package:collection/collection.dart";
-
-class Assignment {
-  final int id;
-  final String title;
-  final int assigneeId;
-  final String assigneeName;
-  final DateTime createdAt;
-  final bool isOneOff;
-  bool isCompleted;
-  final String? description;
-  final DateTime? dueDate;
-  final int? taskGroupId;
-  final String? taskGroupTitle;
-
-  Assignment({
-    required this.id,
-    required this.title,
-    required this.assigneeId,
-    required this.assigneeName,
-    required this.createdAt,
-    required this.isOneOff,
-    required this.isCompleted,
-    this.taskGroupId,
-    this.taskGroupTitle,
-    this.description,
-    this.dueDate,
-  });
-
-  factory Assignment.fromJson(Map<String, dynamic> json) {
-    return Assignment(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      isCompleted: json['isCompleted'] as bool,
-      assigneeId: json['assigneeId'] as int,
-      assigneeName: json['assigneeName'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      isOneOff: json['isOneOff'] as bool,
-      description: json['description'] as String?,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : null,
-      taskGroupId: json['taskGroupId'] as int?,
-      taskGroupTitle: json['taskGroupTitle'] as String?,
-    );
-  }
-}
 
 class AssignmentsWidget extends StatefulWidget {
   const AssignmentsWidget({super.key});
@@ -72,7 +27,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    AuthResponse? user = userProvider.user;
+    User? user = userProvider.user;
     final groupId = user?.groupId;
 
     if (groupId != null) {
@@ -121,13 +76,13 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                 final sectionAssignments = section.value;
 
                 return Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Text(sectionTitle ?? 'One-off tasks',
+                          Text(sectionTitle ?? 'One-off Tasks',
                               style: theme.textTheme.titleLarge),
                           const SizedBox(width: 8),
                           Icon(Icons.arrow_right_alt, color: theme.hintColor),

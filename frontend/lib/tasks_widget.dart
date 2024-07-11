@@ -1,39 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:wg_app/fetch/task_groups.dart';
+import 'package:wg_app/models/task_group.dart';
+import 'package:wg_app/widgets/task_group_list.dart';
+import 'package:wg_app/widgets/task_list.dart';
 
-class TaskGroup {
-  final int id;
-  final String title;
-  final String? description;
-  final String interval;
-  final int numberOfTasks;
-
-  TaskGroup(
-      {required this.id,
-      required this.title,
-      this.description,
-      required this.interval,
-      required this.numberOfTasks});
-
-  factory TaskGroup.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'title': String title,
-        'description': String description,
-        'interval': String interval,
-        'numberOfTasks': int numberOfTasks
-      } =>
-        TaskGroup(
-            id: id,
-            title: title,
-            description: description,
-            interval: interval,
-            numberOfTasks: numberOfTasks),
-      _ => throw const FormatException("Failed to load assignments.")
-    };
-  }
-}
+import 'fetch/tasks.dart';
+import 'fetch/task_groups.dart';
+import 'models/task.dart';
 
 class TasksWidget extends StatefulWidget {
   const TasksWidget({super.key});
@@ -44,67 +16,69 @@ class TasksWidget extends StatefulWidget {
 
 class TasksWidgetState extends State<TasksWidget> {
   late Future<List<TaskGroup>> _taskGroupsFuture;
+  late Future<List<Task>> _tasksFuture;
 
   @override
   void initState() {
     super.initState();
     _taskGroupsFuture = fetchTaskGroups();
+    // TODO: replace with actual group id once group feature implemented
+    _tasksFuture = fetchTasks(4);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<TaskGroup>>(
-        future: _taskGroupsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            print(snapshot.data);
-            if (snapshot.data!.isEmpty) {
-              return const SafeArea(child: Text("No taskgroups."));
-            }
-            return Column(
-              children: [
-                Text(
-                  "Task Groups:",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Divider(),
-                GridView.count(
-                    crossAxisCount: 2,
-                    padding: const EdgeInsets.all(8.0),
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    children: snapshot.data!.map((taskGroup) {
-                      return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(13),
-                        ),
-                        color: Colors.blueAccent,
-                        elevation: 8,
-                        child: ListTile(
-                          title: Text(taskGroup.title,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleMedium),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Each ${taskGroup.interval}"),
-                              Text("Total tasks: ${taskGroup.numberOfTasks}")
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList())
-              ],
-            );
-          } else if (snapshot.hasError) {
-            SafeArea(
-                child:
-                    Text("Eror while fetching task groups: ${snapshot.error}"));
-          }
-          print(snapshot);
-          return const CircularProgressIndicator();
-        });
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        FutureBuilder<List<TaskGroup>>(
+            future: _taskGroupsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                SafeArea(
+                    child: Text(
+                        "Eror while fetching task groups: ${snapshot.error}"));
+              } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                return const SafeArea(child: Text("No taskgroups."));
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Task Groups:",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  TaskGroupList(taskGroups: snapshot.data!),
+                ],
+              );
+            }),
+        FutureBuilder(
+            future: _tasksFuture,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!.isEmpty) {
+                  return const SafeArea(child: Text("No tasks."));
+                }
+                return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        "One-off Tasks:",
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      TaskList(
+                        tasks: snapshot.data!,
+                      )
+                    ]);
+              }
+              return const CircularProgressIndicator();
+            })
+      ]),
+    );
   }
 }

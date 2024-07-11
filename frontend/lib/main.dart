@@ -7,6 +7,7 @@ import 'package:wg_app/assignments_widget.dart';
 import 'package:wg_app/authenticated_client.dart';
 import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/login_form.dart';
+import 'package:wg_app/models/user.dart';
 import 'package:wg_app/register_form.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:wg_app/tasks_widget.dart';
@@ -45,7 +46,7 @@ class _AppState extends State<App> {
       var profileRes =
           await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
 
-      final profile = AuthResponse.fromJson(jsonDecode(profileRes.body));
+      final profile = User.fromJson(jsonDecode(profileRes.body));
       Provider.of<UserProvider>(context, listen: false).setUser(profile);
       setState(() {
         isLoggedIn = true;
@@ -125,19 +126,6 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
         const RegisterForm()
       ][currentPageIndex],
     );
-  }
-}
-
-class UserWidget extends StatelessWidget {
-  const UserWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Accessing the UserProvider and getting the user data
-    UserProvider userProvider = Provider.of<UserProvider>(context);
-    AuthResponse? user = userProvider.user;
-
-    return Text(user != null ? 'Welcome, ${user.username}' : 'Not logged in');
   }
 }
 

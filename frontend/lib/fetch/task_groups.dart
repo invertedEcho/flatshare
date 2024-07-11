@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/main.dart';
-import 'package:wg_app/tasks_widget.dart';
+import 'package:wg_app/models/task_group.dart';
 
 Future<List<TaskGroup>> fetchTaskGroups() async {
   var apiBaseUrl = getApiBaseUrl();
