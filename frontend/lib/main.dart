@@ -11,6 +11,7 @@ import 'package:wg_app/register_form.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:wg_app/tasks_widget.dart';
 import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/widgets/expandable_fab.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
@@ -74,7 +75,10 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(useMaterial3: true, brightness: Brightness.light),
+        theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+        ),
         darkTheme: ThemeData(brightness: Brightness.dark),
         themeMode: ThemeMode.system,
         home: isLoggedIn
@@ -169,6 +173,26 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
               // handle the press
             },
           ),
+        ],
+      ),
+      floatingActionButton: ExpandableFab(
+        children: [
+          Row(children: [
+            const Text("New task group"),
+            const SizedBox(width: 16),
+            ActionButton(
+              onPressed: () => print('New task group'),
+              icon: const Icon(Icons.workspaces),
+            ),
+          ]),
+          Row(children: [
+            const Text("New task"),
+            const SizedBox(width: 16),
+            ActionButton(
+              onPressed: () => print('New task'),
+              icon: const Icon(Icons.add_task),
+            ),
+          ]),
         ],
       ),
       bottomNavigationBar: NavigationBar(
