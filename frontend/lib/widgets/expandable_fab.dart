@@ -63,8 +63,8 @@ class _ExpandableFabState extends State<ExpandableFab>
         children: [
           _buildTapToCloseFab(),
           Positioned(
-            right: 8,
-            bottom: 50,
+            right: 0,
+            bottom: 56,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: widget.children
@@ -84,24 +84,22 @@ class _ExpandableFabState extends State<ExpandableFab>
   }
 
   Widget _buildTapToCloseFab() {
-    return SizedBox(
-      width: 56,
-      height: 56,
-      child: Center(
-        child: Material(
-          color: Theme.of(context).colorScheme.primary,
-          shape: const CircleBorder(),
-          clipBehavior: Clip.antiAlias,
-          elevation: 4,
-          child: InkWell(
-            onTap: _toggle,
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Icon(
-                Icons.close,
-                color: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
+    return IgnorePointer(
+      ignoring: !_open,
+      child: AnimatedContainer(
+        transformAlignment: Alignment.center,
+        duration: const Duration(milliseconds: 250),
+        curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
+        child: AnimatedOpacity(
+          opacity: !_open ? 0.0 : 1.0,
+          curve: const Interval(0.25, 1.0, curve: Curves.easeInOut),
+          duration: const Duration(milliseconds: 250),
+          child: FloatingActionButton(
+            onPressed: _toggle,
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            shape: const CircleBorder(),
+            child: Icon(Icons.close,
+                color: Theme.of(context).colorScheme.onSecondary),
           ),
         ),
       ),
@@ -113,11 +111,6 @@ class _ExpandableFabState extends State<ExpandableFab>
       ignoring: _open,
       child: AnimatedContainer(
         transformAlignment: Alignment.center,
-        transform: Matrix4.diagonal3Values(
-          _open ? 0.7 : 1.0,
-          _open ? 0.7 : 1.0,
-          1.0,
-        ),
         duration: const Duration(milliseconds: 250),
         curve: const Interval(0.0, 0.5, curve: Curves.easeOut),
         child: AnimatedOpacity(
@@ -127,6 +120,7 @@ class _ExpandableFabState extends State<ExpandableFab>
           child: FloatingActionButton(
             onPressed: _toggle,
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            shape: const CircleBorder(),
             child: const Icon(Icons.create),
           ),
         ),
@@ -150,16 +144,18 @@ class ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Material(
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      color: theme.colorScheme.inversePrimary,
-      elevation: 4,
-      child: IconButton(
-        onPressed: onPressed,
-        icon: icon,
-        color: theme.colorScheme.onSurface,
-      ),
-    );
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        color: theme.colorScheme.inversePrimary,
+        elevation: 4,
+        child: SizedBox(
+            height: 56,
+            width: 56,
+            child: IconButton(
+              onPressed: onPressed,
+              icon: icon,
+              color: theme.colorScheme.onSurface,
+            )));
   }
 }
 
