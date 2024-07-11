@@ -54,28 +54,6 @@ class _ExpandableFabState extends State<ExpandableFab>
     });
   }
 
-  Widget _buildExpandingActionButtons() {
-    final children = <Widget>[];
-    final count = widget.children.length;
-    for (var i = 0; i < count; i++) {
-      children.add(
-        _ExpandingActionButton(
-          progress: _expandAnimation,
-          child: widget.children[i],
-        ),
-      );
-      children.add(const SizedBox(height: 10));
-    }
-    return Positioned(
-      right: 8,
-      bottom: 50,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: children,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox.expand(
@@ -84,7 +62,21 @@ class _ExpandableFabState extends State<ExpandableFab>
         clipBehavior: Clip.none,
         children: [
           _buildTapToCloseFab(),
-          _buildExpandingActionButtons(),
+          Positioned(
+            right: 8,
+            bottom: 50,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: widget.children
+                    .map((child) => Column(
+                          children: [
+                            _ExpandingActionButton(
+                                progress: _expandAnimation, child: child),
+                            const SizedBox(height: 12)
+                          ],
+                        ))
+                    .toList()),
+          ),
           _buildTapToOpenFab(),
         ],
       ),
