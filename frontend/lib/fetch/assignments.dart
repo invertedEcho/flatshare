@@ -7,6 +7,7 @@ import 'package:wg_app/models/assignment.dart';
 Future<List<Assignment>> fetchAssignments({required int groupId}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
+      // TODO: correct groupid once group feature is implemented
       .get(Uri.parse('$apiBaseUrl/assignments?groupId=4'));
 
   if (response.statusCode == 200) {

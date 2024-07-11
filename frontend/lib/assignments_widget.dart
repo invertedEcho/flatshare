@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/assignments.dart';
-import 'package:wg_app/login_form.dart';
 import 'package:wg_app/models/assignment.dart';
+import 'package:wg_app/models/user.dart';
 import 'package:wg_app/user_provider.dart';
 import 'package:wg_app/utils/date.dart';
 import "package:collection/collection.dart";
@@ -27,7 +27,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    AuthResponse? user = userProvider.user;
+    User? user = userProvider.user;
     final groupId = user?.groupId;
 
     if (groupId != null) {

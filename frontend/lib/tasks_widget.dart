@@ -22,6 +22,7 @@ class TasksWidgetState extends State<TasksWidget> {
   void initState() {
     super.initState();
     _taskGroupsFuture = fetchTaskGroups();
+    // TODO: replace with actual group id once group feature implemented
     _tasksFuture = fetchTasks(4);
   }
 

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:wg_app/login_form.dart';
+import 'package:wg_app/models/user.dart';
 
 class UserProvider with ChangeNotifier {
-  AuthResponse? _user;
+  User? _user;
 
-  AuthResponse? get user => _user;
+  User? get user => _user;
 
-  void setUser(AuthResponse newUser) {
+  void setUser(User newUser) {
     _user = newUser;
     notifyListeners();
   }
