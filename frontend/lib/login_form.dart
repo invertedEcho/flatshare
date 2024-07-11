@@ -71,43 +71,57 @@ class LoginFormState extends State<LoginForm> {
     return SafeArea(
       child: Form(
         key: _formKey,
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              decoration: const InputDecoration(
-                icon: Icon(Icons.person),
-                labelText: 'Username',
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a username';
-                }
-                return null;
-              },
-              controller: usernameController,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: TextFormField(
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              TextFormField(
                 decoration: const InputDecoration(
-                  icon: Icon(Icons.password),
-                  labelText: 'Password',
+                  icon: Icon(Icons.person),
+                  labelText: 'Username',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a password';
+                    return 'Please enter a username';
                   }
                   return null;
                 },
-                obscureText: true,
-                controller: passwordController,
+                controller: usernameController,
               ),
-            ),
-            FilledButton(
-              onPressed: _handleLogin, // call the refactored method
-              child: const Text('Submit'),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.only(bottom: 22.0, top: 8.0),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    icon: Icon(Icons.password),
+                    labelText: 'Password',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    return null;
+                  },
+                  obscureText: true,
+                  controller: passwordController,
+                ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  style: ButtonStyle(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)))),
+                  onPressed: _handleLogin,
+                  child: const Padding(
+                    padding: EdgeInsets.all(14.0),
+                    child: Text('Login'),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
