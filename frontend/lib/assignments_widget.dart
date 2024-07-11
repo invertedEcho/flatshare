@@ -76,7 +76,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                 final sectionAssignments = section.value;
 
                 return Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(8.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

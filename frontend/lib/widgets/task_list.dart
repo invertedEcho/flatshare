@@ -15,6 +15,8 @@ class TaskList extends StatelessWidget {
         itemBuilder: (context, index) {
           final task = tasks[index];
           return Card(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0)),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
