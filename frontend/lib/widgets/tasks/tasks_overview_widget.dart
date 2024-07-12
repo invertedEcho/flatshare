@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:wg_app/fetch/task_groups.dart';
+import 'package:wg_app/fetch/tasks.dart';
+import 'package:wg_app/models/task.dart';
 import 'package:wg_app/models/task_group.dart';
-import 'package:wg_app/widgets/task_group_list.dart';
-import 'package:wg_app/widgets/task_list.dart';
+import 'package:wg_app/widgets/tasks/task_group_list.dart';
+import 'package:wg_app/widgets/tasks/task_list.dart';
 
-import 'fetch/tasks.dart';
-import 'fetch/task_groups.dart';
-import 'models/task.dart';
-
-class TasksWidget extends StatefulWidget {
-  const TasksWidget({super.key});
+class TasksOverviewWidget extends StatefulWidget {
+  const TasksOverviewWidget({super.key});
 
   @override
-  TasksWidgetState createState() => TasksWidgetState();
+  TasksOverviewWidgetState createState() => TasksOverviewWidgetState();
 }
 
-class TasksWidgetState extends State<TasksWidget> {
+class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
   late Future<List<TaskGroup>> _taskGroupsFuture;
   late Future<List<Task>> _tasksFuture;
 

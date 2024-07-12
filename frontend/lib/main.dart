@@ -3,16 +3,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/assignments_widget.dart';
-import 'package:wg_app/authenticated_client.dart';
+import 'package:wg_app/fetch/authenticated_client.dart';
 import 'package:wg_app/fetch/url.dart';
-import 'package:wg_app/login_form.dart';
 import 'package:wg_app/models/user.dart';
-import 'package:wg_app/register_form.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:wg_app/tasks_widget.dart';
 import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/widgets/assignments/assignments_widget.dart';
 import 'package:wg_app/widgets/expandable_fab.dart';
+import 'package:wg_app/widgets/tasks/tasks_overview_widget.dart';
+import 'package:wg_app/widgets/user/login_form.dart';
+import 'package:wg_app/widgets/user/register_form.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
@@ -205,7 +205,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
       ),
       body: <Widget>[
         const AssignmentsWidget(),
-        const TasksWidget(),
+        const TasksOverviewWidget(),
       ][currentPageIndex],
     );
   }
