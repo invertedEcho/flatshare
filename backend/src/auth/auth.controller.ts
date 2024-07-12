@@ -87,9 +87,9 @@ export class AuthController {
   // TODO: should go into seperate user controller
   @Get('users')
   async getUsers(@Query('groupId') groupId?: number) {
-    const users = db
+    const query = db
       .select({
-        id: userTable.id,
+        userId: userTable.id,
         email: userTable.email,
         username: userTable.username,
         createdAt: userTable.createdAt,
@@ -97,11 +97,13 @@ export class AuthController {
       .from(userTable);
 
     if (groupId === undefined) {
-      return await users;
+      return await query;
     }
 
-    return await users
+    const result = await query
       .innerJoin(userGroupTable, eq(userGroupTable.userId, userTable.id))
       .where(eq(userGroupTable.groupId, groupId));
+    console.log({ result });
+    return result;
   }
 }

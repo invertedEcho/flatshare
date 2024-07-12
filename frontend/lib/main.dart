@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:wg_app/user_provider.dart';
 import 'package:wg_app/widgets/assignments/assignments_widget.dart';
 import 'package:wg_app/widgets/expandable_fab.dart';
+import 'package:wg_app/widgets/tasks/create_task.dart';
 import 'package:wg_app/widgets/tasks/tasks_overview_widget.dart';
 import 'package:wg_app/widgets/user/login_form.dart';
 import 'package:wg_app/widgets/user/register_form.dart';
@@ -158,7 +159,6 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             onPressed: () {
               storage.delete(key: 'jwt-token');
               widget.onLogout();
-              // handle the press
             },
           ),
         ],
@@ -169,16 +169,18 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             const Text("New task group"),
             const SizedBox(width: 16),
             ActionButton(
-              onPressed: () => print('New task group'),
-              icon: const Icon(Icons.workspaces),
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const CreateTask())),
+              icon: const Icon(Icons.group_work_outlined),
             ),
           ]),
           Row(children: [
             const Text("New task"),
             const SizedBox(width: 16),
             ActionButton(
-              onPressed: () => print('New task'),
-              icon: const Icon(Icons.add_task),
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const CreateTask())),
+              icon: const Icon(Icons.task_alt),
             ),
           ]),
         ],

@@ -121,7 +121,7 @@ class _ExpandableFabState extends State<ExpandableFab>
             onPressed: _toggle,
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             shape: const CircleBorder(),
-            child: const Icon(Icons.create),
+            child: const Icon(Icons.add),
           ),
         ),
       ),

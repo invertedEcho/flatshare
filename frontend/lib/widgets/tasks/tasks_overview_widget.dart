@@ -22,7 +22,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
     super.initState();
     _taskGroupsFuture = fetchTaskGroups();
     // TODO: replace with actual group id once group feature implemented
-    _tasksFuture = fetchTasks(4);
+    _tasksFuture = fetchTasks(groupId: 4);
   }
 
   @override

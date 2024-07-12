@@ -32,24 +32,26 @@ class LoginFormState extends State<LoginForm> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       try {
-        var authRes = await login(
+        var authResponse = await login(
           usernameController.text,
           passwordController.text,
         );
+        var userFromResponse = authResponse.$1;
+        var accessToken = authResponse.$2;
 
         if (!mounted) return;
 
         User user = User(
+          // TODO: we should use the information we get from the backend.
           username: usernameController.text,
-          email: authRes.email,
-          accessToken: authRes.accessToken,
-          userId: authRes.userId,
-          groupId: authRes.groupId,
+          email: userFromResponse.email,
+          userId: userFromResponse.userId,
+          groupId: userFromResponse.groupId,
         );
 
         Provider.of<UserProvider>(context, listen: false).setUser(user);
 
-        await storage.write(key: 'jwt-token', value: authRes.accessToken);
+        await storage.write(key: 'jwt-token', value: accessToken);
 
         widget.onLogin();
 
@@ -89,6 +91,7 @@ class LoginFormState extends State<LoginForm> {
                 },
                 controller: usernameController,
               ),
+              // TODO: move this padding to the button instead, use EdgeInsets.symmetric(vertical: 16)
               Padding(
                 padding: const EdgeInsets.only(bottom: 22.0, top: 8.0),
                 child: TextFormField(
