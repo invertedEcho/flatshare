@@ -12,8 +12,6 @@ Future<List<User>> fetchUsersInGroup({required int groupId}) async {
   if (response.statusCode != 200) {
     throw Exception("Failed to fetch users in group: ${response.statusCode}");
   }
-  print(response.statusCode);
   List<dynamic> usersInGroup = jsonDecode(response.body);
-  print(usersInGroup);
   return usersInGroup.map<User>((user) => User.fromJson(user)).toList();
 }

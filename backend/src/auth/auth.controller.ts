@@ -100,10 +100,8 @@ export class AuthController {
       return await query;
     }
 
-    const result = await query
+    return await query
       .innerJoin(userGroupTable, eq(userGroupTable.userId, userTable.id))
       .where(eq(userGroupTable.groupId, groupId));
-    console.log({ result });
-    return result;
   }
 }

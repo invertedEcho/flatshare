@@ -50,7 +50,6 @@ export class TasksController {
     if (Object.keys(oneOffTask).length === 0) {
       throw new BadRequestException();
     }
-    console.log({ oneOffTask });
     await dbCreateOneOffTask(oneOffTask);
   }
 
