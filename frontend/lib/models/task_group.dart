@@ -30,4 +30,8 @@ class TaskGroup {
       _ => throw const FormatException("Failed to parse task groups.")
     };
   }
+  @override
+  String toString() {
+    return title;
+  }
 }

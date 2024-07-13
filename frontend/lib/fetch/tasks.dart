@@ -17,7 +17,7 @@ Future<List<Task>> fetchTasks({required int groupId}) async {
   }
 }
 
-Future<void> createTask(
+Future<void> createOneOffTask(
     {required String title,
     required String description,
     required int groupId,
@@ -31,6 +31,27 @@ Future<void> createTask(
               'description': description,
               'groupId': groupId,
               'userIds': userIds
+            },
+          ));
+  if (response.statusCode != 201) {
+    throw Exception("Failed to create task: ${response.statusCode}");
+  }
+}
+
+Future<void> createRecurringTask(
+    {required String title,
+    required String description,
+    required int groupId,
+    required int taskGroupId}) async {
+  var apiBaseUrl = getApiBaseUrl();
+  final response =
+      await authenticatedClient.post(Uri.parse('$apiBaseUrl/tasks/recurring'),
+          body: jsonEncode(
+            {
+              'title': title,
+              'description': description,
+              'groupId': groupId,
+              'recurringTaskGroupId': taskGroupId
             },
           ));
   if (response.statusCode != 201) {

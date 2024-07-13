@@ -48,7 +48,7 @@ export class TasksController {
   @Post('/one-off')
   async createOneOffTask(@Body() oneOffTask: OneOffTask & { groupId: number }) {
     if (Object.keys(oneOffTask).length === 0) {
-      throw new BadRequestException('test');
+      throw new BadRequestException();
     }
     console.log({ oneOffTask });
     await dbCreateOneOffTask(oneOffTask);
