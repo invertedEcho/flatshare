@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import {
   dbCreateOneOffTask,
   dbCreateRecurringTask,
@@ -38,6 +47,9 @@ export class TasksController {
 
   @Post('/one-off')
   async createOneOffTask(@Body() oneOffTask: OneOffTask & { groupId: number }) {
+    if (Object.keys(oneOffTask).length === 0) {
+      throw new BadRequestException();
+    }
     await dbCreateOneOffTask(oneOffTask);
   }
 

@@ -22,3 +22,5 @@ class Task {
     }
   }
 }
+
+enum TaskType { oneOff, recurring }

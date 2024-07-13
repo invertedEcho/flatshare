@@ -15,6 +15,7 @@ class AuthenticatedClient extends http.BaseClient {
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
     }
+    request.headers['Content-Type'] = 'application/json';
 
     return _httpClient.send(request);
   }
