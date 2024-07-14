@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   Post,
   Query,
   Request,
@@ -10,7 +12,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
 import { db } from 'src/db';
-import { userGroupTable, userTable } from 'src/db/schema';
+import { userUserGroupTable, userTable } from 'src/db/schema';
 import { AuthService, User } from './auth.service';
 import { Public } from './public.decorators';
 import {
@@ -39,14 +41,23 @@ export class AuthController {
   @Post('login')
   async login(@Request() req: { user: User }) {
     const result = await this.authService.login(req.user);
-    const maybeGroupId = await dbGetGroupOfUser(result.userId);
-    return { ...result, groupId: maybeGroupId?.group.id ?? null };
+    const maybeUserGroup = await dbGetGroupOfUser(result.userId);
+    return { ...result, groupId: maybeUserGroup?.user_group.id ?? null };
   }
 
   @Public()
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     const { username, email, password } = registerDto;
+
+    const maybeExistingUser = await db
+      .select({ id: userTable })
+      .from(userTable)
+      .where(eq(userTable.email, email));
+    if (maybeExistingUser.length > 0) {
+      throw new HttpException('User already exists.', HttpStatus.CONFLICT);
+    }
+
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
     const newUser = (
       await db
@@ -75,10 +86,10 @@ export class AuthController {
     @Request() req: { user: { userId: number; username: string } },
   ) {
     const user = await dbGetUserById(req.user.userId);
-    const group = await dbGetGroupOfUser(req.user.userId);
+    const userGroup = await dbGetGroupOfUser(req.user.userId);
     return {
       userId: req.user.userId,
-      groupId: group?.user_group.groupId ?? null,
+      groupId: userGroup?.user_group.id ?? null,
       email: user.email,
       username: user.username,
     };
@@ -101,7 +112,10 @@ export class AuthController {
     }
 
     return await query
-      .innerJoin(userGroupTable, eq(userGroupTable.userId, userTable.id))
-      .where(eq(userGroupTable.groupId, groupId));
+      .innerJoin(
+        userUserGroupTable,
+        eq(userUserGroupTable.userId, userTable.id),
+      )
+      .where(eq(userUserGroupTable.groupId, groupId));
   }
 }

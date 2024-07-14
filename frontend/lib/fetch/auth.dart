@@ -29,3 +29,26 @@ Future<(User, String)> login(String username, String password) async {
       throw Exception("Failed to login");
   }
 }
+
+Future<void> register(String username, String password, String email) async {
+  var apiBaseUrl = getApiBaseUrl();
+  final response = await http.post(
+    Uri.parse('$apiBaseUrl/register'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'username': username,
+      'password': password,
+      'email': email
+    }),
+  );
+
+  if (response.statusCode == 409) {
+    throw Exception("User already exists.");
+  }
+
+  if (response.statusCode != 201) {
+    throw Exception("Failed to register");
+  }
+}

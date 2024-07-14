@@ -4,7 +4,7 @@ import {
   InsertTask,
   SelectTask,
   assignmentTable,
-  taskGroupTable,
+  taskUserGroupTable,
   taskTable,
 } from '../schema';
 import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
@@ -27,8 +27,8 @@ export async function dbGetAllTasks({
     return await query;
   }
   return await query
-    .innerJoin(taskGroupTable, eq(taskGroupTable.taskId, taskTable.id))
-    .where(eq(taskGroupTable.groupId, groupId));
+    .innerJoin(taskUserGroupTable, eq(taskUserGroupTable.taskId, taskTable.id))
+    .where(eq(taskUserGroupTable.groupId, groupId));
 }
 
 export async function dbGetTaskById(taskId: number) {
@@ -59,7 +59,9 @@ export async function dbCreateRecurringTask({
         recurringTaskGroupId,
       })
       .returning();
-    await db.insert(taskGroupTable).values({ taskId: tasks[0].id, groupId });
+    await db
+      .insert(taskUserGroupTable)
+      .values({ taskId: tasks[0].id, groupId });
   } catch (error) {
     console.error({ error });
     throw error;
@@ -101,7 +103,7 @@ export async function dbCreateOneOffTask({
       userId,
     };
   });
-  await db.insert(taskGroupTable).values({ taskId: task.taskId, groupId });
+  await db.insert(taskUserGroupTable).values({ taskId: task.taskId, groupId });
 
   await db.insert(assignmentTable).values(hydratedAssignments);
 }

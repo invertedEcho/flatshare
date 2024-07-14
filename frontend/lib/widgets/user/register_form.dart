@@ -1,32 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:wg_app/fetch/auth.dart';
 
-import 'package:wg_app/fetch/url.dart';
-
-// Define a custom Form widget.
 class RegisterForm extends StatefulWidget {
-  const RegisterForm({super.key});
+  final VoidCallback onRegister;
+  const RegisterForm({super.key, required this.onRegister});
 
   @override
   RegisterFormState createState() {
     return RegisterFormState();
   }
-}
-
-Future<http.Response> register(String username, String password, String email) {
-  var apiBaseUrl = getApiBaseUrl();
-  return http.post(
-    Uri.parse('$apiBaseUrl/register'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'username': username,
-      'password': password,
-      'email': email
-    }),
-  );
 }
 
 class RegisterFormState extends State<RegisterForm> {
@@ -44,11 +26,18 @@ class RegisterFormState extends State<RegisterForm> {
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
-      await register(usernameController.text, passwordController.text,
-          emailController.text);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Processing Data')),
-      );
+      try {
+        await register(usernameController.text, passwordController.text,
+            emailController.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Successfully registered!')),
+        );
+        widget.onRegister();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('$e')),
+        );
+      }
     }
   }
 
@@ -75,6 +64,9 @@ class RegisterFormState extends State<RegisterForm> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: TextFormField(
+                    textCapitalization: TextCapitalization.none,
+                    autocorrect: false,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                         icon: Icon(Icons.email), labelText: 'Email'),
                     validator: (value) {
@@ -88,6 +80,7 @@ class RegisterFormState extends State<RegisterForm> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 22.0, top: 8.0),
                 child: TextFormField(
+                    obscureText: true,
                     decoration: const InputDecoration(
                         icon: Icon(Icons.password), labelText: 'Password'),
                     validator: (value) {

@@ -7,7 +7,7 @@ import {
   assignmentTable,
   recurringTaskGroupTable,
   taskTable,
-  userGroupTable,
+  userUserGroupTable,
   userTable,
 } from '../schema';
 
@@ -33,7 +33,10 @@ export async function dbGetAssignmentsFromCurrentInterval(
       .from(assignmentTable)
       .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
       .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
-      .innerJoin(userGroupTable, eq(userGroupTable.userId, userTable.id))
+      .innerJoin(
+        userUserGroupTable,
+        eq(userUserGroupTable.userId, userTable.id),
+      )
       .leftJoin(
         recurringTaskGroupTable,
         eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
@@ -46,7 +49,7 @@ export async function dbGetAssignmentsFromCurrentInterval(
             sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
             isNull(recurringTaskGroupTable.id),
           ),
-          eq(userGroupTable.groupId, groupId),
+          eq(userUserGroupTable.groupId, groupId),
         ),
       );
 

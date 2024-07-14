@@ -9,16 +9,16 @@ import {
 } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
-export const assignmenState = z.enum(['pending', 'completed']);
-export const assigmentStateEnum = pgEnum('state', assignmenState.options);
-export type AssignmentState = z.infer<typeof assignmenState>;
+const assignmentState = z.enum(['pending', 'completed']);
+export const assigmentStateEnum = pgEnum('state', assignmentState.options);
+export type AssignmentState = z.infer<typeof assignmentState>;
 
 /**
  * This table stores information about all users.
  */
 export const userTable = pgTable('user', {
   id: serial('id').primaryKey(),
-  email: text('email').notNull(),
+  email: text('email').notNull().unique(),
   username: text('username').notNull(),
   password: text('password').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -27,7 +27,7 @@ export const userTable = pgTable('user', {
 /**
  * This table stores information about a group of users
  */
-export const groupTable = pgTable('group', {
+export const userGroupTable = pgTable('user_group', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -36,11 +36,11 @@ export const groupTable = pgTable('group', {
 /**
  * This table stores invite codes of a specific group.
  */
-export const groupInviteTable = pgTable('group_invite', {
+export const userGroupInviteTable = pgTable('user_group_invite', {
   id: serial('id').primaryKey(),
   code: text('code').notNull(),
   groupId: integer('group_id')
-    .references(() => groupTable.id)
+    .references(() => userGroupTable.id)
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
@@ -49,13 +49,13 @@ export const groupInviteTable = pgTable('group_invite', {
  * This association table stores information about which user belong into which groups,
  * in a N-N relation, e.g. a user may be in multiple groups.
  */
-export const userGroupTable = pgTable('user_group', {
+export const userUserGroupTable = pgTable('user_user_group', {
   id: serial('id').primaryKey(),
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
   groupId: integer('group_id')
-    .references(() => groupTable.id)
+    .references(() => userGroupTable.id)
     .notNull(),
 });
 
@@ -91,16 +91,19 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
 /**
  * This table stores information about the users that belong to a recurring task group
  */
-export const recurringTaskGroupUserTable = pgTable('task_group_user', {
-  id: serial('id').primaryKey(),
-  recurringTaskGroupId: integer('recurring_task_group_id')
-    .references(() => recurringTaskGroupTable.id)
-    .notNull(),
-  userId: integer('user_id')
-    .references(() => userTable.id)
-    .notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+export const recurringTaskGroupUserTable = pgTable(
+  'recurring_task_group_user',
+  {
+    id: serial('id').primaryKey(),
+    recurringTaskGroupId: integer('recurring_task_group_id')
+      .references(() => recurringTaskGroupTable.id)
+      .notNull(),
+    userId: integer('user_id')
+      .references(() => userTable.id)
+      .notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+);
 
 /**
  * This table stores information about tasks that need to be completed by a specific user
@@ -121,13 +124,13 @@ export type CreateAssignment = typeof assignmentTable.$inferInsert;
 /**
  * This table stores information about which tasks belong to a user group.
  */
-export const taskGroupTable = pgTable('task_group', {
+export const taskUserGroupTable = pgTable('task_user_group', {
   id: serial('id').primaryKey(),
   taskId: integer('task_id')
     .references(() => taskTable.id)
     .notNull(),
   groupId: integer('groupId')
-    .references(() => groupTable.id)
+    .references(() => userGroupTable.id)
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
