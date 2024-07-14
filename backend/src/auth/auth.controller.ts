@@ -20,7 +20,7 @@ import {
   dbGetGroupOfUser,
   dbGetInviteCode,
 } from 'src/db/functions/user-group';
-import { eq, or } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { dbGetUserById } from 'src/db/functions/user';
 
 class RegisterDto {
