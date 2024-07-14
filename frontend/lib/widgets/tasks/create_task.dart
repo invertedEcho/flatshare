@@ -1,11 +1,13 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/fetch/group.dart';
-import 'package:wg_app/fetch/task_groups.dart';
-import 'package:wg_app/fetch/tasks.dart';
+import 'package:provider/provider.dart';
+import 'package:wg_app/fetch/task.dart';
+import 'package:wg_app/fetch/task_group.dart';
+import 'package:wg_app/fetch/user_group.dart';
 import 'package:wg_app/models/task.dart';
 import 'package:wg_app/models/task_group.dart';
 import 'package:wg_app/models/user.dart';
+import 'package:wg_app/user_provider.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -25,23 +27,36 @@ class CreateTaskState extends State<CreateTask> {
 
   TaskType selectedTaskType = TaskType.oneOff;
 
-  List<User> userInGroups = [];
+  List<User> userInUserGroup = [];
   List<TaskGroup> taskGroups = [];
 
+  // TODO: will probably be gone when below todo is fixed.
+  int? currentUserGroupId;
+
+  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
-  void initState() {
-    super.initState();
-    // TODO: I think this is pretty bad, we should probably move to a FutureBuilder instead.
-    fetchUsersInGroup(groupId: 4).then((result) {
-      setState(() {
-        userInGroups = result;
-      });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    final userGroupId = user?.groupId;
+
+    setState(() {
+      currentUserGroupId = userGroupId;
     });
-    fetchTaskGroups().then((result) {
-      setState(() {
-        taskGroups = result;
+
+    if (userGroupId != null) {
+      fetchUsersInUserGroup(groupId: userGroupId).then((result) {
+        setState(() {
+          userInUserGroup = result;
+        });
       });
-    });
+      fetchTaskGroups(userGroupId: userGroupId).then((result) {
+        setState(() {
+          taskGroups = result;
+        });
+      });
+    }
   }
 
   ButtonStyle getSelectTaskTypeButtonStyle(
@@ -70,17 +85,25 @@ class CreateTaskState extends State<CreateTask> {
         );
         return;
       }
+      // TODO: This should never happen.
+      if (currentUserGroupId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Unexpected error: userGroupId was null.')),
+        );
+        return;
+      }
       try {
         selectedTaskType == TaskType.oneOff
             ? await createOneOffTask(
                 title: title,
                 description: description,
-                groupId: 4,
+                groupId: currentUserGroupId!,
                 userIds: selectedUserIds)
             : await createRecurringTask(
                 title: title,
                 description: description,
-                groupId: 4,
+                groupId: currentUserGroupId!,
                 taskGroupId: selectTaskGroupControler.value!.id);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Created new task!')),
@@ -156,7 +179,7 @@ class CreateTaskState extends State<CreateTask> {
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
                             hintText: "Select users",
-                            items: userInGroups,
+                            items: userInUserGroup,
                             onListChanged: (value) {})
                         : CustomDropdown.search(
                             controller: selectTaskGroupControler,

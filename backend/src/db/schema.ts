@@ -68,7 +68,7 @@ export const taskTable = pgTable('task', {
   title: text('title').notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  // FIXME: This should not be here
+  // FIXME: This should not be here -> association table, so a task can be in multiple recurring task groups
   recurringTaskGroupId: integer('recurring_task_group_id').references(
     () => recurringTaskGroupTable.id,
   ),
@@ -85,6 +85,7 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   description: text('description'),
   interval: interval('interval').notNull(),
   initialStartDate: timestamp('initial_start_date').notNull(),
+  userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 

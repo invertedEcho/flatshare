@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/assignments.dart';
+import 'package:wg_app/fetch/assignment.dart';
 import 'package:wg_app/models/assignment.dart';
 import 'package:wg_app/models/user.dart';
 import 'package:wg_app/user_provider.dart';
@@ -17,12 +17,7 @@ class AssignmentsWidget extends StatefulWidget {
 class AssignmentsWidgetState extends State<AssignmentsWidget> {
   late Future<List<Assignment>> _assignmentsFuture;
 
-  @override
-  void initState() {
-    super.initState();
-    _assignmentsFuture = Future.value([]);
-  }
-
+  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

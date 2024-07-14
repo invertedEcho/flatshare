@@ -15,6 +15,13 @@
       "when": 1720979328073,
       "tag": "0001_far_blur",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1720991061265,
+      "tag": "0002_equal_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }
