@@ -128,7 +128,11 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
       body: <Widget>[
         /// Home page
         LoginForm(onLogin: widget.onLogin),
-        const RegisterForm()
+        RegisterForm(onRegister: () {
+          setState(() {
+            currentPageIndex = 0;
+          });
+        })
       ][currentPageIndex],
     );
   }

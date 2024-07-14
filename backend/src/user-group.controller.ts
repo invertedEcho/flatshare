@@ -6,7 +6,7 @@ import {
   dbGetInviteCode,
 } from './db/functions/user-group';
 import { db } from './db';
-import { groupInviteTable } from './db/schema';
+import { userGroupInviteTable } from './db/schema';
 
 function generateRandomAlphanumericalCode(length = 8) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -22,10 +22,10 @@ function generateRandomAlphanumericalCode(length = 8) {
 export class UserGroupController {
   @Get(':userId')
   async getGroupOfUser(@Param('userId') userId: number) {
-    const userGroupId = await dbGetGroupOfUser(userId);
+    const userGroup = await dbGetGroupOfUser(userId);
     return {
-      userGroupId: userGroupId?.group.id ?? null,
-      name: userGroupId?.group.name ?? null,
+      userGroupId: userGroup?.user_user_group.groupId ?? null,
+      name: userGroup?.user_group.name ?? null,
     };
   }
 
@@ -66,7 +66,7 @@ export class UserGroupController {
     // )[0];
 
     const inviteCode = generateRandomAlphanumericalCode(8);
-    await db.insert(groupInviteTable).values({ code: inviteCode, groupId });
+    await db.insert(userGroupInviteTable).values({ code: inviteCode, groupId });
 
     return { inviteCode };
   }
