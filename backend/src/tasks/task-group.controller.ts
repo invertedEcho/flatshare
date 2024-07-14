@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import {
   dbCreateTaskGroup,
   dbGetTaskGroups,
@@ -10,13 +10,14 @@ export type CreateTaskGroup = {
   interval: string;
   userIds: number[];
   initialStartDate: string;
+  userGroupId: number;
 };
 
 @Controller('task-group')
 export class TaskGroupController {
   @Get()
-  async getTaskGroups() {
-    const taskGroups = await dbGetTaskGroups();
+  async getTaskGroups(@Query('userGroupId') userGroupId: number) {
+    const taskGroups = await dbGetTaskGroups({ userGroupId });
     return taskGroups;
   }
 

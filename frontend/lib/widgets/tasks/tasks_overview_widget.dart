@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:wg_app/fetch/task_groups.dart';
-import 'package:wg_app/fetch/tasks.dart';
+import 'package:provider/provider.dart';
+import 'package:wg_app/fetch/task.dart';
+import 'package:wg_app/fetch/task_group.dart';
 import 'package:wg_app/models/task.dart';
 import 'package:wg_app/models/task_group.dart';
+import 'package:wg_app/models/user.dart';
+import 'package:wg_app/user_provider.dart';
 import 'package:wg_app/widgets/tasks/task_group_list.dart';
 import 'package:wg_app/widgets/tasks/task_list.dart';
 
@@ -17,12 +20,18 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
   late Future<List<TaskGroup>> _taskGroupsFuture;
   late Future<List<Task>> _tasksFuture;
 
+  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
-  void initState() {
-    super.initState();
-    _taskGroupsFuture = fetchTaskGroups();
-    // TODO: replace with actual group id once group feature implemented
-    _tasksFuture = fetchTasks(groupId: 4);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    User? user = userProvider.user;
+    final groupId = user?.groupId;
+
+    if (groupId != null) {
+      _taskGroupsFuture = fetchTaskGroups(userGroupId: groupId);
+      _tasksFuture = fetchTasks(groupId: groupId);
+    }
   }
 
   @override
@@ -40,7 +49,9 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                     child: Text(
                         "Eror while fetching task groups: ${snapshot.error}"));
               } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                return const SafeArea(child: Text("No taskgroups."));
+                return const SafeArea(
+                    child: Text(
+                        "No Task Groups. To get started, use the + Action Button on the bottom right."));
               }
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +69,9 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.isEmpty) {
-                  return const SafeArea(child: Text("No tasks."));
+                  return const SafeArea(
+                      child: Text(
+                          "No Tasks. To get started, use the + Action Button on the bottom right."));
                 }
                 return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

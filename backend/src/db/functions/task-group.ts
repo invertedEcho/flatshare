@@ -8,7 +8,11 @@ import {
 } from '../schema';
 import { CreateTaskGroup } from 'src/tasks/task-group.controller';
 
-export async function dbGetTaskGroups() {
+export async function dbGetTaskGroups({
+  userGroupId,
+}: {
+  userGroupId: number;
+}) {
   return await db
     .select({
       id: recurringTaskGroupTable.id,
@@ -18,6 +22,7 @@ export async function dbGetTaskGroups() {
       numberOfTasks: count(taskTable.id),
     })
     .from(recurringTaskGroupTable)
+    .where(eq(recurringTaskGroupTable.userGroupId, userGroupId))
     .leftJoin(
       taskTable,
       eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
@@ -31,6 +36,7 @@ export async function dbCreateTaskGroup({
   interval,
   userIds,
   initialStartDate,
+  userGroupId,
 }: CreateTaskGroup) {
   try {
     const res = await db
@@ -40,6 +46,7 @@ export async function dbCreateTaskGroup({
         description,
         interval,
         initialStartDate: new Date(initialStartDate),
+        userGroupId,
       })
       .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
 

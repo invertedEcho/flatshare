@@ -1,0 +1,1 @@
+ALTER TABLE "recurring_task_group" ADD COLUMN "user_group_id" integer NOT NULL;
