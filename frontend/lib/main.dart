@@ -81,7 +81,6 @@ class _AppState extends State<App> {
         themeMode: ThemeMode.system,
         home: isLoggedIn
             ? AuthenticatedNavigation(
-                userGroupId: 1,
                 onLogout: handleLogout,
               )
             : UnauthenticatedNavigation(onLogin: handleLogin));

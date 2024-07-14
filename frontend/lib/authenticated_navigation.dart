@@ -6,10 +6,8 @@ import 'package:wg_app/widgets/tasks/create_task.dart';
 import 'package:wg_app/widgets/tasks/tasks_overview_widget.dart';
 
 class AuthenticatedNavigation extends StatefulWidget {
-  final int userGroupId;
   final VoidCallback onLogout;
-  const AuthenticatedNavigation(
-      {super.key, required this.onLogout, required this.userGroupId});
+  const AuthenticatedNavigation({super.key, required this.onLogout});
 
   @override
   State<AuthenticatedNavigation> createState() =>
