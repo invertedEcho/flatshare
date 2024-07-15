@@ -99,14 +99,14 @@ class CreateTaskGroupState extends State<CreateTaskGroup> {
       await createTaskGroup(
           title: title,
           description: description,
-          interval: interval.replaceAll("months", 'mons'),
+          interval: interval,
           userIds: selectedUserIds,
           initialStartDate: selectedDate.toString(),
           userGroupId: groupId);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Created new task group!')),
       );
-      // Navigator.of(context).pop();
+      Navigator.of(context).pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString())),
