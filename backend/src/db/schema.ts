@@ -84,7 +84,9 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   title: text('title').notNull(),
   description: text('description'),
   interval: interval('interval').notNull(),
-  initialStartDate: timestamp('initial_start_date').notNull(),
+  initialStartDate: timestamp('initial_start_date', {
+    mode: 'string',
+  }).notNull(),
   userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
