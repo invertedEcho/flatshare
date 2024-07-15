@@ -1,4 +1,6 @@
-# wg-app WIP
+# Flatshare
+
+This mobile app allows you to easily track all what you need in your shared apartment with ease and no useless features.
 
 ## setup
 

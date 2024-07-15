@@ -14,11 +14,12 @@ import { randomFromArray } from 'src/utils/array';
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
+    if (process.env.NODE_ENV !== 'production') return;
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
     if (tasksToCreateAssignmentsFor.length >= 1) {
       console.info(
-        `Creating new assignments for ${tasksToCreateAssignmentsFor}`,
+        `Creating new assignments for ${JSON.stringify(tasksToCreateAssignmentsFor)}`,
       );
     }
 
@@ -36,7 +37,10 @@ export class AssignmentSchedulerService {
       if (!acc.get(curr.taskGroupId)) {
         acc.set(curr.taskGroupId, []);
       }
-      acc.get(curr.taskGroupId)?.push(curr);
+      acc.get(curr.taskGroupId)?.push({
+        ...curr,
+        taskGroupInitialStartDate: new Date(curr.taskGroupInitialStartDate),
+      });
       return acc;
     }, new Map());
 

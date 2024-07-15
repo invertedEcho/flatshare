@@ -3,6 +3,7 @@ import 'package:wg_app/main.dart';
 import 'package:wg_app/widgets/assignments/assignments_widget.dart';
 import 'package:wg_app/widgets/expandable_fab.dart';
 import 'package:wg_app/widgets/tasks/create_task.dart';
+import 'package:wg_app/widgets/tasks/create_task_group.dart';
 import 'package:wg_app/widgets/tasks/tasks_overview_widget.dart';
 
 class AuthenticatedNavigation extends StatefulWidget {
@@ -40,8 +41,8 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             const Text("New task group"),
             const SizedBox(width: 16),
             ActionButton(
-              onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const CreateTask())),
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const CreateTaskGroup())),
               icon: const Icon(Icons.group_work_outlined),
             ),
           ]),

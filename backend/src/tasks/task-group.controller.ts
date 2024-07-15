@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   dbCreateTaskGroup,
   dbGetTaskGroups,
@@ -23,6 +31,12 @@ export class TaskGroupController {
 
   @Post()
   async createTaskGroup(@Body() taskGroup: CreateTaskGroup) {
+    if (taskGroup.userIds.length === 0) {
+      throw new HttpException(
+        'userIds field must contain one or more values',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     await dbCreateTaskGroup(taskGroup);
   }
 }
