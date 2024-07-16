@@ -17,11 +17,6 @@ export class AssignmentSchedulerService {
     if (process.env.NODE_ENV !== 'production') return;
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
-    if (tasksToCreateAssignmentsFor.length >= 1) {
-      console.info(
-        `Creating new assignments for ${JSON.stringify(tasksToCreateAssignmentsFor)}`,
-      );
-    }
 
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
       Map<
@@ -63,6 +58,9 @@ export class AssignmentSchedulerService {
             ? taskGroupInitialStartDate
             : new Date(new Date().setHours(0, 0, 0, 0)),
         }),
+      );
+      console.info(
+        `Creating new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(tasks, null, 2)}`,
       );
       await dbAddAssignments({ assignments: hydratedAssignments });
     }
