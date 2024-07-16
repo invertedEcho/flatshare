@@ -16,6 +16,7 @@ Future<(User, String)> login(String username, String password) async {
       'password': password,
     }),
   );
+  print(response.body);
 
   switch (response.statusCode) {
     case 201:

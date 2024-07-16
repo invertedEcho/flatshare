@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/auth.dart';
+import 'package:wg_app/fetch/user_group.dart';
 
 import 'package:wg_app/main.dart';
 import 'package:wg_app/models/user.dart';
-import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 
 class LoginForm extends StatefulWidget {
   final VoidCallback onLogin;
@@ -30,40 +32,49 @@ class LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        var authResponse = await login(
-          usernameController.text,
-          passwordController.text,
-        );
-        var userFromResponse = authResponse.$1;
-        var accessToken = authResponse.$2;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-        if (!mounted) return;
+    try {
+      String username = usernameController.text;
+      String password = passwordController.text;
+      var authResponse = await login(
+        username,
+        password,
+      );
+      var userFromResponse = authResponse.$1;
+      var accessToken = authResponse.$2;
 
-        User user = User(
-          // TODO: we should use the information we get from the backend.
-          username: usernameController.text,
-          email: userFromResponse.email,
-          userId: userFromResponse.userId,
-          groupId: userFromResponse.groupId,
-        );
+      if (!mounted) return;
 
-        Provider.of<UserProvider>(context, listen: false).setUser(user);
+      User user = User(
+        username: userFromResponse.username,
+        email: userFromResponse.email,
+        userId: userFromResponse.userId,
+      );
 
-        await storage.write(key: 'jwt-token', value: accessToken);
+      await storage.write(key: 'jwt-token', value: accessToken);
+      UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
 
-        widget.onLogin();
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
 
+      userProvider.setUser(user);
+
+      if (userGroup != null) {
+        userProvider.setUserGroup(userGroup);
+      }
+
+      widget.onLogin();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login Successful!')),
+      );
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Successful!')),
+          SnackBar(content: Text('$e')),
         );
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$e')),
-          );
-        }
       }
     }
   }

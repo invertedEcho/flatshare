@@ -7,7 +7,8 @@ import 'package:wg_app/fetch/user_group.dart';
 import 'package:wg_app/models/task.dart';
 import 'package:wg_app/models/task_group.dart';
 import 'package:wg_app/models/user.dart';
-import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -38,8 +39,8 @@ class CreateTaskState extends State<CreateTask> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user;
-    final userGroupId = user?.groupId;
+    UserGroup? userGroup = userProvider.userGroup;
+    final userGroupId = userGroup?.id;
 
     setState(() {
       currentUserGroupId = userGroupId;

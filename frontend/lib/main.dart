@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:wg_app/authenticated_navigation.dart';
 import 'package:wg_app/fetch/authenticated_client.dart';
 import 'package:wg_app/fetch/url.dart';
+import 'package:wg_app/fetch/user_group.dart';
 import 'package:wg_app/models/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 import 'package:wg_app/unauthenticated_navigation.dart';
-import 'package:wg_app/user_provider.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
@@ -31,6 +33,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   var isLoggedIn = false;
+  var isInGroup = false;
 
   @override
   void initState() {
@@ -44,8 +47,21 @@ class _AppState extends State<App> {
       var profileRes =
           await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
 
-      final profile = User.fromJson(jsonDecode(profileRes.body));
-      Provider.of<UserProvider>(context, listen: false).setUser(profile);
+      final userProfile = User.fromJson(jsonDecode(profileRes.body));
+      UserGroup? userGroup =
+          await fetchUserGroupForUser(userId: userProfile.userId);
+
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.setUser(userProfile);
+
+      if (userGroup != null) {
+        userProvider.setUserGroup(userGroup);
+        setState(() {
+          isInGroup = true;
+        });
+      } else {
+        userProvider.setUserGroup(null);
+      }
       setState(() {
         isLoggedIn = true;
       });

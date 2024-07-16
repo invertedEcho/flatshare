@@ -40,9 +40,7 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Request() req: { user: User }) {
-    const result = await this.authService.login(req.user);
-    const maybeUserGroup = await dbGetGroupOfUser(result.userId);
-    return { ...result, groupId: maybeUserGroup?.user_group.id ?? null };
+    return await this.authService.login(req.user);
   }
 
   @Public()
@@ -89,7 +87,10 @@ export class AuthController {
     const userGroup = await dbGetGroupOfUser(req.user.userId);
     return {
       userId: req.user.userId,
-      groupId: userGroup?.user_group.id ?? null,
+      userGroup: {
+        id: userGroup?.user_group.name,
+        name: userGroup?.user_group.name,
+      },
       email: user.email,
       username: user.username,
     };

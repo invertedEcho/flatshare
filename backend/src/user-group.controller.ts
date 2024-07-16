@@ -1,14 +1,23 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import {
   dbAddUserToGroup,
   dbCreateUserGroup,
   dbGetGroupOfUser,
   dbGetInviteCode,
+  dbGetUserGroup,
 } from './db/functions/user-group';
 import { db } from './db';
 import { userGroupInviteTable } from './db/schema';
 
-function generateRandomAlphanumericalCode(length = 8) {
+function generateRandomAlphanumericalCode(length = 6) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
   for (let i = 0; i < length; i++) {
@@ -20,25 +29,34 @@ function generateRandomAlphanumericalCode(length = 8) {
 
 @Controller('user-group')
 export class UserGroupController {
+  // TODO: we need to support multiple user groups
   @Get(':userId')
   async getGroupOfUser(@Param('userId') userId: number) {
     const userGroup = await dbGetGroupOfUser(userId);
     return {
-      userGroupId: userGroup?.user_user_group.groupId ?? null,
+      id: userGroup?.user_user_group.groupId ?? null,
       name: userGroup?.user_group.name ?? null,
     };
   }
 
-  // TODO: returning success should not be needed. the response status should just not be status 2xx.
   @Post('join')
   async joinGroup(@Body() body: { userId: number; inviteCode: string }) {
     const { inviteCode, userId } = body;
     const maybeInviteCode = await dbGetInviteCode(inviteCode);
+
     if (maybeInviteCode === undefined) {
-      return { success: false, groupId: null };
+      throw new HttpException(
+        'The specified invite code was not found.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
     await dbAddUserToGroup({ userId, groupId: maybeInviteCode.groupId });
-    return { success: true, groupId: maybeInviteCode.groupId };
+
+    const userGroup = await dbGetUserGroup({
+      userGroupId: maybeInviteCode.groupId,
+    });
+    return userGroup;
   }
 
   @Post('join-by-id')
@@ -65,7 +83,7 @@ export class UserGroupController {
     //     .limit(1)
     // )[0];
 
-    const inviteCode = generateRandomAlphanumericalCode(8);
+    const inviteCode = generateRandomAlphanumericalCode(6);
     await db.insert(userGroupInviteTable).values({ code: inviteCode, groupId });
 
     return { inviteCode };
