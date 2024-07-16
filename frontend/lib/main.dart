@@ -33,6 +33,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   var isLoggedIn = false;
+  var isInGroup = false;
 
   @override
   void initState() {
@@ -42,24 +43,29 @@ class _AppState extends State<App> {
 
   Future<void> getUserInfo() async {
     try {
-      print("TESDT");
       var apiBaseUrl = getApiBaseUrl();
       var profileRes =
           await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
 
       final userProfile = User.fromJson(jsonDecode(profileRes.body));
-      UserGroup userGroup =
+      UserGroup? userGroup =
           await fetchUserGroupForUser(userId: userProfile.userId);
 
       var userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.setUser(userProfile);
-      userProvider.setUserGroup(userGroup);
+
+      if (userGroup != null) {
+        userProvider.setUserGroup(userGroup);
+        setState(() {
+          isInGroup = true;
+        });
+      } else {
+        userProvider.setUserGroup(null);
+      }
       setState(() {
         isLoggedIn = true;
       });
     } catch (err) {
-      print("LOGGEDDDING OUT.");
-      print(err);
       setState(() {
         isLoggedIn = false;
       });

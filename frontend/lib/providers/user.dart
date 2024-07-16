@@ -14,7 +14,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setUserGroup(UserGroup newUserGroup) {
+  void setUserGroup(UserGroup? newUserGroup) {
     _userGroup = newUserGroup;
     notifyListeners();
   }

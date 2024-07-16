@@ -12,11 +12,12 @@ import {
   dbCreateUserGroup,
   dbGetGroupOfUser,
   dbGetInviteCode,
+  dbGetUserGroup,
 } from './db/functions/user-group';
 import { db } from './db';
 import { userGroupInviteTable } from './db/schema';
 
-function generateRandomAlphanumericalCode(length = 8) {
+function generateRandomAlphanumericalCode(length = 6) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
   for (let i = 0; i < length; i++) {
@@ -51,7 +52,11 @@ export class UserGroupController {
     }
 
     await dbAddUserToGroup({ userId, groupId: maybeInviteCode.groupId });
-    return { groupId: maybeInviteCode.groupId };
+
+    const userGroup = await dbGetUserGroup({
+      userGroupId: maybeInviteCode.groupId,
+    });
+    return userGroup;
   }
 
   @Post('join-by-id')
@@ -78,7 +83,7 @@ export class UserGroupController {
     //     .limit(1)
     // )[0];
 
-    const inviteCode = generateRandomAlphanumericalCode(8);
+    const inviteCode = generateRandomAlphanumericalCode(6);
     await db.insert(userGroupInviteTable).values({ code: inviteCode, groupId });
 
     return { inviteCode };

@@ -6,8 +6,8 @@ import 'package:wg_app/models/user.dart';
 import 'package:wg_app/models/user_group.dart';
 
 Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
-  var apiBaseUrl = getApiBaseUrl();
-  var response = await authenticatedClient
+  final apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient
       .get(Uri.parse("$apiBaseUrl/users?userGroupId=$groupId"));
 
   if (response.statusCode != 200) {
@@ -18,14 +18,40 @@ Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
   return usersInGroup.map<User>((user) => User.fromJson(user)).toList();
 }
 
-Future<UserGroup> fetchUserGroupForUser({required int userId}) async {
-  var apiBaseUrl = getApiBaseUrl();
-  var response = await authenticatedClient
+Future<UserGroup?> fetchUserGroupForUser({required int userId}) async {
+  final apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient
       .get(Uri.parse("$apiBaseUrl/user-group/$userId"));
   if (response.statusCode != 200) {
     throw Exception(
         "Failed to fetch user group for user: ${response.statusCode}");
   }
-  dynamic userGroup = jsonDecode(response.body);
+  Map<String, dynamic> userGroup = jsonDecode(response.body);
+
+  // TODO: The endpoint should probably return a userGroup object instead
+  // that is either null or contains these two fields.
+  if (userGroup['id'] == null || userGroup['name'] == null) {
+    return null;
+  }
+
   return UserGroup.fromJson(userGroup);
+}
+
+Future<UserGroup> joinGroupByInviteCode(
+    {required int userId, required String inviteCode}) async {
+  final String apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient.post(
+      Uri.parse('$apiBaseUrl/user-group/join'),
+      body: jsonEncode(
+          <String, dynamic>{'userId': userId, 'inviteCode': inviteCode}));
+
+  switch (response.statusCode) {
+    case 201:
+      Map<String, dynamic> result = jsonDecode(response.body);
+      return UserGroup(id: result['id'] as int, name: result['name'] as String);
+    case 400:
+      throw Exception("Invalid invite code");
+    default:
+      throw Exception("Failed to join user group by invite code.");
+  }
 }

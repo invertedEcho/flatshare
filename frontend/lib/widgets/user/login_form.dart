@@ -32,45 +32,49 @@ class LoginFormState extends State<LoginForm> {
   }
 
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        String username = usernameController.text;
-        String password = passwordController.text;
-        var authResponse = await login(
-          username,
-          password,
-        );
-        var userFromResponse = authResponse.$1;
-        var accessToken = authResponse.$2;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-        if (!mounted) return;
+    try {
+      String username = usernameController.text;
+      String password = passwordController.text;
+      var authResponse = await login(
+        username,
+        password,
+      );
+      var userFromResponse = authResponse.$1;
+      var accessToken = authResponse.$2;
 
-        User user = User(
-          username: userFromResponse.username,
-          email: userFromResponse.email,
-          userId: userFromResponse.userId,
-        );
+      if (!mounted) return;
 
-        await storage.write(key: 'jwt-token', value: accessToken);
+      User user = User(
+        username: userFromResponse.username,
+        email: userFromResponse.email,
+        userId: userFromResponse.userId,
+      );
 
-        UserGroup userGroup = await fetchUserGroupForUser(userId: user.userId);
+      await storage.write(key: 'jwt-token', value: accessToken);
+      UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
 
-        var userProvider = Provider.of<UserProvider>(context, listen: false);
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
 
-        userProvider.setUser(user);
+      userProvider.setUser(user);
+
+      if (userGroup != null) {
         userProvider.setUserGroup(userGroup);
+      }
 
-        widget.onLogin();
+      widget.onLogin();
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login Successful!')),
+      );
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Successful!')),
+          SnackBar(content: Text('$e')),
         );
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('$e')),
-          );
-        }
       }
     }
   }

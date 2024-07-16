@@ -45,3 +45,13 @@ export async function dbCreateUserGroup({ groupName }: { groupName: string }) {
     .values({ name: groupName })
     .returning();
 }
+
+export async function dbGetUserGroup({ userGroupId }: { userGroupId: number }) {
+  return (
+    await db
+      .select()
+      .from(userGroupTable)
+      .where(eq(userGroupTable.id, userGroupId))
+      .limit(1)
+  )[0];
+}
