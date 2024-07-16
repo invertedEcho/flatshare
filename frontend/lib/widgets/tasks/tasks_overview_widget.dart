@@ -4,8 +4,8 @@ import 'package:wg_app/fetch/task.dart';
 import 'package:wg_app/fetch/task_group.dart';
 import 'package:wg_app/models/task.dart';
 import 'package:wg_app/models/task_group.dart';
-import 'package:wg_app/models/user.dart';
-import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 import 'package:wg_app/widgets/tasks/task_group_list.dart';
 import 'package:wg_app/widgets/tasks/task_list.dart';
 
@@ -25,8 +25,8 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    User? user = userProvider.user;
-    final groupId = user?.groupId;
+    UserGroup? userGroup = userProvider.userGroup;
+    final groupId = userGroup?.id;
 
     if (groupId != null) {
       _taskGroupsFuture = fetchTaskGroups(userGroupId: groupId);

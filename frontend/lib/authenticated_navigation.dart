@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wg_app/main.dart';
+import 'package:wg_app/providers/user.dart';
 import 'package:wg_app/widgets/assignments/assignments_widget.dart';
 import 'package:wg_app/widgets/expandable_fab.dart';
 import 'package:wg_app/widgets/tasks/create_task.dart';
@@ -20,10 +22,11 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
 
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Flatshare"),
+        title: Text(userProvider.userGroup?.name ?? "No group"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),

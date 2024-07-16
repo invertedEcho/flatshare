@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/auth.dart';
+import 'package:wg_app/fetch/user_group.dart';
 
 import 'package:wg_app/main.dart';
 import 'package:wg_app/models/user.dart';
-import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 
 class LoginForm extends StatefulWidget {
   final VoidCallback onLogin;
@@ -32,9 +34,11 @@ class LoginFormState extends State<LoginForm> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       try {
+        String username = usernameController.text;
+        String password = passwordController.text;
         var authResponse = await login(
-          usernameController.text,
-          passwordController.text,
+          username,
+          password,
         );
         var userFromResponse = authResponse.$1;
         var accessToken = authResponse.$2;
@@ -42,16 +46,19 @@ class LoginFormState extends State<LoginForm> {
         if (!mounted) return;
 
         User user = User(
-          // TODO: we should use the information we get from the backend.
-          username: usernameController.text,
+          username: userFromResponse.username,
           email: userFromResponse.email,
           userId: userFromResponse.userId,
-          groupId: userFromResponse.groupId,
         );
 
-        Provider.of<UserProvider>(context, listen: false).setUser(user);
-
         await storage.write(key: 'jwt-token', value: accessToken);
+
+        UserGroup userGroup = await fetchUserGroupForUser(userId: user.userId);
+
+        var userProvider = Provider.of<UserProvider>(context, listen: false);
+
+        userProvider.setUser(user);
+        userProvider.setUserGroup(userGroup);
 
         widget.onLogin();
 

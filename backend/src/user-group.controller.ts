@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import {
   dbAddUserToGroup,
   dbCreateUserGroup,
@@ -20,25 +28,30 @@ function generateRandomAlphanumericalCode(length = 8) {
 
 @Controller('user-group')
 export class UserGroupController {
+  // TODO: we need to support multiple user groups
   @Get(':userId')
   async getGroupOfUser(@Param('userId') userId: number) {
     const userGroup = await dbGetGroupOfUser(userId);
     return {
-      userGroupId: userGroup?.user_user_group.groupId ?? null,
+      id: userGroup?.user_user_group.groupId ?? null,
       name: userGroup?.user_group.name ?? null,
     };
   }
 
-  // TODO: returning success should not be needed. the response status should just not be status 2xx.
   @Post('join')
   async joinGroup(@Body() body: { userId: number; inviteCode: string }) {
     const { inviteCode, userId } = body;
     const maybeInviteCode = await dbGetInviteCode(inviteCode);
+
     if (maybeInviteCode === undefined) {
-      return { success: false, groupId: null };
+      throw new HttpException(
+        'The specified invite code was not found.',
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
     await dbAddUserToGroup({ userId, groupId: maybeInviteCode.groupId });
-    return { success: true, groupId: maybeInviteCode.groupId };
+    return { groupId: maybeInviteCode.groupId };
   }
 
   @Post('join-by-id')

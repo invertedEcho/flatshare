@@ -6,7 +6,8 @@ import 'package:wg_app/fetch/task_group.dart';
 import 'package:wg_app/fetch/user_group.dart';
 import 'package:wg_app/models/task.dart';
 import 'package:wg_app/models/user.dart';
-import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 
 class CreateTaskGroup extends StatefulWidget {
   const CreateTaskGroup({super.key});
@@ -36,8 +37,8 @@ class CreateTaskGroupState extends State<CreateTaskGroup> {
     super.didChangeDependencies();
 
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    User? user = userProvider.user;
-    final groupId = user?.groupId;
+    UserGroup? userGroup = userProvider.userGroup;
+    final groupId = userGroup?.id;
     if (groupId != null) {
       // TODO: I think this is pretty bad, we should probably move to a FutureBuilder instead.
       fetchUsersInUserGroup(groupId: groupId).then((result) {
@@ -77,10 +78,9 @@ class CreateTaskGroupState extends State<CreateTaskGroup> {
 
     // TODO: we already get the user group id above.
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    User? user = userProvider.user;
-    final groupId = user?.groupId;
+    int? userGroupId = userProvider.userGroup?.id;
 
-    if (groupId == null) {
+    if (userGroupId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Unexpected error: userGroupId was null.')),
@@ -102,7 +102,7 @@ class CreateTaskGroupState extends State<CreateTaskGroup> {
           interval: interval,
           userIds: selectedUserIds,
           initialStartDate: selectedDate.toString(),
-          userGroupId: groupId);
+          userGroupId: userGroupId);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Created new task group!')),
       );

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/assignment.dart';
 import 'package:wg_app/models/assignment.dart';
-import 'package:wg_app/models/user.dart';
-import 'package:wg_app/user_provider.dart';
+import 'package:wg_app/models/user_group.dart';
+import 'package:wg_app/providers/user.dart';
 import 'package:wg_app/utils/date.dart';
 import "package:collection/collection.dart";
 
@@ -22,12 +22,14 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    User? user = userProvider.user;
-    final groupId = user?.groupId;
+    UserGroup? userGroup = userProvider.userGroup;
+    final groupId = userGroup?.id;
 
-    if (groupId != null) {
-      _assignmentsFuture = fetchAssignments(groupId: groupId);
+    if (groupId == null) {
+      throw Exception("userGroupId is null.");
     }
+
+    _assignmentsFuture = fetchAssignments(groupId: groupId);
   }
 
   Future<void> updateAssignment(Assignment assignment) async {
