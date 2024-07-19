@@ -55,3 +55,20 @@ Future<UserGroup> joinGroupByInviteCode(
       throw Exception("Failed to join user group by invite code.");
   }
 }
+
+Future<String> generateInviteCodeForUserGroup(
+    {required int userGroupId}) async {
+  final String apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient
+      .get(Uri.parse('$apiBaseUrl/user-group/invite-code/$userGroupId'));
+
+  switch (response.statusCode) {
+    case 200:
+      Map<String, dynamic> result = jsonDecode(response.body);
+      // TODO
+      return result['inviteCode'] as String;
+    default:
+      throw Exception(
+          "Failed to generate invite code for user group: ${response.statusCode}");
+  }
+}

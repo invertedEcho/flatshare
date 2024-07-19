@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:wg_app/fetch/url.dart';
 import 'package:http/http.dart' as http;
+import 'package:wg_app/main.dart';
 import 'package:wg_app/models/user.dart';
 
 Future<(User, String)> login(String username, String password) async {
@@ -52,4 +53,11 @@ Future<void> register(String username, String password, String email) async {
   if (response.statusCode != 201) {
     throw Exception("Failed to register");
   }
+}
+
+Future<User> getProfile() async {
+  var apiBaseUrl = getApiBaseUrl();
+  var profileRes =
+      await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
+  return User.fromJson(jsonDecode(profileRes.body));
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/authenticated_navigation.dart';
+import 'package:wg_app/fetch/auth.dart';
 import 'package:wg_app/fetch/authenticated_client.dart';
 import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/fetch/user_group.dart';
@@ -43,16 +44,11 @@ class _AppState extends State<App> {
 
   Future<void> getUserInfo() async {
     try {
-      var apiBaseUrl = getApiBaseUrl();
-      var profileRes =
-          await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
-
-      final userProfile = User.fromJson(jsonDecode(profileRes.body));
-      UserGroup? userGroup =
-          await fetchUserGroupForUser(userId: userProfile.userId);
+      User user = await getProfile();
+      UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
 
       var userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.setUser(userProfile);
+      userProvider.setUser(user);
 
       if (userGroup != null) {
         userProvider.setUserGroup(userGroup);
