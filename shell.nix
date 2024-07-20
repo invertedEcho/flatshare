@@ -33,5 +33,5 @@ mkShell {
     aapt
   ];
   # FIXME
-  GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=/run/current-system/sw/bin/aapt2";
+  GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${aapt}/bin/aapt2";
 }
