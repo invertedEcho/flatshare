@@ -1,14 +1,14 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:flatshare/fetch/task.dart';
+import 'package:flatshare/fetch/task_group.dart';
+import 'package:flatshare/fetch/user_group.dart';
+import 'package:flatshare/models/task.dart';
+import 'package:flatshare/models/task_group.dart';
+import 'package:flatshare/models/user.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/task.dart';
-import 'package:wg_app/fetch/task_group.dart';
-import 'package:wg_app/fetch/user_group.dart';
-import 'package:wg_app/models/task.dart';
-import 'package:wg_app/models/task_group.dart';
-import 'package:wg_app/models/user.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:wg_app/fetch/url.dart';
-import 'package:wg_app/main.dart';
-import 'package:wg_app/models/task.dart';
+import 'package:flatshare/fetch/url.dart';
+import 'package:flatshare/main.dart';
+import 'package:flatshare/models/task.dart';
 
 Future<List<Task>> fetchTasks({required int groupId}) async {
   var apiBaseUrl = getApiBaseUrl();

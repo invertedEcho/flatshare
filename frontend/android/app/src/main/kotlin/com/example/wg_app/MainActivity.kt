@@ -1,4 +1,4 @@
-package com.example.wg_app
+package com.invertedecho.flatshare
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:wg_app/fetch/url.dart';
+import 'package:flatshare/fetch/url.dart';
+import 'package:flatshare/models/user.dart';
 import 'package:http/http.dart' as http;
-import 'package:wg_app/models/user.dart';
 
 Future<(User, String)> login(String username, String password) async {
   var apiBaseUrl = getApiBaseUrl();

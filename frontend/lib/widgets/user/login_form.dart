@@ -1,12 +1,11 @@
+import 'package:flatshare/fetch/auth.dart';
+import 'package:flatshare/fetch/user_group.dart';
+import 'package:flatshare/main.dart';
+import 'package:flatshare/models/user.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/auth.dart';
-import 'package:wg_app/fetch/user_group.dart';
-
-import 'package:wg_app/main.dart';
-import 'package:wg_app/models/user.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
 
 class LoginForm extends StatefulWidget {
   final VoidCallback onLogin;

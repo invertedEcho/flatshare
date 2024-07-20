@@ -1,17 +1,17 @@
 import 'dart:convert';
 
+import 'package:flatshare/authenticated_navigation.dart';
+import 'package:flatshare/fetch/authenticated_client.dart';
+import 'package:flatshare/fetch/url.dart';
+import 'package:flatshare/fetch/user_group.dart';
+import 'package:flatshare/models/user.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/unauthenticated_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/authenticated_navigation.dart';
-import 'package:wg_app/fetch/authenticated_client.dart';
-import 'package:wg_app/fetch/url.dart';
-import 'package:wg_app/fetch/user_group.dart';
-import 'package:wg_app/models/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
-import 'package:wg_app/unauthenticated_navigation.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
