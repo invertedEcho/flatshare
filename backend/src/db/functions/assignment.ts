@@ -35,7 +35,10 @@ export async function dbGetAssignmentsFromCurrentInterval(
       .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
       .innerJoin(
         userUserGroupTable,
-        eq(userUserGroupTable.userId, userTable.id),
+        and(
+          eq(userUserGroupTable.groupId, groupId),
+          eq(userUserGroupTable.userId, userTable.id),
+        ),
       )
       .leftJoin(
         recurringTaskGroupTable,
@@ -49,7 +52,6 @@ export async function dbGetAssignmentsFromCurrentInterval(
             sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
             isNull(recurringTaskGroupTable.id),
           ),
-          eq(userUserGroupTable.groupId, groupId),
         ),
       );
 
