@@ -1,13 +1,13 @@
+import 'package:flatshare/fetch/task.dart';
+import 'package:flatshare/fetch/task_group.dart';
+import 'package:flatshare/models/task.dart';
+import 'package:flatshare/models/task_group.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/widgets/tasks/task_group_list.dart';
+import 'package:flatshare/widgets/tasks/task_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/task.dart';
-import 'package:wg_app/fetch/task_group.dart';
-import 'package:wg_app/models/task.dart';
-import 'package:wg_app/models/task_group.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
-import 'package:wg_app/widgets/tasks/task_group_list.dart';
-import 'package:wg_app/widgets/tasks/task_list.dart';
 
 class TasksOverviewWidget extends StatefulWidget {
   const TasksOverviewWidget({super.key});
@@ -73,6 +73,9 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                       child: Text(
                           "No Tasks. To get started, use the + Action Button on the bottom right."));
                 }
+                final oneOffTasks = snapshot.data!
+                    .where((task) => task.recurringTaskGroupId == null)
+                    .toList();
                 return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -84,7 +87,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       TaskList(
-                        tasks: snapshot.data!,
+                        tasks: oneOffTasks,
                       )
                     ]);
               }

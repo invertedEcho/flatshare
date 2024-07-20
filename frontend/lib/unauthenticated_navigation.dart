@@ -1,6 +1,6 @@
+import 'package:flatshare/widgets/user/login_form.dart';
+import 'package:flatshare/widgets/user/register_form.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/widgets/user/login_form.dart';
-import 'package:wg_app/widgets/user/register_form.dart';
 
 class UnauthenticatedNavigation extends StatefulWidget {
   final VoidCallback onLogin;

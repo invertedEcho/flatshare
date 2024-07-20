@@ -1,17 +1,14 @@
+import 'package:flatshare/main.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/widgets/assignments/assignments_widget.dart';
+import 'package:flatshare/widgets/create_group.dart';
+import 'package:flatshare/widgets/expandable_fab.dart';
+import 'package:flatshare/widgets/join_group.dart';
+import 'package:flatshare/widgets/tasks/create_task.dart';
+import 'package:flatshare/widgets/tasks/create_task_group.dart';
+import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/user_group.dart';
-import 'package:wg_app/main.dart';
-import 'package:wg_app/providers/user.dart';
-import 'package:wg_app/utils/env.dart';
-import 'package:wg_app/widgets/assignments/assignments_widget.dart';
-import 'package:wg_app/widgets/create_group.dart';
-import 'package:wg_app/widgets/expandable_fab.dart';
-import 'package:wg_app/widgets/join_group.dart';
-import 'package:wg_app/widgets/tasks/create_task.dart';
-import 'package:wg_app/widgets/tasks/create_task_group.dart';
-import 'package:wg_app/widgets/tasks/tasks_overview_widget.dart';
-import 'package:share_plus/share_plus.dart';
 
 List<Widget> getWidgets(int? userGroupId) {
   if (userGroupId != null) {

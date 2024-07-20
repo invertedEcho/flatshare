@@ -2,15 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/authenticated_navigation.dart';
-import 'package:wg_app/fetch/auth.dart';
-import 'package:wg_app/fetch/authenticated_client.dart';
-import 'package:wg_app/fetch/user_group.dart';
-import 'package:wg_app/models/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
-import 'package:wg_app/unauthenticated_navigation.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
