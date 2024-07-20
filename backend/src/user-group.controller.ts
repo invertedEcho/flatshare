@@ -16,16 +16,7 @@ import {
 } from './db/functions/user-group';
 import { db } from './db';
 import { userGroupInviteTable } from './db/schema';
-
-function generateRandomAlphanumericalCode(length = 6) {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    code += characters.charAt(randomIndex);
-  }
-  return code;
-}
+import { generateRandomAlphanumericalCode } from './utils/random';
 
 @Controller('user-group')
 export class UserGroupController {
@@ -72,7 +63,6 @@ export class UserGroupController {
     return (await dbCreateUserGroup({ groupName }))[0];
   }
 
-  // TODO: yeaaahhh we definitely need to protect this route.
   @Get('invite-code/:groupId')
   async generateInviteCode(@Param('groupId') groupId: number) {
     // const group = (

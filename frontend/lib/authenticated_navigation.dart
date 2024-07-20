@@ -1,14 +1,17 @@
+import 'package:flatshare/fetch/user_group.dart';
+import 'package:flatshare/main.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/utils/env.dart';
+import 'package:flatshare/widgets/assignments/assignments_widget.dart';
+import 'package:flatshare/widgets/create_group.dart';
+import 'package:flatshare/widgets/expandable_fab.dart';
+import 'package:flatshare/widgets/join_group.dart';
+import 'package:flatshare/widgets/tasks/create_task.dart';
+import 'package:flatshare/widgets/tasks/create_task_group.dart';
+import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/main.dart';
-import 'package:wg_app/providers/user.dart';
-import 'package:wg_app/widgets/assignments/assignments_widget.dart';
-import 'package:wg_app/widgets/create_group.dart';
-import 'package:wg_app/widgets/expandable_fab.dart';
-import 'package:wg_app/widgets/join_group.dart';
-import 'package:wg_app/widgets/tasks/create_task.dart';
-import 'package:wg_app/widgets/tasks/create_task_group.dart';
-import 'package:wg_app/widgets/tasks/tasks_overview_widget.dart';
+import 'package:share_plus/share_plus.dart';
 
 List<Widget> getWidgets(int? userGroupId) {
   if (userGroupId != null) {
@@ -63,6 +66,43 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
   int currentPageIndex = 0;
   int? userGroupId;
 
+  void handleLogout() {
+    storage.delete(key: 'jwt-token');
+    widget.onLogout();
+  }
+
+  void handleOpenGenerateInviteCode() async {
+    if (userGroupId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Failed to generate user group invite code. userGroupId was null.')),
+      );
+      return;
+    }
+    String inviteCode =
+        await generateInviteCodeForUserGroup(userGroupId: userGroupId!);
+    String inviteCodeUrl = getInviteCodeUrl(inviteCode: inviteCode);
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return SizedBox(
+              height: 200,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Generated invite code: $inviteCode"),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                      onPressed: () => Share.share(
+                          "Join my Group on Flatshare by using this invite code: $inviteCodeUrl"),
+                      child: const Text("Share this invite code"))
+                ],
+              ));
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context);
@@ -78,14 +118,30 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             ? Text(userProvider.userGroup!.name)
             : null,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: () {
-              storage.delete(key: 'jwt-token');
-              widget.onLogout();
-            },
-          ),
+          PopupMenuButton(itemBuilder: (BuildContext context) {
+            return [
+              PopupMenuItem(
+                  onTap: handleLogout,
+                  child: const Row(children: [
+                    Icon(Icons.logout),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text("Logout"),
+                  ])),
+              PopupMenuItem(
+                  onTap: handleOpenGenerateInviteCode,
+                  child: const Row(
+                    children: [
+                      Icon(Icons.password),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text("Invite new user to your group")
+                    ],
+                  ))
+            ];
+          })
         ],
       ),
       floatingActionButton: userProvider.userGroup?.id != null

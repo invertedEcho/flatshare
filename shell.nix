@@ -13,7 +13,7 @@ let
 
   android-sdk = android-nixpkgs.sdk (sdkPkgs: with sdkPkgs; [
     cmdline-tools-latest
-    build-tools-34-0-0
+    build-tools-30-0-3
     platform-tools
     platforms-android-34
     emulator
@@ -30,11 +30,8 @@ mkShell {
     android-sdk
     nodejs
     pnpm
+    aapt
   ];
 
-  shellHook = ''
-    export GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=/run/current-system/sw/bin/aapt2";
-    echo "Please make sure you have setup /tmp"
-    export TMPDIR=/tmp
-  '';
+  GRADLE_OPTS="-Dorg.gradle.project.android.aapt2FromMavenOverride=${aapt}/bin/aapt2";
 }

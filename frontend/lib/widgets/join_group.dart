@@ -1,8 +1,8 @@
+import 'package:flatshare/fetch/user_group.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/user_group.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
 
 class JoinGroup extends StatefulWidget {
   const JoinGroup({super.key});
