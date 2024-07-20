@@ -1,10 +1,10 @@
+import 'package:flatshare/fetch/assignment.dart';
+import 'package:flatshare/models/assignment.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/utils/date.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wg_app/fetch/assignment.dart';
-import 'package:wg_app/models/assignment.dart';
-import 'package:wg_app/models/user_group.dart';
-import 'package:wg_app/providers/user.dart';
-import 'package:wg_app/utils/date.dart';
 import "package:collection/collection.dart";
 
 class AssignmentsWidget extends StatefulWidget {

@@ -1,5 +1,5 @@
+import 'package:flatshare/fetch/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/fetch/auth.dart';
 
 class RegisterForm extends StatefulWidget {
   final VoidCallback onRegister;

@@ -1,5 +1,5 @@
+import 'package:flatshare/models/task_group.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/models/task_group.dart';
 
 // TODO: We should probably fix that our backend doesn't return the pg interval type formatted
 // like this in the case of month

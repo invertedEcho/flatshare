@@ -1,6 +1,6 @@
+import 'package:flatshare/models/user.dart';
+import 'package:flatshare/models/user_group.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/models/user.dart';
-import 'package:wg_app/models/user_group.dart';
 
 class UserProvider with ChangeNotifier {
   User? _user;

@@ -1,5 +1,5 @@
+import 'package:flatshare/models/task.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/models/task.dart';
 
 class TaskList extends StatelessWidget {
   final List<Task> tasks;
