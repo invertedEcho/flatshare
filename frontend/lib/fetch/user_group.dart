@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flatshare/fetch/url.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/utils/env.dart';
 
 Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
   final apiBaseUrl = getApiBaseUrl();
@@ -53,5 +53,22 @@ Future<UserGroup> joinGroupByInviteCode(
       throw Exception("Invalid invite code");
     default:
       throw Exception("Failed to join user group by invite code.");
+  }
+}
+
+Future<String> generateInviteCodeForUserGroup(
+    {required int userGroupId}) async {
+  final String apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient
+      .get(Uri.parse('$apiBaseUrl/user-group/invite-code/$userGroupId'));
+
+  switch (response.statusCode) {
+    case 200:
+      Map<String, dynamic> result = jsonDecode(response.body);
+      // TODO
+      return result['inviteCode'] as String;
+    default:
+      throw Exception(
+          "Failed to generate invite code for user group: ${response.statusCode}");
   }
 }
