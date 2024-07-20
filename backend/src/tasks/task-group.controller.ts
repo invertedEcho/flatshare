@@ -4,12 +4,14 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
 import {
   dbCreateTaskGroup,
   dbGetTaskGroups,
+  dbGetTasksOfTaskGroup,
 } from 'src/db/functions/task-group';
 
 export type CreateTaskGroup = {
@@ -27,6 +29,13 @@ export class TaskGroupController {
   async getTaskGroups(@Query('userGroupId') userGroupId: number) {
     const taskGroups = await dbGetTaskGroups({ userGroupId });
     return taskGroups;
+  }
+
+  // TODO: this endpoint should be protected, only users with the correct groupId should be able to fetch this
+  @Get('/tasks/:taskGroupId')
+  async getTasksForTaskGroup(@Param('taskGroupId') taskGroupId: number) {
+    const tasks = await dbGetTasksOfTaskGroup(taskGroupId);
+    return tasks;
   }
 
   @Post()

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wg_app/models/task_group.dart';
+import 'package:wg_app/widgets/screens/edit_task_group.dart';
 
 // TODO: We should probably fix that our backend doesn't return the pg interval type formatted
 // like this in the case of month
@@ -24,6 +25,14 @@ class TaskGroupList extends StatelessWidget {
         itemBuilder: (context, index) {
           final taskGroup = taskGroups[index];
           return Card(
+              child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EditTaskGroupScreen(
+                        taskGroupId: taskGroup.id,
+                      )));
+            },
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -42,7 +51,7 @@ class TaskGroupList extends StatelessWidget {
                 ],
               ),
             ),
-          );
+          ));
         });
   }
 }
