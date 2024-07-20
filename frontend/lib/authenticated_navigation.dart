@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wg_app/fetch/user_group.dart';
 import 'package:wg_app/main.dart';
 import 'package:wg_app/providers/user.dart';
+import 'package:wg_app/utils/env.dart';
 import 'package:wg_app/widgets/assignments/assignments_widget.dart';
 import 'package:wg_app/widgets/create_group.dart';
 import 'package:wg_app/widgets/expandable_fab.dart';
@@ -81,6 +82,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
     }
     String inviteCode =
         await generateInviteCodeForUserGroup(userGroupId: userGroupId!);
+    String inviteCodeUrl = getInviteCodeUrl(inviteCode: inviteCode);
     showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
@@ -91,9 +93,10 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Generated invite code: $inviteCode"),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                       onPressed: () => Share.share(
-                          "Join my Group on Flatshare by using this invite code: $inviteCode"),
+                          "Join my Group on Flatshare by using this invite code: $inviteCodeUrl"),
                       child: const Text("Share this invite code"))
                 ],
               ));

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/main.dart';
 import 'package:wg_app/models/assignment.dart';
+import 'package:wg_app/utils/env.dart';
 
 Future<List<Assignment>> fetchAssignments({required int groupId}) async {
   var apiBaseUrl = getApiBaseUrl();

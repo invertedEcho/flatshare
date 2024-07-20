@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:wg_app/authenticated_navigation.dart';
 import 'package:wg_app/fetch/auth.dart';
 import 'package:wg_app/fetch/authenticated_client.dart';
-import 'package:wg_app/fetch/url.dart';
 import 'package:wg_app/fetch/user_group.dart';
 import 'package:wg_app/models/user.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -18,9 +16,28 @@ Future main() async {
   await dotenv.load(fileName: '.env');
   runApp(MultiProvider(
     providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
-    child: const App(),
+    child: MaterialApp.router(routerConfig: router),
   ));
 }
+
+final router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (_, __) => Scaffold(
+        appBar: AppBar(title: const Text('Home Screen')),
+      ),
+      routes: [
+        GoRoute(
+          path: 'details',
+          builder: (_, __) => Scaffold(
+            appBar: AppBar(title: const Text('Details Screen')),
+          ),
+        ),
+      ],
+    ),
+  ],
+);
 
 const storage = FlutterSecureStorage();
 final authenticatedClient = AuthenticatedClient(storage);
