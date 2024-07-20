@@ -1,7 +1,8 @@
 import 'dart:convert';
 
-import 'package:flatshare/fetch/url.dart';
+import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
+import 'package:flatshare/utils/env.dart';
 import 'package:http/http.dart' as http;
 
 Future<(User, String)> login(String username, String password) async {

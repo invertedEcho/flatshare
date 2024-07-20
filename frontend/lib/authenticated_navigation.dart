@@ -1,5 +1,7 @@
+import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_group.dart';
 import 'package:flatshare/widgets/expandable_fab.dart';
@@ -9,6 +11,7 @@ import 'package:flatshare/widgets/tasks/create_task_group.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 List<Widget> getWidgets(int? userGroupId) {
   if (userGroupId != null) {

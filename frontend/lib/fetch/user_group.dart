@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:flatshare/fetch/url.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/utils/env.dart';
 
 Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
   final apiBaseUrl = getApiBaseUrl();

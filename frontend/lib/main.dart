@@ -1,6 +1,15 @@
+import 'dart:convert';
+
+import 'package:flatshare/authenticated_navigation.dart';
+import 'package:flatshare/fetch/authenticated_client.dart';
+import 'package:flatshare/fetch/user_group.dart';
+import 'package:flatshare/models/user.dart';
+import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/unauthenticated_navigation.dart';
+import 'package:flatshare/utils/env.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -8,28 +17,9 @@ Future main() async {
   await dotenv.load(fileName: '.env');
   runApp(MultiProvider(
     providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
-    child: MaterialApp.router(routerConfig: router),
+    child: const App(),
   ));
 }
-
-final router = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (_, __) => Scaffold(
-        appBar: AppBar(title: const Text('Home Screen')),
-      ),
-      routes: [
-        GoRoute(
-          path: 'details',
-          builder: (_, __) => Scaffold(
-            appBar: AppBar(title: const Text('Details Screen')),
-          ),
-        ),
-      ],
-    ),
-  ],
-);
 
 const storage = FlutterSecureStorage();
 final authenticatedClient = AuthenticatedClient(storage);
@@ -53,11 +43,16 @@ class _AppState extends State<App> {
 
   Future<void> getUserInfo() async {
     try {
-      User user = await getProfile();
-      UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
+      var apiBaseUrl = getApiBaseUrl();
+      var profileRes =
+          await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
+
+      final userProfile = User.fromJson(jsonDecode(profileRes.body));
+      UserGroup? userGroup =
+          await fetchUserGroupForUser(userId: userProfile.userId);
 
       var userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.setUser(user);
+      userProvider.setUser(userProfile);
 
       if (userGroup != null) {
         userProvider.setUserGroup(userGroup);
