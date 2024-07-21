@@ -94,8 +94,8 @@ class EditTaskFormState extends State<EditTaskForm> {
         TextEditingController(text: widget.task.description);
   }
 
-  void onSubmit(Task task) {
-    updateTask(
+  Future<void> onSubmit(Task task) async {
+    await updateTask(
         taskId: task.id,
         title: titleController.text,
         description: descriptionController.text,
@@ -130,8 +130,8 @@ class EditTaskFormState extends State<EditTaskForm> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                      onPressed: () {
-                        onSubmit(task);
+                      onPressed: () async {
+                        await onSubmit(task);
                         widget.refreshState();
                         Navigator.pop(context);
                       },
