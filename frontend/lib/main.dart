@@ -27,7 +27,11 @@ final goRouter = GoRouter(routes: [
       builder: (context, state) => const AuthenticatedNavigation()),
   GoRoute(
       path: '/login',
-      builder: (context, state) => const UnauthenticatedNavigation())
+      builder: (context, state) => const UnauthenticatedNavigation()),
+  // GoRoute(
+  //     path: '/accept-invite',
+  //     builder: (context, state) =>
+  //         Text("accept invite: ${state.uri.queryParameters['inviteCode']}"))
 ]);
 
 class App extends StatefulWidget {
