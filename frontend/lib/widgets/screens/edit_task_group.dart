@@ -1,11 +1,12 @@
+import 'package:flatshare/fetch/task_group.dart';
+import 'package:flatshare/models/task.dart';
+import 'package:flatshare/models/task_group.dart';
+import 'package:flatshare/widgets/tasks/task_list.dart';
 import 'package:flutter/material.dart';
-import 'package:wg_app/fetch/task_group.dart';
-import 'package:wg_app/models/task.dart';
-import 'package:wg_app/widgets/tasks/task_list.dart';
 
 class EditTaskGroupScreen extends StatefulWidget {
-  final int taskGroupId;
-  const EditTaskGroupScreen({super.key, required this.taskGroupId});
+  final TaskGroup taskGroup;
+  const EditTaskGroupScreen({super.key, required this.taskGroup});
 
   @override
   EditTaskGroupScreenState createState() => EditTaskGroupScreenState();
@@ -18,13 +19,13 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _tasksFuture = fetchTasksForTaskGroup(taskGroupId: widget.taskGroupId);
+    _tasksFuture = fetchTasksForTaskGroup(taskGroupId: widget.taskGroup.id);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit task group")),
+      appBar: AppBar(title: Text("Edit ${widget.taskGroup.title}")),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(mainAxisSize: MainAxisSize.min, children: [

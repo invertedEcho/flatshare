@@ -28,9 +28,8 @@ class TaskGroupList extends StatelessWidget {
               child: InkWell(
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => EditTaskGroupScreen(
-                        taskGroupId: taskGroup.id,
-                      )));
+                  builder: (context) =>
+                      EditTaskGroupScreen(taskGroup: taskGroup)));
             },
             borderRadius: BorderRadius.circular(16),
             child: Padding(
