@@ -182,7 +182,7 @@ class EditTaskFormState extends State<EditTaskForm> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  if (_formKey.currentState?.validate() ?? false) {
+                  if (_formKey.currentState!.validate()) {
                     await onSubmit(task);
                     widget.refreshState();
                     Navigator.pop(context);
