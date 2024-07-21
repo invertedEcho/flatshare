@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
+import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:http/http.dart' as http;
 
@@ -60,4 +62,16 @@ Future<User> getProfile() async {
   var profileRes =
       await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
   return User.fromJson(jsonDecode(profileRes.body));
+}
+
+Future<(User?, UserGroup?)> getUserInfo() async {
+  try {
+    User userProfile = await getProfile();
+    UserGroup? userGroup =
+        await fetchUserGroupForUser(userId: userProfile.userId);
+    return (userProfile, userGroup);
+  } catch (err) {
+    print("ERROR: $err");
+    return (null, null);
+  }
 }

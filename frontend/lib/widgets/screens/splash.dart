@@ -1,11 +1,7 @@
-import 'dart:convert';
-
-import 'package:flatshare/fetch/user_group.dart';
-import 'package:flatshare/main.dart';
+import 'package:flatshare/fetch/auth.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/user.dart';
-import 'package:flatshare/utils/env.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -16,22 +12,6 @@ class SplashScreen extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return SplashScreenState();
-  }
-}
-
-Future<(User?, UserGroup?)> getUserInfo() async {
-  try {
-    var apiBaseUrl = getApiBaseUrl();
-    var profileRes =
-        await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
-
-    User userProfile = User.fromJson(jsonDecode(profileRes.body));
-    UserGroup? userGroup =
-        await fetchUserGroupForUser(userId: userProfile.userId);
-    return (userProfile, userGroup);
-  } catch (err) {
-    print("ERROR: $err");
-    return (null, null);
   }
 }
 
