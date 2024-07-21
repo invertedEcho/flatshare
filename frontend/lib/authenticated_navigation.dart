@@ -10,6 +10,7 @@ import 'package:flatshare/widgets/tasks/create_task.dart';
 import 'package:flatshare/widgets/tasks/create_task_group.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -54,8 +55,7 @@ List<NavigationDestination> getNavigationDestinations(int? userGroupId) {
 }
 
 class AuthenticatedNavigation extends StatefulWidget {
-  final VoidCallback onLogout;
-  const AuthenticatedNavigation({super.key, required this.onLogout});
+  const AuthenticatedNavigation({super.key});
 
   @override
   State<AuthenticatedNavigation> createState() =>
@@ -68,7 +68,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
 
   void handleLogout() {
     storage.delete(key: 'jwt-token');
-    widget.onLogout();
+    context.go('/login');
   }
 
   void handleOpenGenerateInviteCode() async {

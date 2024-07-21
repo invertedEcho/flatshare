@@ -10,6 +10,7 @@ import 'package:flatshare/unauthenticated_navigation.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -32,73 +33,81 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  var isLoggedIn = false;
-  var isInGroup = false;
+  late Future<(User?, UserGroup?)> userInfoFuture;
 
   @override
   void initState() {
     super.initState();
-    getUserInfo();
+    userInfoFuture = getUserInfo();
   }
 
-  Future<void> getUserInfo() async {
+  Future<(User?, UserGroup?)> getUserInfo() async {
     try {
       var apiBaseUrl = getApiBaseUrl();
       var profileRes =
           await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
 
-      final userProfile = User.fromJson(jsonDecode(profileRes.body));
+      User userProfile = User.fromJson(jsonDecode(profileRes.body));
       UserGroup? userGroup =
           await fetchUserGroupForUser(userId: userProfile.userId);
-
-      var userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.setUser(userProfile);
-
-      if (userGroup != null) {
-        userProvider.setUserGroup(userGroup);
-        setState(() {
-          isInGroup = true;
-        });
-      } else {
-        userProvider.setUserGroup(null);
-      }
-      setState(() {
-        isLoggedIn = true;
-      });
+      return (userProfile, userGroup);
     } catch (err) {
-      setState(() {
-        isLoggedIn = false;
-      });
+      return (null, null);
     }
   }
 
   void handleLogout() async {
     await storage.delete(key: 'jwt-token');
-    setState(() {
-      isLoggedIn = false;
-    });
-  }
-
-  void handleLogin() async {
-    setState(() {
-      isLoggedIn = true;
-    });
+    context.go('/login');
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final goRouter = GoRouter(routes: [
+      GoRoute(
+          path: '/',
+          builder: (context, state) {
+            return FutureBuilder<(User?, UserGroup?)>(
+                future: userInfoFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasData) {
+                    // TODO: This is a ugly workaround. We can't navigate to another route while there are being initialized.
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      var data = snapshot.data;
+                      var maybeUser = data!.$1;
+                      var maybeUserGroup = data.$2;
+                      var userProvider =
+                          Provider.of<UserProvider>(context, listen: false);
+                      if (maybeUserGroup != null) {
+                        userProvider.setUserGroup(maybeUserGroup);
+                      }
+                      if (maybeUser != null) {
+                        userProvider.setUser(maybeUser);
+                        context.go('/home');
+                      }
+                      context.go('/login');
+                    });
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                });
+          }),
+      GoRoute(
+          path: '/home',
+          builder: (context, state) => const AuthenticatedNavigation()),
+      GoRoute(
+          path: '/login',
+          builder: (context, state) => const UnauthenticatedNavigation())
+    ]);
+    return MaterialApp.router(
+        routerConfig: goRouter,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
           brightness: Brightness.light,
         ),
         darkTheme: ThemeData(brightness: Brightness.dark),
-        themeMode: ThemeMode.system,
-        home: isLoggedIn
-            ? AuthenticatedNavigation(
-                onLogout: handleLogout,
-              )
-            : UnauthenticatedNavigation(onLogin: handleLogin));
+        themeMode: ThemeMode.system);
   }
 }

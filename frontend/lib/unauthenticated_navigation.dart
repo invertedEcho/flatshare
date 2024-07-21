@@ -3,8 +3,7 @@ import 'package:flatshare/widgets/user/register_form.dart';
 import 'package:flutter/material.dart';
 
 class UnauthenticatedNavigation extends StatefulWidget {
-  final VoidCallback onLogin;
-  const UnauthenticatedNavigation({super.key, required this.onLogin});
+  const UnauthenticatedNavigation({super.key});
 
   @override
   State<UnauthenticatedNavigation> createState() =>
@@ -38,7 +37,7 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
       ),
       body: <Widget>[
         /// Home page
-        LoginForm(onLogin: widget.onLogin),
+        const LoginForm(),
         RegisterForm(onRegister: () {
           setState(() {
             currentPageIndex = 0;
