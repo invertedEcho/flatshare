@@ -51,11 +51,11 @@ Future<List<Task>> fetchTasksForTaskGroup({required int taskGroupId}) async {
       .get(Uri.parse("$apiBaseUrl/task-group/tasks/$taskGroupId"));
   if (response.statusCode == 200) {
     List<dynamic> tasks = jsonDecode(response.body);
-    List<Task> typedTasks =
+    List<Task> parsedTasks =
         tasks.map<Task>((assignment) => Task.fromJson(assignment)).toList();
     // TODO: sort by something that makes more sense
-    typedTasks.sort((a, b) => a.id - b.id);
-    return typedTasks;
+    parsedTasks.sort((a, b) => a.id - b.id);
+    return parsedTasks;
   } else {
     throw Exception(
         "Failed to load tasks for task group $taskGroupId: ${response.statusCode}");
