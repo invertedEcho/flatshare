@@ -15,10 +15,14 @@ class EditTaskGroupScreen extends StatefulWidget {
 class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
   late Future<List<Task>> _tasksFuture;
 
-  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initializeFutures();
+  }
+
+  void _initializeFutures() {
     _tasksFuture = fetchTasksForTaskGroup(taskGroupId: widget.taskGroup.id);
   }
 
@@ -50,7 +54,14 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
                       "Tasks in task group",
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    TaskList(tasks: snapshot.data!)
+                    TaskList(
+                      tasks: snapshot.data!,
+                      refreshState: () {
+                        print("refreshed");
+                        _initializeFutures();
+                        setState(() {});
+                      },
+                    )
                   ],
                 );
               }),

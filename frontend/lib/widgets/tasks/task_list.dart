@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class TaskList extends StatelessWidget {
   final List<Task> tasks;
+  final VoidCallback refreshState;
 
-  const TaskList({super.key, required this.tasks});
+  const TaskList({super.key, required this.tasks, required this.refreshState});
 
   @override
   Widget build(BuildContext context) {
@@ -53,8 +54,8 @@ class TaskList extends StatelessWidget {
                                                   .headlineMedium),
                                           const SizedBox(height: 40),
                                           EditTaskForm(
-                                            task: task,
-                                          )
+                                              task: task,
+                                              refreshState: refreshState)
                                         ],
                                       )),
                                 );
@@ -69,8 +70,10 @@ class TaskList extends StatelessWidget {
 }
 
 class EditTaskForm extends StatefulWidget {
+  final VoidCallback refreshState;
   final Task task;
-  const EditTaskForm({super.key, required this.task});
+  const EditTaskForm(
+      {super.key, required this.task, required this.refreshState});
 
   @override
   EditTaskFormState createState() {
@@ -85,7 +88,6 @@ class EditTaskFormState extends State<EditTaskForm> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     titleController = TextEditingController(text: widget.task.title);
     descriptionController =
@@ -130,6 +132,7 @@ class EditTaskFormState extends State<EditTaskForm> {
                   child: ElevatedButton(
                       onPressed: () {
                         onSubmit(task);
+                        widget.refreshState();
                         Navigator.pop(context);
                       },
                       child: const Text("Submit")),
