@@ -111,10 +111,8 @@ class EditTaskFormState extends State<EditTaskForm> {
 
     if (userGroupId != null) {
       try {
-        // Fetch task groups
         final result = await fetchTaskGroups(userGroupId: userGroupId);
 
-        // Initialize the SingleSelectController with the appropriate task group
         setState(() {
           taskGroups = result;
           selectTaskGroupController = SingleSelectController<TaskGroup?>(
@@ -124,7 +122,6 @@ class EditTaskFormState extends State<EditTaskForm> {
           );
         });
       } catch (error) {
-        // Handle error here (e.g., show a message)
         print('Error fetching task groups: $error');
       }
     }
@@ -165,10 +162,10 @@ class EditTaskFormState extends State<EditTaskForm> {
                   const InputDecoration(labelText: "Description (optional)"),
             ),
             const SizedBox(height: 20),
-            if (selectTaskGroupController !=
-                null) // Ensure controller is not null
+            // I don't think you should have to do this, but without it the dropdown always displays the initial value as selected
+            if (selectTaskGroupController != null)
               CustomDropdown.search(
-                controller: selectTaskGroupController!,
+                controller: selectTaskGroupController,
                 decoration: const CustomDropdownDecoration(
                   listItemStyle: TextStyle(color: Colors.black),
                   hintStyle: TextStyle(color: Colors.black),
