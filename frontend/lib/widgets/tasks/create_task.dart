@@ -24,7 +24,7 @@ class CreateTaskState extends State<CreateTask> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final multiSelectUserController = MultiSelectController<User>([]);
-  final selectTaskGroupControler = SingleSelectController<TaskGroup>(null);
+  final selectTaskGroupController = SingleSelectController<TaskGroup>(null);
 
   TaskType selectedTaskType = TaskType.oneOff;
 
@@ -80,7 +80,7 @@ class CreateTaskState extends State<CreateTask> {
           .map((selectUser) => selectUser.userId)
           .toList();
       if (selectedTaskType == TaskType.recurring &&
-          selectTaskGroupControler.value == null) {
+          selectTaskGroupController.value == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select a task group first.')),
         );
@@ -105,7 +105,7 @@ class CreateTaskState extends State<CreateTask> {
                 title: title,
                 description: description,
                 groupId: currentUserGroupId!,
-                taskGroupId: selectTaskGroupControler.value!.id);
+                taskGroupId: selectTaskGroupController.value!.id);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Created new task!')),
         );
@@ -183,7 +183,7 @@ class CreateTaskState extends State<CreateTask> {
                             items: userInUserGroup,
                             onListChanged: (value) {})
                         : CustomDropdown.search(
-                            controller: selectTaskGroupControler,
+                            controller: selectTaskGroupController,
                             decoration: const CustomDropdownDecoration(
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
