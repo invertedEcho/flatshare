@@ -23,54 +23,77 @@ class TaskList extends StatelessWidget {
         itemCount: tasks.length,
         itemBuilder: (context, index) {
           final task = tasks[index];
-          return Card(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0)),
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          task.title,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        Text(task.description!)
-                      ],
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            // TODO: fix black edges visible when swiping dismissible
+            child: Dismissible(
+              direction: DismissDirection.endToStart,
+              key: Key(task.id.toString()),
+              onDismissed: (direction) async {
+                await deleteTask(taskId: task.id);
+                refreshState();
+              },
+              background: Container(
+                  decoration: const BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  padding: const EdgeInsets.all(16),
+                  child: const Align(
+                    alignment: Alignment.centerRight,
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.black,
                     ),
-                    ElevatedButton(
-                        onPressed: () {
-                          showModalBottomSheet<void>(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Container(
-                                      height: 300,
-                                      width: double.infinity,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text("Edit task",
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .headlineMedium),
-                                          const SizedBox(height: 40),
-                                          EditTaskForm(
-                                              task: task,
-                                              refreshState: refreshState)
-                                        ],
-                                      )),
-                                );
-                              });
-                        },
-                        child: Icon(Icons.edit))
-                  ],
-                )),
+                  )),
+              child: Card(
+                margin: const EdgeInsets.all(0),
+                child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              task.title,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            Text(task.description!)
+                          ],
+                        ),
+                        ElevatedButton(
+                            onPressed: () {
+                              showModalBottomSheet<void>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Container(
+                                          height: 300,
+                                          width: double.infinity,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Text("Edit task",
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .headlineMedium),
+                                              const SizedBox(height: 40),
+                                              EditTaskForm(
+                                                  task: task,
+                                                  refreshState: refreshState)
+                                            ],
+                                          )),
+                                    );
+                                  });
+                            },
+                            child: Icon(Icons.edit))
+                      ],
+                    )),
+              ),
+            ),
           );
         });
   }

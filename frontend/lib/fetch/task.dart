@@ -79,3 +79,15 @@ Future<void> updateTask(
     throw Exception("Failed to update task: ${response.statusCode}");
   }
 }
+
+Future<void> deleteTask({required int taskId}) async {
+  var apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient.delete(
+    Uri.parse('$apiBaseUrl/tasks/$taskId'),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(
+        "Failed to delete task with taskId $taskId: ${response.statusCode}");
+  }
+}
