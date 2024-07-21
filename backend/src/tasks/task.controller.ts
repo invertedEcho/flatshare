@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -11,6 +12,7 @@ import {
 import {
   dbCreateOneOffTask,
   dbCreateRecurringTask,
+  dbDeleteRecurringTask,
   dbGetAllTasks,
   dbUpdateTask,
 } from 'src/db/functions/task';
@@ -56,5 +58,10 @@ export class TasksController {
   @Put(':id')
   async updateTask(@Param('id') id: string, @Body() task: UpdateTask) {
     await dbUpdateTask({ ...task, id: Number(id) });
+  }
+
+  @Delete(':id')
+  async deleteRecurringTask(@Param('id') id: number) {
+    await dbDeleteRecurringTask({ taskId: id });
   }
 }
