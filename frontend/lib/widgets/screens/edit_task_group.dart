@@ -5,8 +5,10 @@ import 'package:flatshare/widgets/tasks/task_list.dart';
 import 'package:flutter/material.dart';
 
 class EditTaskGroupScreen extends StatefulWidget {
+  final VoidCallback onRefresh;
   final TaskGroup taskGroup;
-  const EditTaskGroupScreen({super.key, required this.taskGroup});
+  const EditTaskGroupScreen(
+      {super.key, required this.taskGroup, required this.onRefresh});
 
   @override
   EditTaskGroupScreenState createState() => EditTaskGroupScreenState();
@@ -15,10 +17,13 @@ class EditTaskGroupScreen extends StatefulWidget {
 class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
   late Future<List<Task>> _tasksFuture;
 
-  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+    _initializeFutures();
+  }
+
+  void _initializeFutures() {
     _tasksFuture = fetchTasksForTaskGroup(taskGroupId: widget.taskGroup.id);
   }
 
@@ -50,7 +55,14 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
                       "Tasks in task group",
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    TaskList(tasks: snapshot.data!)
+                    TaskList(
+                      tasks: snapshot.data!,
+                      refreshState: () {
+                        widget.onRefresh();
+                        _initializeFutures();
+                        setState(() {});
+                      },
+                    )
                   ],
                 );
               }),

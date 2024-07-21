@@ -20,10 +20,13 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
   late Future<List<TaskGroup>> _taskGroupsFuture;
   late Future<List<Task>> _tasksFuture;
 
-  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+    _initializeFutures();
+  }
+
+  void _initializeFutures() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     UserGroup? userGroup = userProvider.userGroup;
     final groupId = userGroup?.id;
@@ -45,9 +48,9 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const CircularProgressIndicator();
               } else if (snapshot.hasError) {
-                SafeArea(
+                return SafeArea(
                     child: Text(
-                        "Eror while fetching task groups: ${snapshot.error}"));
+                        "Error while fetching task groups: ${snapshot.error}"));
               } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                 return const SafeArea(
                     child: Text(
@@ -60,38 +63,49 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                     "Task Groups:",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  TaskGroupList(taskGroups: snapshot.data!),
+                  TaskGroupList(
+                      taskGroups: snapshot.data!,
+                      onRefresh: () {
+                        _initializeFutures();
+                        setState(() {});
+                      }),
                 ],
               );
             }),
-        FutureBuilder(
+        FutureBuilder<List<Task>>(
             future: _tasksFuture,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.isEmpty) {
-                  return const SafeArea(
-                      child: Text(
-                          "No Tasks. To get started, use the + Action Button on the bottom right."));
-                }
-                final oneOffTasks = snapshot.data!
-                    .where((task) => task.recurringTaskGroupId == null)
-                    .toList();
-                return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        "One-off Tasks:",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      TaskList(
-                        tasks: oneOffTasks,
-                      )
-                    ]);
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return SafeArea(
+                    child:
+                        Text("Error while fetching tasks: ${snapshot.error}"));
+              } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                return const SafeArea(
+                    child: Text(
+                        "No Tasks. To get started, use the + Action Button on the bottom right."));
               }
-              return const CircularProgressIndicator();
+              final oneOffTasks = snapshot.data!
+                  .where((task) => task.recurringTaskGroupId == null)
+                  .toList();
+              return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      "One-off Tasks:",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    TaskList(
+                        tasks: oneOffTasks,
+                        refreshState: () {
+                          _initializeFutures();
+                          setState(() {});
+                        }),
+                  ]);
             })
       ]),
     );
