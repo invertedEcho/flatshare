@@ -3,7 +3,7 @@ import 'package:flatshare/main.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
-import 'package:flatshare/widgets/create_group.dart';
+import 'package:flatshare/widgets/create_user_group.dart';
 import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
@@ -25,7 +25,7 @@ List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
     JoinGroup(
       inviteCode: inviteCode,
     ),
-    const CreateGroup(),
+    const CreateUserGroup(),
   ];
 }
 
