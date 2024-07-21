@@ -92,8 +92,7 @@ class EditTaskFormState extends State<EditTaskForm> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController titleController;
   late TextEditingController descriptionController;
-  SingleSelectController<TaskGroup?> selectTaskGroupController =
-      SingleSelectController(null);
+  SingleSelectController<TaskGroup?>? selectTaskGroupController;
   List<TaskGroup> taskGroups = [];
 
   @override
@@ -102,8 +101,6 @@ class EditTaskFormState extends State<EditTaskForm> {
     titleController = TextEditingController(text: widget.task.title);
     descriptionController =
         TextEditingController(text: widget.task.description);
-
-    // Initialize the selectTaskGroupController after fetching taskGroups
     fetchTaskGroupsAndInitialize();
   }
 
@@ -116,17 +113,16 @@ class EditTaskFormState extends State<EditTaskForm> {
       try {
         // Fetch task groups
         final result = await fetchTaskGroups(userGroupId: userGroupId);
-        selectTaskGroupController = SingleSelectController<TaskGroup?>(
-          result.firstWhereOrNull(
-            (taskGroup) => taskGroup.id == widget.task.recurringTaskGroupId,
-          ),
-        );
 
+        // Initialize the SingleSelectController with the appropriate task group
         setState(() {
           taskGroups = result;
+          selectTaskGroupController = SingleSelectController<TaskGroup?>(
+            result.firstWhereOrNull(
+              (taskGroup) => taskGroup.id == widget.task.recurringTaskGroupId,
+            ),
+          );
         });
-
-        // Initialize the SingleSelectController after taskGroups is populated
       } catch (error) {
         // Handle error here (e.g., show a message)
         print('Error fetching task groups: $error');
@@ -136,57 +132,68 @@ class EditTaskFormState extends State<EditTaskForm> {
 
   Future<void> onSubmit(Task task) async {
     await updateTask(
-        taskId: task.id,
-        title: titleController.text,
-        description: descriptionController.text,
-        taskGroupId: selectTaskGroupController.value?.id);
+      taskId: task.id,
+      title: titleController.text,
+      description: descriptionController.text,
+      taskGroupId: selectTaskGroupController?.value?.id,
+    );
   }
 
   @override
-  build(BuildContext buildContext) {
+  Widget build(BuildContext buildContext) {
     final Task task = widget.task;
+
     return Form(
-        key: _formKey,
-        child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: titleController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a title';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(labelText: "Title"),
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(0),
+        child: Column(
+          children: [
+            TextFormField(
+              controller: titleController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a title';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(labelText: "Title"),
+            ),
+            TextFormField(
+              controller: descriptionController,
+              decoration:
+                  const InputDecoration(labelText: "Description (optional)"),
+            ),
+            const SizedBox(height: 20),
+            if (selectTaskGroupController !=
+                null) // Ensure controller is not null
+              CustomDropdown.search(
+                controller: selectTaskGroupController!,
+                decoration: const CustomDropdownDecoration(
+                  listItemStyle: TextStyle(color: Colors.black),
+                  hintStyle: TextStyle(color: Colors.black),
                 ),
-                TextFormField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(
-                      labelText: "Description (optional)"),
-                ),
-                const SizedBox(height: 20),
-                CustomDropdown.search(
-                    controller: selectTaskGroupController,
-                    decoration: const CustomDropdownDecoration(
-                        listItemStyle: TextStyle(color: Colors.black),
-                        hintStyle: TextStyle(color: Colors.black)),
-                    hintText: "Select task group",
-                    items: taskGroups,
-                    onChanged: (value) {}),
-                SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                      onPressed: () async {
-                        await onSubmit(task);
-                        widget.refreshState();
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Submit")),
-                ),
-              ],
-            )));
+                hintText: "Select task group",
+                items: taskGroups,
+                onChanged: (value) {},
+              ),
+            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState?.validate() ?? false) {
+                    await onSubmit(task);
+                    widget.refreshState();
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text("Submit"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
