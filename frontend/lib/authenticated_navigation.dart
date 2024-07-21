@@ -14,7 +14,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-List<Widget> getWidgets(int? userGroupId) {
+List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
   if (userGroupId != null) {
     return [
       const AssignmentsWidget(),
@@ -22,7 +22,9 @@ List<Widget> getWidgets(int? userGroupId) {
     ];
   }
   return [
-    const JoinGroup(),
+    JoinGroup(
+      inviteCode: inviteCode,
+    ),
     const CreateGroup(),
   ];
 }
@@ -55,7 +57,8 @@ List<NavigationDestination> getNavigationDestinations(int? userGroupId) {
 }
 
 class AuthenticatedNavigation extends StatefulWidget {
-  const AuthenticatedNavigation({super.key});
+  final String? userGroupInviteCode;
+  const AuthenticatedNavigation({super.key, this.userGroupInviteCode});
 
   @override
   State<AuthenticatedNavigation> createState() =>
@@ -68,6 +71,9 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
 
   void handleLogout() {
     storage.delete(key: 'jwt-token');
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.clearUser();
+    userProvider.clearUserGroup();
     context.go('/login');
   }
 
@@ -180,7 +186,8 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         selectedIndex: currentPageIndex,
         destinations: getNavigationDestinations(userGroupId),
       ),
-      body: getWidgets(userGroupId)[currentPageIndex],
+      body:
+          getWidgets(userGroupId, widget.userGroupInviteCode)[currentPageIndex],
     );
   }
 }

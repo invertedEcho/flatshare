@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  final String? maybeInviteCode;
-  const SplashScreen({super.key, this.maybeInviteCode});
+  final String? userGroupInviteCode;
+  const SplashScreen({super.key, this.userGroupInviteCode});
 
   @override
   State<StatefulWidget> createState() {
@@ -27,7 +27,7 @@ class SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final maybeInviteCode = widget.maybeInviteCode;
+    final userGroupInviteCode = widget.userGroupInviteCode;
     return FutureBuilder<(User?, UserGroup?)>(
         future: userInfoFuture,
         builder: (context, snapshot) {
@@ -46,13 +46,13 @@ class SplashScreenState extends State<SplashScreen> {
               }
               if (maybeUser != null) {
                 userProvider.setUser(maybeUser);
-                String path = maybeInviteCode != null
-                    ? '/home?inviteCode=$maybeInviteCode'
+                String path = userGroupInviteCode != null
+                    ? '/home?inviteCode=$userGroupInviteCode'
                     : '/home';
                 context.go(path);
               } else {
-                String path = maybeInviteCode != null
-                    ? '/login?inviteCode=$maybeInviteCode'
+                String path = userGroupInviteCode != null
+                    ? '/login?inviteCode=$userGroupInviteCode'
                     : '/login';
                 context.go(path);
               }

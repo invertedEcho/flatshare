@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 class RegisterForm extends StatefulWidget {
   final VoidCallback onRegister;
-  const RegisterForm({super.key, required this.onRegister});
+  final String? maybeInviteCode;
+  const RegisterForm(
+      {super.key, required this.onRegister, this.maybeInviteCode});
 
   @override
   RegisterFormState createState() {
@@ -28,7 +30,7 @@ class RegisterFormState extends State<RegisterForm> {
     if (_formKey.currentState!.validate()) {
       try {
         await register(usernameController.text, passwordController.text,
-            emailController.text);
+            emailController.text, widget.maybeInviteCode);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Successfully registered!')),
         );
@@ -51,6 +53,9 @@ class RegisterFormState extends State<RegisterForm> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
+              if (widget.maybeInviteCode != null)
+                Text(
+                    "Note: After registering, you will automatically join the User Group: ${widget.maybeInviteCode}"),
               TextFormField(
                   decoration: const InputDecoration(
                       icon: Icon(Icons.person), labelText: 'Username'),
