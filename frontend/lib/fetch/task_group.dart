@@ -10,12 +10,14 @@ Future<List<TaskGroup>> fetchTaskGroups({required int userGroupId}) async {
   final response = await authenticatedClient
       .get(Uri.parse('$apiBaseUrl/task-group?userGroupId=$userGroupId'));
   if (response.statusCode == 200) {
-    List<dynamic> assignments = jsonDecode(response.body);
-    return assignments
+    List<dynamic> taskGroups = jsonDecode(response.body);
+    final parsedTaskGroups = taskGroups
         .map<TaskGroup>((assignment) => TaskGroup.fromJson(assignment))
         .toList();
+    parsedTaskGroups.sort((a, b) => a.id - b.id);
+    return parsedTaskGroups;
   } else {
-    throw Exception("Failed to load assignments: ${response.statusCode}");
+    throw Exception("Failed to load taskGroups: ${response.statusCode}");
   }
 }
 
