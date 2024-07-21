@@ -70,7 +70,6 @@ export async function dbCreateRecurringTask({
 
 export async function dbDeleteRecurringTask({ taskId }: { taskId: number }) {
   try {
-    console.debug('deleting task ', taskId);
     await db.delete(assignmentTable).where(eq(assignmentTable.taskId, taskId));
     await db
       .delete(taskUserGroupTable)
