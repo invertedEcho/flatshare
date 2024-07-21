@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class JoinGroup extends StatefulWidget {
-  const JoinGroup({super.key});
+  final String? inviteCode;
+  const JoinGroup({super.key, this.inviteCode});
 
   @override
   JoinGroupState createState() {
@@ -43,6 +44,12 @@ class JoinGroupState extends State<JoinGroup> {
         SnackBar(content: Text('$error')),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    inviteCodeController.text = widget.inviteCode ?? "";
   }
 
   @override

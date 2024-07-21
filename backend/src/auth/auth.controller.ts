@@ -27,7 +27,7 @@ class RegisterDto {
   username: string;
   email: string;
   password: string;
-  inviteCode?: string;
+  inviteCode: string | null;
 }
 
 const SALT_ROUNDS = 10;
@@ -63,7 +63,7 @@ export class AuthController {
         .values({ email, username, password: hash })
         .returning()
     )[0];
-    if (registerDto.inviteCode !== undefined) {
+    if (registerDto.inviteCode !== null) {
       try {
         const maybeGroup = await dbGetInviteCode(registerDto.inviteCode);
         await dbAddUserToGroup({
@@ -74,8 +74,7 @@ export class AuthController {
         console.error({ error });
       }
     }
-    // TODO: Should we return the data from our incoming request, or what actually got inserted into the database?
-    return { username, email };
+    return { username: newUser.username, email: newUser.email };
   }
 
   // TODO: This endpoint doesnt seem right...

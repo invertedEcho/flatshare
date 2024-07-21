@@ -21,13 +21,23 @@ const storage = FlutterSecureStorage();
 final authenticatedClient = AuthenticatedClient(storage);
 
 final goRouter = GoRouter(routes: [
-  GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+  GoRoute(
+      path: '/',
+      builder: (context, state) => SplashScreen(
+            userGroupInviteCode: state.uri.queryParameters['inviteCode'],
+          )),
   GoRoute(
       path: '/home',
-      builder: (context, state) => const AuthenticatedNavigation()),
+      builder: (context, state) {
+        final maybeInviteCode = state.uri.queryParameters['inviteCode'];
+        return AuthenticatedNavigation(userGroupInviteCode: maybeInviteCode);
+      }),
   GoRoute(
       path: '/login',
-      builder: (context, state) => const UnauthenticatedNavigation())
+      builder: (context, state) {
+        final maybeInviteCode = state.uri.queryParameters['inviteCode'];
+        return UnauthenticatedNavigation(maybeInviteCode: maybeInviteCode);
+      }),
 ]);
 
 class App extends StatefulWidget {

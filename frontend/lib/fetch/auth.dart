@@ -34,17 +34,19 @@ Future<(User, String)> login(String username, String password) async {
   }
 }
 
-Future<void> register(String username, String password, String email) async {
+Future<void> register(
+    String username, String password, String email, String? inviteCode) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await http.post(
     Uri.parse('$apiBaseUrl/register'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
-    body: jsonEncode(<String, String>{
+    body: jsonEncode(<String, String?>{
       'username': username,
       'password': password,
-      'email': email
+      'email': email,
+      'inviteCode': inviteCode,
     }),
   );
 
