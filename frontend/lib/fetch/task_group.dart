@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flatshare/main.dart';
+import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/utils/env.dart';
 
@@ -38,5 +39,18 @@ Future<void> createTaskGroup(
           }));
   if (response.statusCode != 201) {
     throw Exception("Failed to create task group: ${response.statusCode}");
+  }
+}
+
+Future<List<Task>> fetchTasksForTaskGroup({required int taskGroupId}) async {
+  final apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient
+      .get(Uri.parse("$apiBaseUrl/task-group/tasks/$taskGroupId"));
+  if (response.statusCode == 200) {
+    List<dynamic> tasks = jsonDecode(response.body);
+    return tasks.map<Task>((assignment) => Task.fromJson(assignment)).toList();
+  } else {
+    throw Exception(
+        "Failed to load tasks for task group $taskGroupId: ${response.statusCode}");
   }
 }
