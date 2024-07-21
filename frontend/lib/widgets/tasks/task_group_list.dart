@@ -12,9 +12,11 @@ String formatInterval(String interval) {
 }
 
 class TaskGroupList extends StatelessWidget {
+  final VoidCallback onRefresh;
   final List<TaskGroup> taskGroups;
 
-  const TaskGroupList({super.key, required this.taskGroups});
+  const TaskGroupList(
+      {super.key, required this.taskGroups, required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +30,8 @@ class TaskGroupList extends StatelessWidget {
               child: InkWell(
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) =>
-                      EditTaskGroupScreen(taskGroup: taskGroup)));
+                  builder: (context) => EditTaskGroupScreen(
+                      taskGroup: taskGroup, onRefresh: onRefresh)));
             },
             borderRadius: BorderRadius.circular(16),
             child: Padding(
