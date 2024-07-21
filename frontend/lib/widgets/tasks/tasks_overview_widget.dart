@@ -63,7 +63,12 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                     "Task Groups:",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  TaskGroupList(taskGroups: snapshot.data!),
+                  TaskGroupList(
+                      taskGroups: snapshot.data!,
+                      onRefresh: () {
+                        _initializeFutures();
+                        setState(() {});
+                      }),
                 ],
               );
             }),

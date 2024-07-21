@@ -5,8 +5,10 @@ import 'package:flatshare/widgets/tasks/task_list.dart';
 import 'package:flutter/material.dart';
 
 class EditTaskGroupScreen extends StatefulWidget {
+  final VoidCallback onRefresh;
   final TaskGroup taskGroup;
-  const EditTaskGroupScreen({super.key, required this.taskGroup});
+  const EditTaskGroupScreen(
+      {super.key, required this.taskGroup, required this.onRefresh});
 
   @override
   EditTaskGroupScreenState createState() => EditTaskGroupScreenState();
@@ -17,7 +19,6 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initializeFutures();
   }
@@ -57,7 +58,7 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
                     TaskList(
                       tasks: snapshot.data!,
                       refreshState: () {
-                        print("refreshed");
+                        widget.onRefresh();
                         _initializeFutures();
                         setState(() {});
                       },
