@@ -55,7 +55,7 @@ class RegisterFormState extends State<RegisterForm> {
             children: <Widget>[
               if (widget.maybeInviteCode != null)
                 Text(
-                    "Note: After registering, you will automatically join the User Group: ${widget.maybeInviteCode}"),
+                    "Note: After registering, you will automatically join the User Group with this invite code: ${widget.maybeInviteCode}"),
               TextFormField(
                   decoration: const InputDecoration(
                       icon: Icon(Icons.person), labelText: 'Username'),

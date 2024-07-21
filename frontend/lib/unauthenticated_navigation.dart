@@ -37,7 +37,6 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
         ],
       ),
       body: <Widget>[
-        /// Home page
         RegisterForm(
           onRegister: () {
             setState(() {
