@@ -23,4 +23,9 @@ class UserProvider with ChangeNotifier {
     _user = null;
     notifyListeners();
   }
+
+  void clearUserGroup() {
+    _userGroup = null;
+    notifyListeners();
+  }
 }

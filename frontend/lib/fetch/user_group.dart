@@ -72,3 +72,30 @@ Future<String> generateInviteCodeForUserGroup(
           "Failed to generate invite code for user group: ${response.statusCode}");
   }
 }
+
+Future<UserGroup> createUserGroup({required String userGroupName}) async {
+  final String apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient.post(
+      Uri.parse('$apiBaseUrl/user-group/create'),
+      body: jsonEncode(<String, dynamic>{'groupName': userGroupName}));
+
+  switch (response.statusCode) {
+    case 201:
+      Map<String, dynamic> result = jsonDecode(response.body);
+      return UserGroup.fromJson(result);
+    default:
+      throw Exception("Failed to create user group: ${response.statusCode}");
+  }
+}
+
+Future<void> joinUserGroupById(
+    {required int userId, required int groupId}) async {
+  final String apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient.post(
+      Uri.parse('$apiBaseUrl/user-group/join-by-id'),
+      body:
+          jsonEncode(<String, dynamic>{'userId': userId, 'groupId': groupId}));
+  if (response.statusCode != 201) {
+    throw Exception("Failed to join user group: ${response.statusCode}");
+  }
+}

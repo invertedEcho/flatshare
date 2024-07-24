@@ -4,52 +4,40 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class JoinGroup extends StatefulWidget {
-  final String? inviteCode;
-  const JoinGroup({super.key, this.inviteCode});
+class CreateUserGroup extends StatefulWidget {
+  const CreateUserGroup({super.key});
 
   @override
-  JoinGroupState createState() {
-    return JoinGroupState();
+  CreateUserGroupState createState() {
+    return CreateUserGroupState();
   }
 }
 
-class JoinGroupState extends State<JoinGroup> {
+class CreateUserGroupState extends State<CreateUserGroup> {
   final _formKey = GlobalKey<FormState>();
 
-  final inviteCodeController = TextEditingController();
+  final userGroupNameController = TextEditingController();
 
-  handleSubmit() async {
-    if (!(_formKey.currentState!.validate())) {
+  void handleSubmit() async {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
-    final inviteCode = inviteCodeController.text;
-    UserProvider userProvider =
-        Provider.of<UserProvider>(context, listen: false);
-    final user = userProvider.user;
-    if (user == null) {
-      throw Exception(
-          "Unexpected error: user was null in the join group widget");
-    }
 
+    String userGroupName = userGroupNameController.text;
     try {
-      final UserGroup userGroup = await joinGroupByInviteCode(
-          userId: user.userId, inviteCode: inviteCode);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      UserGroup userGroup = await createUserGroup(userGroupName: userGroupName);
+      await joinUserGroupById(
+          userId: userProvider.user!.userId, groupId: userGroup.id);
       userProvider.setUserGroup(userGroup);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Joined group!')),
+        const SnackBar(content: Text('Created group!')),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$error')),
       );
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    inviteCodeController.text = widget.inviteCode ?? "";
   }
 
   @override
@@ -63,15 +51,14 @@ class JoinGroupState extends State<JoinGroup> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextFormField(
-                    decoration: const InputDecoration(
-                        icon: Icon(Icons.password), labelText: "Invite Code"),
-                    controller: inviteCodeController,
+                    controller: userGroupNameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return "Please enter a valid invite code.";
+                        return "Please enter a name for your group";
                       }
                       return null;
                     },
+                    decoration: const InputDecoration(labelText: "Name"),
                   ),
                   const SizedBox(height: 20),
                   SizedBox(
@@ -86,7 +73,7 @@ class JoinGroupState extends State<JoinGroup> {
                       onPressed: handleSubmit,
                       child: const Padding(
                         padding: EdgeInsets.all(14.0),
-                        child: Text('Join'),
+                        child: Text('Create'),
                       ),
                     ),
                   ),

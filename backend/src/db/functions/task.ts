@@ -68,6 +68,19 @@ export async function dbCreateRecurringTask({
   }
 }
 
+export async function dbDeleteRecurringTask({ taskId }: { taskId: number }) {
+  try {
+    await db.delete(assignmentTable).where(eq(assignmentTable.taskId, taskId));
+    await db
+      .delete(taskUserGroupTable)
+      .where(eq(taskUserGroupTable.taskId, taskId));
+    await db.delete(taskTable).where(eq(taskTable.id, taskId));
+  } catch (error) {
+    console.error({ error });
+    throw error;
+  }
+}
+
 export async function dbUpdateTask({
   description,
   taskGroupId,

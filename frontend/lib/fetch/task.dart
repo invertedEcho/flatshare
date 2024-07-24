@@ -58,3 +58,36 @@ Future<void> createRecurringTask(
     throw Exception("Failed to create task: ${response.statusCode}");
   }
 }
+
+Future<void> updateTask(
+    {required int taskId,
+    required String title,
+    required String description,
+    int? taskGroupId}) async {
+  var apiBaseUrl = getApiBaseUrl();
+  final response =
+      await authenticatedClient.put(Uri.parse('$apiBaseUrl/tasks/$taskId'),
+          body: jsonEncode(
+            {
+              'title': title,
+              'description': description,
+              'taskGroupId': taskGroupId
+            },
+          ));
+
+  if (response.statusCode != 200) {
+    throw Exception("Failed to update task: ${response.statusCode}");
+  }
+}
+
+Future<void> deleteTask({required int taskId}) async {
+  var apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient.delete(
+    Uri.parse('$apiBaseUrl/tasks/$taskId'),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception(
+        "Failed to delete task with taskId $taskId: ${response.statusCode}");
+  }
+}

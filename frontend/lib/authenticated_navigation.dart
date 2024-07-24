@@ -3,17 +3,18 @@ import 'package:flatshare/main.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
-import 'package:flatshare/widgets/create_group.dart';
+import 'package:flatshare/widgets/create_user_group.dart';
 import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
 import 'package:flatshare/widgets/tasks/create_task_group.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-List<Widget> getWidgets(int? userGroupId) {
+List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
   if (userGroupId != null) {
     return [
       const AssignmentsWidget(),
@@ -21,8 +22,10 @@ List<Widget> getWidgets(int? userGroupId) {
     ];
   }
   return [
-    const JoinGroup(),
-    const CreateGroup(),
+    JoinGroup(
+      inviteCode: inviteCode,
+    ),
+    const CreateUserGroup(),
   ];
 }
 
@@ -54,8 +57,8 @@ List<NavigationDestination> getNavigationDestinations(int? userGroupId) {
 }
 
 class AuthenticatedNavigation extends StatefulWidget {
-  final VoidCallback onLogout;
-  const AuthenticatedNavigation({super.key, required this.onLogout});
+  final String? userGroupInviteCode;
+  const AuthenticatedNavigation({super.key, this.userGroupInviteCode});
 
   @override
   State<AuthenticatedNavigation> createState() =>
@@ -68,7 +71,10 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
 
   void handleLogout() {
     storage.delete(key: 'jwt-token');
-    widget.onLogout();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.clearUser();
+    userProvider.clearUserGroup();
+    context.go('/login');
   }
 
   void handleOpenGenerateInviteCode() async {
@@ -180,7 +186,8 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         selectedIndex: currentPageIndex,
         destinations: getNavigationDestinations(userGroupId),
       ),
-      body: getWidgets(userGroupId)[currentPageIndex],
+      body:
+          getWidgets(userGroupId, widget.userGroupInviteCode)[currentPageIndex],
     );
   }
 }

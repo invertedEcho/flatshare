@@ -1,4 +1,5 @@
 import 'package:flatshare/models/task_group.dart';
+import 'package:flatshare/widgets/screens/edit_task_group.dart';
 import 'package:flutter/material.dart';
 
 // TODO: We should probably fix that our backend doesn't return the pg interval type formatted
@@ -11,9 +12,11 @@ String formatInterval(String interval) {
 }
 
 class TaskGroupList extends StatelessWidget {
+  final VoidCallback onRefresh;
   final List<TaskGroup> taskGroups;
 
-  const TaskGroupList({super.key, required this.taskGroups});
+  const TaskGroupList(
+      {super.key, required this.taskGroups, required this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +27,13 @@ class TaskGroupList extends StatelessWidget {
         itemBuilder: (context, index) {
           final taskGroup = taskGroups[index];
           return Card(
+              child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EditTaskGroupScreen(
+                      taskGroup: taskGroup, onRefresh: onRefresh)));
+            },
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -42,7 +52,7 @@ class TaskGroupList extends StatelessWidget {
                 ],
               ),
             ),
-          );
+          ));
         });
   }
 }

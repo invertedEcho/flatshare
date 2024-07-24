@@ -5,11 +5,11 @@ import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
-  final VoidCallback onLogin;
-  const LoginForm({super.key, required this.onLogin});
+  const LoginForm({super.key});
 
   @override
   LoginFormState createState() {
@@ -64,7 +64,7 @@ class LoginFormState extends State<LoginForm> {
         userProvider.setUserGroup(userGroup);
       }
 
-      widget.onLogin();
+      context.go("/home");
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login Successful!')),
