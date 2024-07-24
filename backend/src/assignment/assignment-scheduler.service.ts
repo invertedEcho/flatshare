@@ -14,10 +14,12 @@ import { randomFromArray } from 'src/utils/array';
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
-    if (process.env.NODE_ENV !== 'production') return;
+    console.log("test")
+    // if (process.env.NODE_ENV !== 'production') return;
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
 
+    // TODO: create a arrayGroupBy util function
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
       Map<
         number,

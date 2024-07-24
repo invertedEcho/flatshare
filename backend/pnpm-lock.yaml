@@ -30,7 +30,7 @@ dependencies:
     specifier: ^5.1.1
     version: 5.1.1
   drizzle-orm:
-    specifier: ^0.30.9
+    specifier: ^0.30.10
     version: 0.30.10(pg@8.12.0)(postgres@3.4.4)
   passport:
     specifier: ^0.7.0
@@ -98,7 +98,7 @@ devDependencies:
     specifier: ^16.4.5
     version: 16.4.5
   drizzle-kit:
-    specifier: ^0.21.1
+    specifier: ^0.21.4
     version: 0.21.4
   eslint:
     specifier: ^8.42.0

@@ -10,9 +10,7 @@ if (databaseUrl === undefined) {
   throw new Error('env: DATABASE_URL undefined');
 }
 
-const databaseConnection = drizzle(
-  postgres(databaseUrl, { ssl: 'require', max: 1 }),
-);
+const databaseConnection = drizzle(postgres(databaseUrl, { max: 1 }));
 
 const main = async () => {
   try {

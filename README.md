@@ -10,6 +10,13 @@ This mobile app allows you to easily track all what you need in your shared apar
 cd backend && pnpm i
 ```
 
+- setup database
+
+```bash
+# you will of course have to install docker beforehand
+docker compose up -d
+```
+
 - setup environment variables
 
 ```bash
