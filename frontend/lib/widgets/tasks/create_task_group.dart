@@ -93,6 +93,12 @@ class CreateTaskGroupState extends State<CreateTaskGroup> {
     List<int> selectedUserIds = multiSelectUserController.value
         .map((selectUser) => selectUser.userId)
         .toList();
+    if (selectedUserIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('At least one user must be selected')),
+      );
+      return;
+    }
     String interval =
         "${intervalCountController.text} ${intervalTypes[intervalTypeController.selectedItem]}";
     try {
