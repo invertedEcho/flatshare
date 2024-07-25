@@ -41,7 +41,13 @@ export async function dbCreateTaskGroup({
   try {
     const res = await db
       .insert(recurringTaskGroupTable)
-      .values({ title, description, interval, userGroupId, initialStartDate })
+      .values({
+        title,
+        description,
+        interval,
+        userGroupId,
+        initialStartDate: new Date(initialStartDate),
+      })
       .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
 
     const { recurringTaskGroupId } = res[0];
