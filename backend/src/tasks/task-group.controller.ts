@@ -19,7 +19,7 @@ export type CreateTaskGroup = {
   description?: string;
   interval: string;
   userIds: number[];
-  initialStartDate: string;
+  initialStartDate: Date;
   userGroupId: number;
 };
 
