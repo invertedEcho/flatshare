@@ -36,7 +36,7 @@ export class AssignmentSchedulerService {
       }
       acc.get(curr.taskGroupId)?.push({
         ...curr,
-        taskGroupInitialStartDate: new Date(curr.taskGroupInitialStartDate),
+        taskGroupInitialStartDate: curr.taskGroupInitialStartDate,
       });
       return acc;
     }, new Map());
@@ -58,7 +58,8 @@ export class AssignmentSchedulerService {
           userId: nextResponsibleUserId,
           createdAt: isInFirstInterval
             ? taskGroupInitialStartDate
-            : new Date(new Date().setHours(0, 0, 0, 0)),
+            : // IDK if this is correct, what if its 23:00 for example in local time ozne
+              new Date(new Date().setHours(0, 0, 0, 0)),
         }),
       );
       console.info(
