@@ -1,12 +1,12 @@
 import { count, eq } from 'drizzle-orm';
 import { db } from '..';
 import {
+  InsertRecurringTaskGroup,
   recurringTaskGroupTable,
   recurringTaskGroupUserTable,
   taskTable,
   userTable,
 } from '../schema';
-import { CreateTaskGroup } from 'src/tasks/task-group.controller';
 
 export async function dbGetTaskGroups({
   userGroupId,
@@ -37,7 +37,7 @@ export async function dbCreateTaskGroup({
   userIds,
   initialStartDate,
   userGroupId,
-}: CreateTaskGroup) {
+}: InsertRecurringTaskGroup & { userIds: number[] }) {
   try {
     const res = await db
       .insert(recurringTaskGroupTable)
@@ -46,7 +46,7 @@ export async function dbCreateTaskGroup({
         description,
         interval,
         userGroupId,
-        initialStartDate: new Date(initialStartDate),
+        initialStartDate,
       })
       .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
 

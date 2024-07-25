@@ -90,6 +90,8 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type InsertRecurringTaskGroup =
+  typeof recurringTaskGroupTable.$inferInsert;
 
 /**
  * This table stores information about the users that belong to a recurring task group
