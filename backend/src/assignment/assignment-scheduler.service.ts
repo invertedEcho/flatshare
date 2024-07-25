@@ -18,6 +18,7 @@ export class AssignmentSchedulerService {
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval();
 
+    // TODO: create a arrayGroupBy util function
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
       Map<
         number,
