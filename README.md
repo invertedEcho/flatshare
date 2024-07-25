@@ -10,20 +10,20 @@ This mobile app allows you to easily track all what you need in your shared apar
 cd backend && pnpm i
 ```
 
+- setup environment variables
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+# adjust the values as needed.
+```
+
 - setup database
 
 ```bash
 # you will of course have to install docker beforehand
 docker compose up -d
 ```
-
-- setup environment variables
-
-```bash
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-```
-adjust the values as needed.
 
 - start the apps
 
