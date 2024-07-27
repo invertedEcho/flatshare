@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -8,11 +9,20 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { eq, inArray } from 'drizzle-orm';
+import { db } from 'src/db';
 import {
   dbCreateTaskGroup,
   dbGetTaskGroups,
   dbGetTasksOfTaskGroup,
 } from 'src/db/functions/task-group';
+import {
+  assignmentTable,
+  recurringTaskGroupTable,
+  recurringTaskGroupUserTable,
+  taskTable,
+  taskUserGroupTable,
+} from 'src/db/schema';
 
 export type CreateTaskGroup = {
   title: string;
@@ -47,5 +57,27 @@ export class TaskGroupController {
       );
     }
     await dbCreateTaskGroup(taskGroup);
+  }
+
+  @Delete(':taskGroupId')
+  async deleteTaskGroup(@Param('taskGroupId') taskGroupId: number) {
+    await db
+      .delete(recurringTaskGroupUserTable)
+      .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId));
+    const taskIds = (await dbGetTasksOfTaskGroup(taskGroupId)).map(
+      (task) => task.id,
+    );
+    if (taskIds.length > 0) {
+      await db
+        .delete(assignmentTable)
+        .where(inArray(assignmentTable.taskId, taskIds));
+      await db
+        .delete(taskUserGroupTable)
+        .where(inArray(taskUserGroupTable.taskId, taskIds));
+      await db.delete(taskTable).where(inArray(taskTable.id, taskIds));
+    }
+    await db
+      .delete(recurringTaskGroupTable)
+      .where(eq(recurringTaskGroupTable.id, taskGroupId));
   }
 }

@@ -15,6 +15,33 @@ class TaskList extends StatelessWidget {
 
   const TaskList({super.key, required this.tasks, required this.refreshState});
 
+  void onDismissed({required BuildContext context, required int taskId}) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: const Text("Are you sure?"),
+            content: const Text(
+                "Are you really sure you want to delete this task? This will also delete all current assignments that exist for this task."),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    refreshState();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Abort")),
+              TextButton(
+                  onPressed: () async {
+                    await deleteTask(taskId: taskId);
+                    Navigator.of(context).pop();
+                    refreshState();
+                  },
+                  child: const Text("Confirm"))
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -30,8 +57,7 @@ class TaskList extends StatelessWidget {
               direction: DismissDirection.endToStart,
               key: Key(task.id.toString()),
               onDismissed: (direction) async {
-                await deleteTask(taskId: task.id);
-                refreshState();
+                onDismissed(context: context, taskId: task.id);
               },
               background: Container(
                   decoration: const BoxDecoration(
@@ -70,17 +96,17 @@ class TaskList extends StatelessWidget {
                                     return Padding(
                                       padding: const EdgeInsets.all(16.0),
                                       child: Container(
-                                          height: 300,
+                                          height: 350,
                                           width: double.infinity,
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.start,
                                             children: [
-                                              Text("Edit task",
+                                              Text("Edit Task",
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .headlineMedium),
-                                              const SizedBox(height: 40),
+                                              const SizedBox(height: 20),
                                               EditTaskForm(
                                                   task: task,
                                                   refreshState: refreshState)
