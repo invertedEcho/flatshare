@@ -6,12 +6,11 @@ export async function dbGetUserById(userId: number) {
   return (await db.select().from(userTable).where(eq(userTable.id, userId)))[0];
 }
 
-// TODO: This shouldnt exist. A username is not unique
-export async function findUserByName(username: string) {
+export async function dbGetUserByEmail(email: string) {
   const res = await db
     .select()
     .from(userTable)
-    .where(eq(userTable.username, username))
+    .where(eq(userTable.email, email))
     .limit(1);
   return res[0];
 }

@@ -20,12 +20,12 @@ class LoginForm extends StatefulWidget {
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
 
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
-    usernameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -36,24 +36,19 @@ class LoginFormState extends State<LoginForm> {
     }
 
     try {
-      String username = usernameController.text;
+      String email = emailController.text;
       String password = passwordController.text;
-      var authResponse = await login(
-        username,
+      var accessToken = await login(
+        email,
         password,
       );
-      var userFromResponse = authResponse.$1;
-      var accessToken = authResponse.$2;
+      print(accessToken);
+      await storage.write(key: 'jwt-token', value: accessToken);
 
       if (!mounted) return;
 
-      User user = User(
-        username: userFromResponse.username,
-        email: userFromResponse.email,
-        userId: userFromResponse.userId,
-      );
+      User user = await getProfile();
 
-      await storage.write(key: 'jwt-token', value: accessToken);
       UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
 
       var userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -91,15 +86,15 @@ class LoginFormState extends State<LoginForm> {
               TextFormField(
                 decoration: const InputDecoration(
                   icon: Icon(Icons.person),
-                  labelText: 'Username',
+                  labelText: 'Email',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a username';
+                    return 'Please enter an email';
                   }
                   return null;
                 },
-                controller: usernameController,
+                controller: emailController,
               ),
               // TODO: move this padding to the button instead, use EdgeInsets.symmetric(vertical: 16)
               Padding(
