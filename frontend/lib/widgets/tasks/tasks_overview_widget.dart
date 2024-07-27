@@ -64,7 +64,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                                     : Colors.black),
                             backgroundColor: WidgetStateProperty.all<Color>(
                                 filterBy == TaskType.recurring
-                                    ? Colors.deepPurple
+                                    ? Colors.blueAccent
                                     : Colors.grey.shade300),
                             textStyle: WidgetStateProperty.all<TextStyle>(
                               TextStyle(
@@ -73,8 +73,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                                     : FontWeight.normal,
                               ),
                             ),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
+                            shape: WidgetStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -90,28 +89,22 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                   Expanded(
                       child: ElevatedButton(
                           style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color>(
-                                (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.pressed))
-                                    return Colors.deepPurple.shade200;
-                                  return filterBy == TaskType.oneOff
-                                      ? Colors.deepPurple
-                                      : Colors.grey.shade300;
-                                },
-                              ),
+                              backgroundColor: WidgetStateProperty.all(
+                                  filterBy == TaskType.oneOff
+                                      ? Colors.blueAccent
+                                      : Colors.grey.shade300),
                               foregroundColor: WidgetStateProperty.all(
                                   filterBy == TaskType.oneOff
                                       ? Colors.white
                                       : Colors.black),
-                              textStyle: MaterialStateProperty.all<TextStyle>(
+                              textStyle: WidgetStateProperty.all<TextStyle>(
                                 TextStyle(
                                   fontWeight: filterBy == TaskType.oneOff
                                       ? FontWeight.bold
                                       : FontWeight.normal,
                                 ),
                               ),
-                              shape: MaterialStateProperty.all<
+                              shape: WidgetStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),

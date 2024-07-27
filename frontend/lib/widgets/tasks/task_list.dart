@@ -222,7 +222,7 @@ class EditTaskFormState extends State<EditTaskForm> {
                 items: taskGroups,
                 onChanged: (value) {},
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
