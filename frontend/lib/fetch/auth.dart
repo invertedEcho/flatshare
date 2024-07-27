@@ -7,26 +7,22 @@ import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:http/http.dart' as http;
 
-Future<(User, String)> login(String username, String password) async {
+Future<String> login(String email, String password) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await http.post(
-    Uri.parse('$apiBaseUrl/login'),
+    Uri.parse('$apiBaseUrl/auth/login'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(<String, String>{
-      'username': username,
+      'email': email,
       'password': password,
     }),
   );
-  print(response.body);
 
   switch (response.statusCode) {
-    case 201:
-      return (
-        User.fromJson(jsonDecode(response.body)),
-        jsonDecode(response.body)['accessToken'] as String
-      );
+    case 200:
+      return jsonDecode(response.body)['accessToken'] as String;
     case 401:
       throw Exception("Incorrect credentials");
     default:
@@ -38,7 +34,7 @@ Future<void> register(
     String username, String password, String email, String? inviteCode) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await http.post(
-    Uri.parse('$apiBaseUrl/register'),
+    Uri.parse('$apiBaseUrl/auth/register'),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -62,7 +58,7 @@ Future<void> register(
 Future<User> getProfile() async {
   var apiBaseUrl = getApiBaseUrl();
   var profileRes =
-      await authenticatedClient.get(Uri.parse('$apiBaseUrl/profile'));
+      await authenticatedClient.get(Uri.parse('$apiBaseUrl/auth/profile'));
   return User.fromJson(jsonDecode(profileRes.body));
 }
 
@@ -73,7 +69,6 @@ Future<(User?, UserGroup?)> getUserInfo() async {
         await fetchUserGroupForUser(userId: userProfile.userId);
     return (userProfile, userGroup);
   } catch (err) {
-    print("ERROR: $err");
     return (null, null);
   }
 }

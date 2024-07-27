@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Post,
@@ -9,12 +10,10 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import * as bcrypt from 'bcrypt';
 import { db } from 'src/db';
 import { userUserGroupTable, userTable } from 'src/db/schema';
-import { AuthService, User } from './auth.service';
-import { Public } from './public.decorators';
+import { AuthService } from './auth.service';
 import {
   dbAddUserToGroup,
   dbGetGroupOfUser,
@@ -22,6 +21,8 @@ import {
 } from 'src/db/functions/user-group';
 import { eq } from 'drizzle-orm';
 import { dbGetUserById } from 'src/db/functions/user';
+import { AuthGuard } from './auth.guard';
+import { Public } from './constants';
 
 class RegisterDto {
   username: string;
@@ -30,17 +31,22 @@ class RegisterDto {
   inviteCode: string | null;
 }
 
+export class LoginDto {
+  email: string;
+  password: string;
+}
+
 const SALT_ROUNDS = 10;
 
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @UseGuards(AuthGuard('local'))
+  @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Request() req: { user: User }) {
-    return await this.authService.login(req.user);
+  async login(@Body() body: LoginDto) {
+    return await this.authService.login(body);
   }
 
   @Public()
@@ -77,15 +83,15 @@ export class AuthController {
     return { username: newUser.username, email: newUser.email };
   }
 
-  // TODO: This endpoint doesnt seem right...
+  @UseGuards(AuthGuard)
   @Get('profile')
   async getProfile(
-    @Request() req: { user: { userId: number; username: string } },
+    @Request() req: { user: { sub: number; username: string } },
   ) {
-    const user = await dbGetUserById(req.user.userId);
-    const userGroup = await dbGetGroupOfUser(req.user.userId);
+    const user = await dbGetUserById(req.user.sub);
+    const userGroup = await dbGetGroupOfUser(req.user.sub);
     return {
-      userId: req.user.userId,
+      userId: req.user.sub,
       userGroup: {
         id: userGroup?.user_group.name,
         name: userGroup?.user_group.name,
