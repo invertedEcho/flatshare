@@ -3,8 +3,6 @@ import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/widgets/screens/edit_task_group.dart';
 import 'package:flutter/material.dart';
 
-// TODO: We should probably fix that our backend doesn't return the pg interval type formatted
-// like this in the case of month
 String formatInterval(String interval) {
   if (interval.contains("mon")) {
     return interval.replaceAll("mon", "month");
@@ -19,6 +17,38 @@ class TaskGroupList extends StatelessWidget {
   const TaskGroupList(
       {super.key, required this.taskGroups, required this.onRefresh});
 
+  void handleOnDismissed(
+      {required BuildContext context, required int taskGroupId}) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Are you sure?"),
+            content: const Text(
+                "Are you really sure you want to delete this task group? This will also delete all tasks attached to this task group, and all assignments attached to these tasks."),
+            actions: [
+              TextButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Abort")),
+              TextButton(
+                  onPressed: () async {
+                    try {
+                      await deleteTaskGroup(taskGroupId: taskGroupId);
+                    } catch (error) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$error')),
+                      );
+                    }
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Confirm"))
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -31,35 +61,7 @@ class TaskGroupList extends StatelessWidget {
               key: Key(taskGroup.id.toString()),
               direction: DismissDirection.endToStart,
               onDismissed: (direction) {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: const Text("Are you sure?"),
-                        content: const Text(
-                            "Are you really sure you want to delete this task group? This will also delete all tasks attached to this task group, and all assignments attached to these tasks."),
-                        actions: [
-                          TextButton(
-                              onPressed: () async {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Abort")),
-                          TextButton(
-                              onPressed: () async {
-                                try {
-                                  await deleteTaskGroup(
-                                      taskGroupId: taskGroup.id);
-                                } catch (error) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('$error')),
-                                  );
-                                }
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("Confirm"))
-                        ],
-                      );
-                    });
+                handleOnDismissed(context: context, taskGroupId: taskGroup.id);
               },
               background: Container(
                   decoration: const BoxDecoration(

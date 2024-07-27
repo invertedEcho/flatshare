@@ -15,7 +15,7 @@ class TaskList extends StatelessWidget {
 
   const TaskList({super.key, required this.tasks, required this.refreshState});
 
-  void onDismissed({required BuildContext context, required int taskId}) {
+  void handleOnDismissed({required BuildContext context, required int taskId}) {
     showDialog(
         context: context,
         builder: (BuildContext ctx) {
@@ -57,7 +57,7 @@ class TaskList extends StatelessWidget {
               direction: DismissDirection.endToStart,
               key: Key(task.id.toString()),
               onDismissed: (direction) async {
-                onDismissed(context: context, taskId: task.id);
+                handleOnDismissed(context: context, taskId: task.id);
               },
               background: Container(
                   decoration: const BoxDecoration(

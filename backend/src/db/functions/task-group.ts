@@ -1,9 +1,11 @@
-import { count, eq } from 'drizzle-orm';
+import { count, eq, inArray } from 'drizzle-orm';
 import { db } from '..';
 import {
+  assignmentTable,
   recurringTaskGroupTable,
   recurringTaskGroupUserTable,
   taskTable,
+  taskUserGroupTable,
   userTable,
 } from '../schema';
 import { CreateTaskGroup } from 'src/tasks/task-group.controller';
@@ -87,4 +89,25 @@ export async function dbGetTasksOfTaskGroup(taskGroupId: number) {
     .select()
     .from(taskTable)
     .where(eq(taskTable.recurringTaskGroupId, taskGroupId));
+}
+
+export async function dbDeleteTaskGroup(taskGroupId: number) {
+  await db
+    .delete(recurringTaskGroupUserTable)
+    .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId));
+  const taskIds = (await dbGetTasksOfTaskGroup(taskGroupId)).map(
+    (task) => task.id,
+  );
+  if (taskIds.length > 0) {
+    await db
+      .delete(assignmentTable)
+      .where(inArray(assignmentTable.taskId, taskIds));
+    await db
+      .delete(taskUserGroupTable)
+      .where(inArray(taskUserGroupTable.taskId, taskIds));
+    await db.delete(taskTable).where(inArray(taskTable.id, taskIds));
+  }
+  await db
+    .delete(recurringTaskGroupTable)
+    .where(eq(recurringTaskGroupTable.id, taskGroupId));
 }
