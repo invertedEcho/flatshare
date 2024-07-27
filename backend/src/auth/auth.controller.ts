@@ -47,7 +47,6 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() body: LoginDto) {
-    console.log({ body });
     return await this.authService.login(body);
   }
 
@@ -90,7 +89,6 @@ export class AuthController {
   async getProfile(
     @Request() req: { user: { sub: number; username: string } },
   ) {
-    console.log({ req });
     const user = await dbGetUserById(req.user.sub);
     const userGroup = await dbGetGroupOfUser(req.user.sub);
     return {

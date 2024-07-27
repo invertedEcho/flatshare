@@ -18,6 +18,8 @@ export class AuthGuard implements CanActivate {
 
   // If this function returns true, the jwt token (if existing) in the incoming request is valid,
   // and the request gets added a 'user' field, which contains the decoded data from the jwt secret.
+  // It works by checking if the request contains an authorization header with a Bearer token,
+  // and validates it.
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),

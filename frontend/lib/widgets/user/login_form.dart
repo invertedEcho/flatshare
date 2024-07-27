@@ -42,7 +42,6 @@ class LoginFormState extends State<LoginForm> {
         email,
         password,
       );
-      print(accessToken);
       await storage.write(key: 'jwt-token', value: accessToken);
 
       if (!mounted) return;

@@ -22,7 +22,9 @@ export class AuthService {
     ) {
       throw new UnauthorizedException();
     }
-    return user;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _password, ...result } = user;
+    return result;
   }
 
   async login({ email, password }: LoginDto) {
@@ -32,7 +34,6 @@ export class AuthService {
       sub: user.id,
       username: user.username,
     };
-    console.log({ user, payload });
     return {
       accessToken: await this.jwtService.signAsync(payload),
     };

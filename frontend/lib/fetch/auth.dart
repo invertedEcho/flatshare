@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 
 Future<String> login(String email, String password) async {
   var apiBaseUrl = getApiBaseUrl();
-  print(apiBaseUrl);
   final response = await http.post(
     Uri.parse('$apiBaseUrl/auth/login'),
     headers: <String, String>{
@@ -20,9 +19,6 @@ Future<String> login(String email, String password) async {
       'password': password,
     }),
   );
-  print(response);
-
-  print(response.body);
 
   switch (response.statusCode) {
     case 200:
@@ -63,8 +59,6 @@ Future<User> getProfile() async {
   var apiBaseUrl = getApiBaseUrl();
   var profileRes =
       await authenticatedClient.get(Uri.parse('$apiBaseUrl/auth/profile'));
-  print(profileRes);
-  print(profileRes.body);
   return User.fromJson(jsonDecode(profileRes.body));
 }
 
@@ -75,7 +69,6 @@ Future<(User?, UserGroup?)> getUserInfo() async {
         await fetchUserGroupForUser(userId: userProfile.userId);
     return (userProfile, userGroup);
   } catch (err) {
-    print("ERROR: $err");
     return (null, null);
   }
 }
