@@ -46,13 +46,13 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
                 } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                   return const SafeArea(
                       child: Text(
-                          "No tasks inside this task group. To create some tasks, use the + Action Button on the bottom right."));
+                          "No tasks inside this task group. To create some tasks, go back to the previous screen and use the + Action Button on the bottom right."));
                 }
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Tasks in task group",
+                      "Tasks:",
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     TaskList(

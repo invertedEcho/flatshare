@@ -61,3 +61,12 @@ Future<List<Task>> fetchTasksForTaskGroup({required int taskGroupId}) async {
         "Failed to load tasks for task group $taskGroupId: ${response.statusCode}");
   }
 }
+
+Future<void> deleteTaskGroup({required int taskGroupId}) async {
+  final apiBaseUrl = getApiBaseUrl();
+  final response = await authenticatedClient
+      .delete(Uri.parse("$apiBaseUrl/task-group/$taskGroupId"));
+  if (response.statusCode != 200) {
+    throw Exception("Failed to delete task group: ${response.statusCode}");
+  }
+}
