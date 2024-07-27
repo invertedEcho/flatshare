@@ -72,7 +72,6 @@ class TaskList extends StatelessWidget {
                     ),
                   )),
               child: Card(
-                margin: const EdgeInsets.all(0),
                 child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -223,7 +222,7 @@ class EditTaskFormState extends State<EditTaskForm> {
                 items: taskGroups,
                 onChanged: (value) {},
               ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

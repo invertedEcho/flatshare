@@ -8,7 +8,7 @@ import 'package:flatshare/utils/env.dart';
 Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
   final apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
-      .get(Uri.parse("$apiBaseUrl/users?userGroupId=$groupId"));
+      .get(Uri.parse("$apiBaseUrl/user-group/$groupId/users"));
 
   if (response.statusCode != 200) {
     throw Exception(

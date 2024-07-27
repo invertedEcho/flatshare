@@ -15,8 +15,13 @@ import {
   dbGetUserGroup,
 } from './db/functions/user-group';
 import { db } from './db';
-import { userGroupInviteTable } from './db/schema';
+import {
+  userGroupInviteTable,
+  userTable,
+  userUserGroupTable,
+} from './db/schema';
 import { generateRandomAlphanumericalCode } from './utils/random';
+import { eq } from 'drizzle-orm';
 
 @Controller('user-group')
 export class UserGroupController {
@@ -77,5 +82,23 @@ export class UserGroupController {
     await db.insert(userGroupInviteTable).values({ code: inviteCode, groupId });
 
     return { inviteCode };
+  }
+
+  @Get(':userGroupId/users')
+  async getUsers(@Param('userGroupId') userGroupId: number) {
+    console.log({ userGroupId });
+    return await db
+      .select({
+        userId: userTable.id,
+        email: userTable.email,
+        username: userTable.username,
+        createdAt: userTable.createdAt,
+      })
+      .from(userTable)
+      .innerJoin(
+        userUserGroupTable,
+        eq(userUserGroupTable.userId, userTable.id),
+      )
+      .where(eq(userUserGroupTable.groupId, userGroupId));
   }
 }

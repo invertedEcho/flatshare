@@ -6,13 +6,12 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { db } from 'src/db';
-import { userUserGroupTable, userTable } from 'src/db/schema';
+import { userTable } from 'src/db/schema';
 import { AuthService } from './auth.service';
 import {
   dbAddUserToGroup,
@@ -99,29 +98,5 @@ export class AuthController {
       email: user.email,
       username: user.username,
     };
-  }
-
-  // TODO: should go into seperate user controller
-  @Get('users')
-  async getUsers(@Query('groupId') groupId?: number) {
-    const query = db
-      .select({
-        userId: userTable.id,
-        email: userTable.email,
-        username: userTable.username,
-        createdAt: userTable.createdAt,
-      })
-      .from(userTable);
-
-    if (groupId === undefined) {
-      return await query;
-    }
-
-    return await query
-      .innerJoin(
-        userUserGroupTable,
-        eq(userUserGroupTable.userId, userTable.id),
-      )
-      .where(eq(userUserGroupTable.groupId, groupId));
   }
 }
