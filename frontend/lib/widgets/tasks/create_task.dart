@@ -65,6 +65,7 @@ class CreateTaskState extends State<CreateTask> {
     return ButtonStyle(
       foregroundColor:
           WidgetStatePropertyAll(taskTypeOfButton == selectedTaskType
+              // TODO: Fix nested ternary, you baaaaad
               ? Colors.blue
               : MediaQuery.of(context).platformBrightness == Brightness.dark
                   ? Colors.white

@@ -72,7 +72,6 @@ class TaskList extends StatelessWidget {
                     ),
                   )),
               child: Card(
-                margin: const EdgeInsets.all(0),
                 child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(

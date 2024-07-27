@@ -37,47 +37,120 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
     }
   }
 
+  // TODO: We should just use a radio
+  TaskType filterBy = TaskType.recurring;
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Column(children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Flexible(
-              child: FutureBuilder<List<TaskGroup>>(
-                  future: _taskGroupsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return SafeArea(
-                          child: Text(
-                              "Error while fetching task groups: ${snapshot.error}"));
-                    } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                      return const SafeArea(
-                          child: Text(
-                              "No Task Groups. To get started, use the + Action Button on the bottom right."));
-                    }
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Task Groups:",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        TaskGroupList(
-                            taskGroups: snapshot.data!,
-                            onRefresh: () {
-                              _initializeFutures();
-                              setState(() {});
-                            }),
-                      ],
-                    );
-                  }),
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Container(
+            decoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                color: Colors.grey[300]),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            foregroundColor: WidgetStateProperty.all(
+                                filterBy == TaskType.recurring
+                                    ? Colors.white
+                                    : Colors.black),
+                            backgroundColor: WidgetStateProperty.all<Color>(
+                                filterBy == TaskType.recurring
+                                    ? Colors.deepPurple
+                                    : Colors.grey.shade300),
+                            textStyle: WidgetStateProperty.all<TextStyle>(
+                              TextStyle(
+                                fontWeight: filterBy == TaskType.recurring
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              filterBy = TaskType.recurring;
+                            });
+                          },
+                          child: const Text("Task Groups"))),
+                  const SizedBox(width: 4),
+                  Expanded(
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.pressed))
+                                    return Colors.deepPurple.shade200;
+                                  return filterBy == TaskType.oneOff
+                                      ? Colors.deepPurple
+                                      : Colors.grey.shade300;
+                                },
+                              ),
+                              foregroundColor: WidgetStateProperty.all(
+                                  filterBy == TaskType.oneOff
+                                      ? Colors.white
+                                      : Colors.black),
+                              textStyle: MaterialStateProperty.all<TextStyle>(
+                                TextStyle(
+                                  fontWeight: filterBy == TaskType.oneOff
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              )),
+                          onPressed: () {
+                            setState(() {
+                              filterBy = TaskType.oneOff;
+                            });
+                          },
+                          child: const Text("One-Off Tasks"))),
+                ],
+              ),
             ),
-            Flexible(
-                child: FutureBuilder<List<Task>>(
+          ),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+            child: filterBy == TaskType.recurring
+                ? FutureBuilder<List<TaskGroup>>(
+                    future: _taskGroupsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text(
+                            "Error while fetching task groups: ${snapshot.error}");
+                      } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+                        return const Text(
+                            "No Task Groups. To get started, use the + Action Button on the bottom right.");
+                      }
+                      return TaskGroupList(
+                          taskGroups: snapshot.data!,
+                          onRefresh: () {
+                            _initializeFutures();
+                            setState(() {});
+                          });
+                    })
+                : FutureBuilder<List<Task>>(
                     future: _tasksFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -86,35 +159,31 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                         return SafeArea(
                             child: Text(
                                 "Error while fetching tasks: ${snapshot.error}"));
-                      } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                        return const SafeArea(
-                            child: Text(
-                                "No Tasks. To get started, use the + Action Button on the bottom right."));
                       }
                       final oneOffTasks = snapshot.data!
                           .where((task) => task.recurringTaskGroupId == null)
                           .toList();
-                      return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      if (oneOffTasks.isEmpty) {
+                        return const Column(
                           children: [
-                            const SizedBox(
+                            SizedBox(
                               height: 20,
                             ),
-                            Text(
-                              "One-off Tasks:",
-                              style: Theme.of(context).textTheme.titleLarge,
+                            Center(
+                              child: Text(
+                                  "No Tasks. To get started, use the + Action Button on the bottom right."),
                             ),
-                            TaskList(
-                                tasks: oneOffTasks,
-                                refreshState: () {
-                                  _initializeFutures();
-                                  setState(() {});
-                                }),
-                          ]);
+                          ],
+                        );
+                      }
+                      return TaskList(
+                          tasks: oneOffTasks,
+                          refreshState: () {
+                            _initializeFutures();
+                            setState(() {});
+                          });
                     }))
-          ]),
-        )
-      ],
+      ]),
     );
   }
 }
