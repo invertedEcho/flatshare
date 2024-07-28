@@ -7,7 +7,6 @@ import 'package:flatshare/widgets/create_user_group.dart';
 import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
-import 'package:flatshare/widgets/tasks/create_task_group.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -150,19 +149,20 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
           })
         ],
       ),
+      // TODO: We might want to directly go to the CreateTask screen if we now decide to only render one option here.
       floatingActionButton: userProvider.userGroup?.id != null
           ? ExpandableFab(
               children: [
-                Row(children: [
-                  const Text("New task group"),
-                  const SizedBox(width: 16),
-                  ActionButton(
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const CreateTaskGroup())),
-                    icon: const Icon(Icons.group_work_outlined),
-                  ),
-                ]),
+                // Row(children: [
+                //   const Text("New task group"),
+                //   const SizedBox(width: 16),
+                //   ActionButton(
+                //     onPressed: () => Navigator.of(context).push(
+                //         MaterialPageRoute(
+                //             builder: (context) => const CreateTaskGroup())),
+                //     icon: const Icon(Icons.group_work_outlined),
+                //   ),
+                // ]),
                 Row(children: [
                   const Text("New task"),
                   const SizedBox(width: 16),

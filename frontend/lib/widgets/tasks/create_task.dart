@@ -1,14 +1,14 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flatshare/fetch/task.dart';
-import 'package:flatshare/fetch/task_group.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/task.dart';
-import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+enum IntervalType { daily, weekly, monthly }
 
 class CreateTask extends StatefulWidget {
   const CreateTask({super.key});
@@ -24,12 +24,12 @@ class CreateTaskState extends State<CreateTask> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final multiSelectUserController = MultiSelectController<User>([]);
-  final selectTaskGroupController = SingleSelectController<TaskGroup>(null);
 
   TaskType selectedTaskType = TaskType.oneOff;
+  // TODO: use interval type
+  String? selectedInterval;
 
   List<User> userInUserGroup = [];
-  List<TaskGroup> taskGroups = [];
 
   // TODO: will probably be gone when below todo is fixed.
   int? currentUserGroupId;
@@ -50,11 +50,6 @@ class CreateTaskState extends State<CreateTask> {
       fetchUsersInUserGroup(groupId: userGroupId).then((result) {
         setState(() {
           userInUserGroup = result;
-        });
-      });
-      fetchTaskGroups(userGroupId: userGroupId).then((result) {
-        setState(() {
-          taskGroups = result;
         });
       });
     }
@@ -86,10 +81,9 @@ class CreateTaskState extends State<CreateTask> {
         );
         return;
       }
-      if (selectedTaskType == TaskType.recurring &&
-          selectTaskGroupController.value == null) {
+      if (selectedTaskType == TaskType.recurring && selectedInterval == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a task group first')),
+          const SnackBar(content: Text('Please select an interval first')),
         );
         return;
       }
@@ -111,8 +105,8 @@ class CreateTaskState extends State<CreateTask> {
             : await createRecurringTask(
                 title: title,
                 description: description,
-                groupId: currentUserGroupId!,
-                taskGroupId: selectTaskGroupController.value!.id);
+                userGroupId: currentUserGroupId!,
+                interval: selectedInterval!);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Created new task!')),
         );
@@ -165,7 +159,7 @@ class CreateTaskState extends State<CreateTask> {
                                 selectedTaskType = TaskType.oneOff;
                               });
                             },
-                            child: const Text("One-Off Task")),
+                            child: const Text("One-Time Task")),
                         const Spacer(),
                         ElevatedButton(
                             style: getSelectTaskTypeButtonStyle(
@@ -190,13 +184,23 @@ class CreateTaskState extends State<CreateTask> {
                             items: userInUserGroup,
                             onListChanged: (value) {})
                         : CustomDropdown.search(
-                            controller: selectTaskGroupController,
                             decoration: const CustomDropdownDecoration(
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
-                            hintText: "Select task group",
-                            items: taskGroups,
-                            onChanged: (value) {}),
+                            hintText: "Select interval",
+                            items: const ['Daily', 'Weekly', 'Monthly'],
+                            onChanged: (value) {
+                              setState(() {
+                                // im kinda scared that the value can be null here... why?
+                                selectedInterval = value!;
+                              });
+                            }),
+                    // Tooltip(
+                    //   message: 'Please note that',
+                    //   triggerMode: TooltipTriggerMode.tap,
+                    //   child: IconButton(
+                    //       onPressed: () {}, icon: const Icon(Icons.help)),
+                    // ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                         onPressed: handleSubmit, child: const Text("Submit")),

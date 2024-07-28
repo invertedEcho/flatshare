@@ -16,7 +16,8 @@ import {
   dbGetAllTasks,
   dbUpdateTask,
 } from 'src/db/functions/task';
-import { InsertTask, SelectTask } from 'src/db/schema';
+import { SelectTask } from 'src/db/schema';
+import { getPgIntervalFromDisplayInterval } from 'src/utils/interval';
 
 // TODO: make a base type for these three types below
 // TODO: extra type for this feels weird
@@ -33,6 +34,13 @@ export type UpdateTask = {
   taskGroupId?: number;
 };
 
+export type CreateRecurringTask = {
+  title: string;
+  description?: string;
+  interval: string;
+  userGroupId: number;
+};
+
 @Controller('tasks')
 export class TasksController {
   @Get()
@@ -43,8 +51,18 @@ export class TasksController {
   }
 
   @Post('/recurring')
-  async createRecurringTask(@Body() task: InsertTask & { groupId: number }) {
-    await dbCreateRecurringTask(task);
+  async createRecurringTask(@Body() recurringTask: CreateRecurringTask) {
+    const formattedInterval = getPgIntervalFromDisplayInterval(
+      recurringTask.interval,
+    );
+    if (formattedInterval === undefined) {
+      throw new Error(`Unsupported interval: ${formattedInterval}`);
+    }
+
+    await dbCreateRecurringTask({
+      ...recurringTask,
+      interval: formattedInterval,
+    });
   }
 
   @Post('/one-off')

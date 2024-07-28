@@ -79,7 +79,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                     children: [
                       Row(
                         children: [
-                          Text(sectionTitle ?? 'One-off Tasks',
+                          Text(sectionTitle ?? 'One-Time Tasks',
                               style: theme.textTheme.titleLarge),
                           const SizedBox(width: 8),
                           Icon(Icons.arrow_right_alt, color: theme.hintColor),

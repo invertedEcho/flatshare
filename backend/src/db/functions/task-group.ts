@@ -40,48 +40,38 @@ export async function dbCreateTaskGroup({
   initialStartDate,
   userGroupId,
 }: CreateTaskGroup) {
-  try {
-    const res = await db
-      .insert(recurringTaskGroupTable)
-      .values({
-        title,
-        description,
-        interval,
-        userGroupId,
-        initialStartDate: new Date(initialStartDate),
-      })
-      .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
+  const recurringTaskGroups = await db
+    .insert(recurringTaskGroupTable)
+    .values({
+      title,
+      description,
+      interval,
+      userGroupId,
+      initialStartDate: new Date(initialStartDate),
+    })
+    .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
 
-    const { recurringTaskGroupId } = res[0];
+  const recurringTaskGroup = recurringTaskGroups[0];
 
-    await db.insert(recurringTaskGroupUserTable).values(
-      userIds.map((userId) => ({
-        recurringTaskGroupId,
-        userId,
-      })),
-    );
-  } catch (error) {
-    console.error({ error });
-    throw error;
+  if (recurringTaskGroup === undefined) {
+    throw new Error('Failed to create recurring task group');
   }
+  await db.insert(recurringTaskGroupUserTable).values(
+    userIds.map((userId) => ({
+      recurringTaskGroupId: recurringTaskGroup.recurringTaskGroupId,
+      userId,
+    })),
+  );
 }
 
 export async function dbGetTaskGroupUsers(taskGroupId: number) {
-  try {
-    const taskGroupUsers = await db
-      .select({ userId: userTable.id })
-      .from(recurringTaskGroupUserTable)
-      .innerJoin(
-        userTable,
-        eq(recurringTaskGroupUserTable.userId, userTable.id),
-      )
-      .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId));
+  const taskGroupUsers = await db
+    .select({ userId: userTable.id })
+    .from(recurringTaskGroupUserTable)
+    .innerJoin(userTable, eq(recurringTaskGroupUserTable.userId, userTable.id))
+    .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId));
 
-    return taskGroupUsers;
-  } catch (error) {
-    console.error({ error });
-    throw error;
-  }
+  return taskGroupUsers;
 }
 
 export async function dbGetTasksOfTaskGroup(taskGroupId: number) {

@@ -17,7 +17,7 @@ class TaskGroup {
       {
         'id': int id,
         'title': String title,
-        'description': String description,
+        'description': String? description,
         'interval': String interval,
         'numberOfTasks': int numberOfTasks
       } =>
