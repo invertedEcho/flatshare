@@ -14,9 +14,9 @@ import { db } from 'src/db';
 import { userTable } from 'src/db/schema';
 import { AuthService } from './auth.service';
 import {
-  dbAddUserToGroup,
-  dbGetGroupOfUser,
-  dbGetInviteCode,
+  dbAddUserToUserGroup,
+  dbGetUserGroupOfUser,
+  dbGetUserGroupByInviteCode,
 } from 'src/db/functions/user-group';
 import { eq } from 'drizzle-orm';
 import { dbGetUserById } from 'src/db/functions/user';
@@ -68,13 +68,24 @@ export class AuthController {
         .values({ email, username, password: hash })
         .returning()
     )[0];
+
+    if (newUser === undefined) {
+      throw new Error('Failed creating user');
+    }
+
     if (registerDto.inviteCode !== null) {
       try {
-        const maybeGroup = await dbGetInviteCode(registerDto.inviteCode);
-        await dbAddUserToGroup({
-          userId: newUser.id,
-          groupId: maybeGroup.groupId,
-        });
+        // TODO: this whole thing should be a sql transaction, and if this fails, we dont have to worry about deleting the created user.
+        const maybeGroup = await dbGetUserGroupByInviteCode(
+          registerDto.inviteCode,
+        );
+        // TODO: because here, we probably want to return a BAD_REQUEST instead, e.g. the invite code is invalid.
+        if (maybeGroup !== undefined) {
+          await dbAddUserToUserGroup({
+            userId: newUser.id,
+            groupId: maybeGroup.groupId,
+          });
+        }
       } catch (error) {
         console.error({ error });
       }
@@ -88,7 +99,12 @@ export class AuthController {
     @Request() req: { user: { sub: number; username: string } },
   ) {
     const user = await dbGetUserById(req.user.sub);
-    const userGroup = await dbGetGroupOfUser(req.user.sub);
+    if (user === undefined) {
+      throw new Error(
+        'The access token seemed valid, but the user id included in the jwt token could not be found in the database.',
+      );
+    }
+    const userGroup = await dbGetUserGroupOfUser(req.user.sub);
     return {
       userId: req.user.sub,
       userGroup: {

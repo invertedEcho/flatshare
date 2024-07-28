@@ -13,6 +13,8 @@ import {
   UpdateTask,
 } from 'src/tasks/task.controller';
 import { getTaskGroupTitleFromInterval } from 'src/utils/interval';
+import { dbCreateTaskGroup } from './task-group';
+import { dbGetUsersOfUserGroup } from './user-group';
 
 export async function dbGetAllTasks({
   groupId,
@@ -68,20 +70,20 @@ export async function dbCreateRecurringTask({
   if (recurringTaskGroupTitle === undefined) {
     throw new Error('Unsupported interval while creating a recurring task');
   }
+  const usersOfUserGroup = await dbGetUsersOfUserGroup({ userGroupId });
   const recurringTaskGroupId =
     recurringTaskGroup === undefined
       ? (
-          await db
-            .insert(recurringTaskGroupTable)
-            .values({
-              title: recurringTaskGroupTitle,
-              interval,
-              // TODO: add function here
-              initialStartDate: new Date(),
-              userGroupId,
-            })
-            .returning()
-        )[0]?.id
+          await dbCreateTaskGroup({
+            interval,
+            title: recurringTaskGroupTitle,
+            userIds: usersOfUserGroup.map(
+              (userOfUserGroup) => userOfUserGroup.userId,
+            ),
+            initialStartDate: new Date(),
+            userGroupId,
+          })
+        ).id
       : recurringTaskGroup.id;
 
   if (recurringTaskGroupId === undefined) {

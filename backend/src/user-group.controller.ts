@@ -8,10 +8,10 @@ import {
   Post,
 } from '@nestjs/common';
 import {
-  dbAddUserToGroup,
+  dbAddUserToUserGroup,
   dbCreateUserGroup,
-  dbGetGroupOfUser,
-  dbGetInviteCode,
+  dbGetUserGroupOfUser,
+  dbGetUserGroupByInviteCode,
   dbGetUserGroup,
 } from './db/functions/user-group';
 import { db } from './db';
@@ -28,7 +28,7 @@ export class UserGroupController {
   // TODO: we need to support multiple user groups
   @Get(':userId')
   async getGroupOfUser(@Param('userId') userId: number) {
-    const userGroup = await dbGetGroupOfUser(userId);
+    const userGroup = await dbGetUserGroupOfUser(userId);
     return {
       id: userGroup?.user_user_group.groupId ?? null,
       name: userGroup?.user_group.name ?? null,
@@ -38,7 +38,7 @@ export class UserGroupController {
   @Post('join')
   async joinGroup(@Body() body: { userId: number; inviteCode: string }) {
     const { inviteCode, userId } = body;
-    const maybeInviteCode = await dbGetInviteCode(inviteCode);
+    const maybeInviteCode = await dbGetUserGroupByInviteCode(inviteCode);
 
     if (maybeInviteCode === undefined) {
       throw new HttpException(
@@ -47,7 +47,7 @@ export class UserGroupController {
       );
     }
 
-    await dbAddUserToGroup({ userId, groupId: maybeInviteCode.groupId });
+    await dbAddUserToUserGroup({ userId, groupId: maybeInviteCode.groupId });
 
     const userGroup = await dbGetUserGroup({
       userGroupId: maybeInviteCode.groupId,
@@ -58,7 +58,7 @@ export class UserGroupController {
   @Post('join-by-id')
   async joinGroupById(@Body() body: { userId: number; groupId: number }) {
     const { groupId, userId } = body;
-    await dbAddUserToGroup({ userId, groupId });
+    await dbAddUserToUserGroup({ userId, groupId });
     return { success: true, groupId };
   }
 

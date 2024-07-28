@@ -49,7 +49,7 @@ export async function dbCreateTaskGroup({
       userGroupId,
       initialStartDate,
     })
-    .returning({ recurringTaskGroupId: recurringTaskGroupTable.id });
+    .returning();
 
   const recurringTaskGroup = recurringTaskGroups[0];
 
@@ -58,10 +58,11 @@ export async function dbCreateTaskGroup({
   }
   await db.insert(recurringTaskGroupUserTable).values(
     userIds.map((userId) => ({
-      recurringTaskGroupId: recurringTaskGroup.recurringTaskGroupId,
+      recurringTaskGroupId: recurringTaskGroup.id,
       userId,
     })),
   );
+  return recurringTaskGroup;
 }
 
 export async function dbGetTaskGroupUsers(taskGroupId: number) {

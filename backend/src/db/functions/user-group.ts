@@ -6,7 +6,7 @@ import {
   userUserGroupTable,
 } from '../schema';
 
-export async function dbGetGroupOfUser(userId: number) {
+export async function dbGetUserGroupOfUser(userId: number) {
   const userGroups = await db
     .select()
     .from(userUserGroupTable)
@@ -20,7 +20,7 @@ export async function dbGetGroupOfUser(userId: number) {
   return userGroups[0];
 }
 
-export async function dbGetInviteCode(inviteCode: string) {
+export async function dbGetUserGroupByInviteCode(inviteCode: string) {
   const inviteCodeRows = await db
     .select()
     .from(userGroupInviteTable)
@@ -29,7 +29,7 @@ export async function dbGetInviteCode(inviteCode: string) {
   return inviteCodeRows[0];
 }
 
-export async function dbAddUserToGroup({
+export async function dbAddUserToUserGroup({
   userId,
   groupId,
 }: {
@@ -54,4 +54,15 @@ export async function dbGetUserGroup({ userGroupId }: { userGroupId: number }) {
       .where(eq(userGroupTable.id, userGroupId))
       .limit(1)
   )[0];
+}
+
+export async function dbGetUsersOfUserGroup({
+  userGroupId,
+}: {
+  userGroupId: number;
+}) {
+  return await db
+    .select()
+    .from(userUserGroupTable)
+    .where(eq(userUserGroupTable.groupId, userGroupId));
 }

@@ -40,6 +40,8 @@ export class AssignmentSchedulerService {
       return acc;
     }, new Map());
 
+    // TODO: yeaaahhhhh, we probably want to just have a db query with a join instead of iterating over a result set and querying
+    // the db for each item.
     for (const [taskGroupId, tasks] of tasksByGroup) {
       const userIds = await dbGetTaskGroupUsers(taskGroupId);
       if (userIds.length === 0) {
@@ -50,6 +52,12 @@ export class AssignmentSchedulerService {
         taskGroupId,
         userIds.map(({ userId }) => userId),
       );
+
+      if (nextResponsibleUserId === undefined) {
+        throw new Error(
+          `Failed to find the next responsible user for the task group ${taskGroupId}`,
+        );
+      }
 
       const hydratedAssignments = tasks.map(
         ({ taskId, isInFirstInterval, taskGroupInitialStartDate }) => ({
@@ -79,7 +87,7 @@ async function getNextResponsibleUserId(
   /* If there already are current assignments, return the userId of one of the current assignments
        (It doesn't matter which one, they should all be assigned to the same user) */
   if (currentAssignments.length != 0) {
-    return currentAssignments[0].assignment.userId;
+    return currentAssignments[0]?.assignment.userId;
   }
 
   const lastAssignments = await dbGetAssignmentsForTaskGroup(
@@ -94,7 +102,7 @@ async function getNextResponsibleUserId(
   /* If all users were already assigned the task, the next responsible user is the one who was assigned the task the longest ago.
         Otherwise it is randomly chosen from the users that were not assigned the task yet */
   if (userIdsWithoutAnyAssignments.length === 0) {
-    return lastAssignments[lastAssignments.length - 1].assignment.userId;
+    return lastAssignments[lastAssignments.length - 1]?.assignment.userId;
   } else {
     return randomFromArray(userIdsWithoutAnyAssignments);
   }
