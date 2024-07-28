@@ -48,7 +48,10 @@ export class TaskGroupController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    await dbCreateTaskGroup(taskGroup);
+    await dbCreateTaskGroup({
+      ...taskGroup,
+      initialStartDate: new Date(taskGroup.initialStartDate),
+    });
   }
 
   @Delete(':taskGroupId')
