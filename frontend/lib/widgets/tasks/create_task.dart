@@ -65,6 +65,7 @@ class CreateTaskState extends State<CreateTask> {
     return ButtonStyle(
       foregroundColor:
           WidgetStatePropertyAll(taskTypeOfButton == selectedTaskType
+              // TODO: Fix nested ternary, you baaaaad
               ? Colors.blue
               : MediaQuery.of(context).platformBrightness == Brightness.dark
                   ? Colors.white
@@ -79,10 +80,16 @@ class CreateTaskState extends State<CreateTask> {
       List<int> selectedUserIds = multiSelectUserController.value
           .map((selectUser) => selectUser.userId)
           .toList();
+      if (selectedTaskType == TaskType.oneOff && selectedUserIds.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('At least one user must be selected')),
+        );
+        return;
+      }
       if (selectedTaskType == TaskType.recurring &&
           selectTaskGroupController.value == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a task group first.')),
+          const SnackBar(content: Text('Please select a task group first')),
         );
         return;
       }
@@ -90,7 +97,7 @@ class CreateTaskState extends State<CreateTask> {
       if (currentUserGroupId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Unexpected error: userGroupId was null.')),
+              content: Text('Unexpected error: userGroupId was null')),
         );
         return;
       }

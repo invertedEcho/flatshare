@@ -12,7 +12,7 @@ import {
 import {
   dbCreateOneOffTask,
   dbCreateRecurringTask,
-  dbDeleteRecurringTask,
+  dbDeleteTask,
   dbGetAllTasks,
   dbUpdateTask,
 } from 'src/db/functions/task';
@@ -61,7 +61,7 @@ export class TasksController {
   }
 
   @Delete(':id')
-  async deleteRecurringTask(@Param('id') id: number) {
-    await dbDeleteRecurringTask({ taskId: id });
+  async deleteTask(@Param('id') id: number) {
+    await dbDeleteTask({ taskId: id });
   }
 }

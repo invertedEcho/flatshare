@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   HttpStatus,
@@ -10,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   dbCreateTaskGroup,
+  dbDeleteTaskGroup,
   dbGetTaskGroups,
   dbGetTasksOfTaskGroup,
 } from 'src/db/functions/task-group';
@@ -50,5 +52,10 @@ export class TaskGroupController {
       ...taskGroup,
       initialStartDate: new Date(taskGroup.initialStartDate),
     });
+  }
+
+  @Delete(':taskGroupId')
+  async deleteTaskGroup(@Param('taskGroupId') taskGroupId: number) {
+    await dbDeleteTaskGroup(taskGroupId);
   }
 }

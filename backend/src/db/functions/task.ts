@@ -68,7 +68,7 @@ export async function dbCreateRecurringTask({
   }
 }
 
-export async function dbDeleteRecurringTask({ taskId }: { taskId: number }) {
+export async function dbDeleteTask({ taskId }: { taskId: number }) {
   try {
     await db.delete(assignmentTable).where(eq(assignmentTable.taskId, taskId));
     await db
