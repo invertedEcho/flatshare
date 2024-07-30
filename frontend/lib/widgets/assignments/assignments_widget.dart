@@ -59,7 +59,8 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
             if (snapshot.data!.isEmpty) {
               return const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text("No assignments."),
+                child: Text(
+                    "Currently, there are no assignments. To get started, use the + Action Button on the bottom right."),
               );
             }
             var groupedAssignments = groupBy(

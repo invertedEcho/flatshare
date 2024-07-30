@@ -40,19 +40,20 @@ export class TaskGroupController {
     return tasks;
   }
 
-  @Post()
-  async createTaskGroup(@Body() taskGroup: CreateTaskGroup) {
-    if (taskGroup.userIds.length === 0) {
-      throw new HttpException(
-        'userIds field must contain one or more values',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    await dbCreateTaskGroup({
-      ...taskGroup,
-      initialStartDate: new Date(taskGroup.initialStartDate),
-    });
-  }
+  // NOTE: Manually creating a task group is unsupported atm, this will be reintroduced in the future
+  // @Post()
+  // async createTaskGroup(@Body() taskGroup: CreateTaskGroup) {
+  //   if (taskGroup.userIds.length === 0) {
+  //     throw new HttpException(
+  //       'userIds field must contain one or more values',
+  //       HttpStatus.BAD_REQUEST,
+  //     );
+  //   }
+  //   await dbCreateTaskGroup({
+  //     ...taskGroup,
+  //     initialStartDate: new Date(taskGroup.initialStartDate),
+  //   });
+  // }
 
   @Delete(':taskGroupId')
   async deleteTaskGroup(@Param('taskGroupId') taskGroupId: number) {

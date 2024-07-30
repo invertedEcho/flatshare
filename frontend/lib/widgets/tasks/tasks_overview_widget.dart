@@ -121,7 +121,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         Expanded(
             child: filterBy == TaskType.recurring
                 ? FutureBuilder<List<TaskGroup>>(
@@ -134,7 +134,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                             "Error while fetching task groups: ${snapshot.error}");
                       } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                         return const Text(
-                            "No Task Groups. To get started, use the + Action Button on the bottom right.");
+                            "No recurring Tasks. To get started, use the + Action Button on the bottom right.");
                       }
                       return TaskGroupList(
                           taskGroups: snapshot.data!,
@@ -157,17 +157,8 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                           .where((task) => task.recurringTaskGroupId == null)
                           .toList();
                       if (oneOffTasks.isEmpty) {
-                        return const Column(
-                          children: [
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Center(
-                              child: Text(
-                                  "No Tasks. To get started, use the + Action Button on the bottom right."),
-                            ),
-                          ],
-                        );
+                        return const Text(
+                            "No Tasks. To get started, use the + Action Button on the bottom right.");
                       }
                       return TaskList(
                           tasks: oneOffTasks,

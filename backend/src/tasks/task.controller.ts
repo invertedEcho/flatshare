@@ -17,7 +17,10 @@ import {
   dbUpdateTask,
 } from 'src/db/functions/task';
 import { SelectTask } from 'src/db/schema';
-import { getPgIntervalFromDisplayInterval } from 'src/utils/interval';
+import {
+  DefaultDisplayInterval,
+  displayIntervalToPostgresInterval,
+} from 'src/utils/interval';
 
 // TODO: make a base type for these three types below
 // TODO: extra type for this feels weird
@@ -34,10 +37,10 @@ export type UpdateTask = {
   taskGroupId?: number;
 };
 
-export type CreateRecurringTask = {
+export type CreateRecurringTaskBody = {
   title: string;
   description?: string;
-  interval: string;
+  interval: DefaultDisplayInterval;
   userGroupId: number;
 };
 
@@ -51,13 +54,9 @@ export class TasksController {
   }
 
   @Post('/recurring')
-  async createRecurringTask(@Body() recurringTask: CreateRecurringTask) {
-    const formattedInterval = getPgIntervalFromDisplayInterval(
-      recurringTask.interval,
-    );
-    if (formattedInterval === undefined) {
-      throw new Error(`Unsupported interval: ${formattedInterval}`);
-    }
+  async createRecurringTask(@Body() recurringTask: CreateRecurringTaskBody) {
+    const formattedInterval =
+      displayIntervalToPostgresInterval[recurringTask.interval];
 
     await dbCreateRecurringTask({
       ...recurringTask,

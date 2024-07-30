@@ -7,14 +7,14 @@ import {
   taskTable,
   recurringTaskGroupTable,
 } from '../schema';
+import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
 import {
-  CreateRecurringTask,
-  OneOffTask,
-  UpdateTask,
-} from 'src/tasks/task.controller';
-import { getTaskGroupTitleFromInterval } from 'src/utils/interval';
+  DefaultPostgresInterval,
+  getLongNameFromPostgresInterval,
+} from 'src/utils/interval';
 import { dbCreateTaskGroup } from './task-group';
 import { dbGetUsersOfUserGroup } from './user-group';
+import { getDefaultInitialStartDateForInterval } from 'src/utils/date';
 
 export async function dbGetAllTasks({
   groupId,
@@ -47,13 +47,24 @@ export async function dbGetTaskById(taskId: number) {
   return queryResult[0];
 }
 
+type CreateRecurringTask = {
+  title: string;
+  description?: string;
+  interval: DefaultPostgresInterval;
+  userGroupId: number;
+};
+
 export async function dbCreateRecurringTask({
   title,
   description,
   userGroupId,
   interval,
 }: CreateRecurringTask) {
-  const recurringTaskGroup = (
+  const recurringTaskGroupTitle = getLongNameFromPostgresInterval(interval);
+
+  const usersOfUserGroup = await dbGetUsersOfUserGroup({ userGroupId });
+
+  const maybeExistingRecurringTaskGroup = (
     await db
       .select()
       .from(recurringTaskGroupTable)
@@ -66,13 +77,8 @@ export async function dbCreateRecurringTask({
       .limit(1)
   )[0];
 
-  const recurringTaskGroupTitle = getTaskGroupTitleFromInterval(interval);
-  if (recurringTaskGroupTitle === undefined) {
-    throw new Error('Unsupported interval while creating a recurring task');
-  }
-  const usersOfUserGroup = await dbGetUsersOfUserGroup({ userGroupId });
   const recurringTaskGroupId =
-    recurringTaskGroup === undefined
+    maybeExistingRecurringTaskGroup === undefined
       ? (
           await dbCreateTaskGroup({
             interval,
@@ -80,17 +86,11 @@ export async function dbCreateRecurringTask({
             userIds: usersOfUserGroup.map(
               (userOfUserGroup) => userOfUserGroup.userId,
             ),
-            initialStartDate: new Date(),
+            initialStartDate: getDefaultInitialStartDateForInterval(interval),
             userGroupId,
           })
         ).id
-      : recurringTaskGroup.id;
-
-  if (recurringTaskGroupId === undefined) {
-    throw new Error(
-      'Failed to get or create task group when creating a recurring task.',
-    );
-  }
+      : maybeExistingRecurringTaskGroup.id;
 
   const task = (
     await db

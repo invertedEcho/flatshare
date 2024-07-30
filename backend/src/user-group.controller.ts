@@ -86,7 +86,6 @@ export class UserGroupController {
 
   @Get(':userGroupId/users')
   async getUsers(@Param('userGroupId') userGroupId: number) {
-    console.log({ userGroupId });
     return await db
       .select({
         userId: userTable.id,
