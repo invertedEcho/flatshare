@@ -7,7 +7,6 @@ import 'package:flatshare/widgets/create_user_group.dart';
 import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
-import 'package:flatshare/widgets/tasks/create_task_group.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -101,6 +100,9 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                   Text("Generated invite code: $inviteCode"),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                      style: const ButtonStyle(
+                          foregroundColor:
+                              WidgetStatePropertyAll(Colors.blueAccent)),
                       onPressed: () => Share.share(
                           "Join my Group on Flatshare by using this invite code: $inviteCodeUrl"),
                       child: const Text("Share this invite code"))
@@ -151,29 +153,12 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         ],
       ),
       floatingActionButton: userProvider.userGroup?.id != null
-          ? ExpandableFab(
-              children: [
-                Row(children: [
-                  const Text("New task group"),
-                  const SizedBox(width: 16),
-                  ActionButton(
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const CreateTaskGroup())),
-                    icon: const Icon(Icons.group_work_outlined),
-                  ),
-                ]),
-                Row(children: [
-                  const Text("New task"),
-                  const SizedBox(width: 16),
-                  ActionButton(
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const CreateTask())),
-                    icon: const Icon(Icons.task_alt),
-                  ),
-                ]),
-              ],
+          ? FloatingActionButton(
+              backgroundColor: Colors.blueAccent,
+              foregroundColor: Colors.white,
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const CreateTask())),
+              child: Icon(Icons.add),
             )
           : null,
       bottomNavigationBar: NavigationBar(

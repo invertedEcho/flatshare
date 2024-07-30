@@ -16,7 +16,11 @@ import {
   dbGetAllTasks,
   dbUpdateTask,
 } from 'src/db/functions/task';
-import { InsertTask, SelectTask } from 'src/db/schema';
+import { SelectTask } from 'src/db/schema';
+import {
+  DefaultDisplayInterval,
+  displayIntervalToPostgresInterval,
+} from 'src/utils/interval';
 
 // TODO: make a base type for these three types below
 // TODO: extra type for this feels weird
@@ -33,6 +37,13 @@ export type UpdateTask = {
   taskGroupId?: number;
 };
 
+export type CreateRecurringTaskBody = {
+  title: string;
+  description?: string;
+  interval: DefaultDisplayInterval;
+  userGroupId: number;
+};
+
 @Controller('tasks')
 export class TasksController {
   @Get()
@@ -43,8 +54,14 @@ export class TasksController {
   }
 
   @Post('/recurring')
-  async createRecurringTask(@Body() task: InsertTask & { groupId: number }) {
-    await dbCreateRecurringTask(task);
+  async createRecurringTask(@Body() recurringTask: CreateRecurringTaskBody) {
+    const formattedInterval =
+      displayIntervalToPostgresInterval[recurringTask.interval];
+
+    await dbCreateRecurringTask({
+      ...recurringTask,
+      interval: formattedInterval,
+    });
   }
 
   @Post('/one-off')

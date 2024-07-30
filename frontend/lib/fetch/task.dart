@@ -40,9 +40,9 @@ Future<void> createOneOffTask(
 
 Future<void> createRecurringTask(
     {required String title,
-    required String description,
-    required int groupId,
-    required int taskGroupId}) async {
+    required String? description,
+    required int userGroupId,
+    required String interval}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
       await authenticatedClient.post(Uri.parse('$apiBaseUrl/tasks/recurring'),
@@ -50,8 +50,8 @@ Future<void> createRecurringTask(
             {
               'title': title,
               'description': description,
-              'groupId': groupId,
-              'recurringTaskGroupId': taskGroupId
+              'userGroupId': userGroupId,
+              'interval': interval
             },
           ));
   if (response.statusCode != 201) {

@@ -84,7 +84,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                               filterBy = TaskType.recurring;
                             });
                           },
-                          child: const Text("Task Groups"))),
+                          child: const Text("Recurring Tasks"))),
                   const SizedBox(width: 4),
                   Expanded(
                       child: ElevatedButton(
@@ -115,26 +115,26 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                               filterBy = TaskType.oneOff;
                             });
                           },
-                          child: const Text("One-Off Tasks"))),
+                          child: const Text("One-Time Tasks"))),
                 ],
               ),
             ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 20),
         Expanded(
             child: filterBy == TaskType.recurring
                 ? FutureBuilder<List<TaskGroup>>(
                     future: _taskGroupsFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return Text(
                             "Error while fetching task groups: ${snapshot.error}");
                       } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                         return const Text(
-                            "No Task Groups. To get started, use the + Action Button on the bottom right.");
+                            "No recurring Tasks. To get started, use the + Action Button on the bottom right.");
                       }
                       return TaskGroupList(
                           taskGroups: snapshot.data!,
@@ -157,17 +157,8 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                           .where((task) => task.recurringTaskGroupId == null)
                           .toList();
                       if (oneOffTasks.isEmpty) {
-                        return const Column(
-                          children: [
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Center(
-                              child: Text(
-                                  "No Tasks. To get started, use the + Action Button on the bottom right."),
-                            ),
-                          ],
-                        );
+                        return const Text(
+                            "No Tasks. To get started, use the + Action Button on the bottom right.");
                       }
                       return TaskList(
                           tasks: oneOffTasks,

@@ -30,7 +30,7 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Edit ${widget.taskGroup.title}")),
+      appBar: AppBar(title: Text("Tasks:")),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -51,10 +51,6 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Tasks:",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
                     TaskList(
                       tasks: snapshot.data!,
                       refreshState: () {

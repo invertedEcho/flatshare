@@ -3,11 +3,17 @@ import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/widgets/screens/edit_task_group.dart';
 import 'package:flutter/material.dart';
 
-String formatInterval(String interval) {
-  if (interval.contains("mon")) {
-    return interval.replaceAll("mon", "month");
+String formatPostgresInterval(String interval) {
+  switch (interval) {
+    case '1 day':
+      return 'Every day';
+    case '7 days':
+      return "Every week";
+    case '1 mon':
+      return "Every month";
+    default:
+      return interval;
   }
-  return interval;
 }
 
 class TaskGroupList extends StatelessWidget {
@@ -25,7 +31,7 @@ class TaskGroupList extends StatelessWidget {
           return AlertDialog(
             title: const Text("Are you sure?"),
             content: const Text(
-                "Are you really sure you want to delete this task group? This will also delete all tasks attached to this task group, and all assignments attached to these tasks."),
+                "Are you really sure you want to delete all tasks with this interval? This will also delete all assignments attached to these tasks."),
             actions: [
               TextButton(
                   onPressed: () async {
@@ -88,16 +94,15 @@ class TaskGroupList extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(taskGroup.title,
-                          style: Theme.of(context).textTheme.titleMedium),
-                      Text(taskGroup.description!),
-                      Text("Total tasks: ${taskGroup.numberOfTasks}"),
                       Row(
                         children: [
                           const Icon(Icons.repeat),
-                          Text("Every ${formatInterval(taskGroup.interval)}")
+                          Text(formatPostgresInterval(taskGroup.interval),
+                              style: Theme.of(context).textTheme.titleMedium),
                         ],
-                      )
+                      ),
+                      Text(taskGroup.description ?? ""),
+                      Text("Total tasks: ${taskGroup.numberOfTasks}"),
                     ],
                   ),
                 ),

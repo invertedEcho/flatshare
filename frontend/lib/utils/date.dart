@@ -1,4 +1,7 @@
 String parseToDueDate(DateTime dueDate) {
-  String diffInDays = DateTime.now().difference(dueDate).inDays.toString();
-  return "Due in: ${diffInDays}d";
+  final diffInDays = dueDate.difference(DateTime.now()).inDays;
+  if (diffInDays == 0) {
+    return "Due today";
+  }
+  return "Due in $diffInDays days";
 }

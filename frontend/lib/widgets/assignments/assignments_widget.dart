@@ -59,7 +59,8 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
             if (snapshot.data!.isEmpty) {
               return const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text("No assignments."),
+                child: Text(
+                    "Currently, there are no assignments. To get started, use the + Action Button on the bottom right."),
               );
             }
             var groupedAssignments = groupBy(
@@ -79,7 +80,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                     children: [
                       Row(
                         children: [
-                          Text(sectionTitle ?? 'One-off Tasks',
+                          Text(sectionTitle ?? 'One-Time Tasks',
                               style: theme.textTheme.titleLarge),
                           const SizedBox(width: 8),
                           Icon(Icons.arrow_right_alt, color: theme.hintColor),
