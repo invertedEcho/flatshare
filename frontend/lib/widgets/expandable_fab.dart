@@ -96,11 +96,11 @@ class _ExpandableFabState extends State<ExpandableFab>
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
-            backgroundColor: Theme.of(context).colorScheme.secondary,
+            backgroundColor: Colors.blueAccent,
             shape: const CircleBorder(),
             heroTag: "closeFAB",
-            child: Icon(Icons.close,
-                color: Theme.of(context).colorScheme.onSecondary),
+            child:
+                Icon(Icons.close, color: Theme.of(context).colorScheme.primary),
           ),
         ),
       ),
@@ -120,10 +120,10 @@ class _ExpandableFabState extends State<ExpandableFab>
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            backgroundColor: Colors.blueAccent,
             shape: const CircleBorder(),
-            child: const Icon(Icons.add),
             heroTag: "openFAB",
+            child: const Icon(Icons.add),
           ),
         ),
       ),

@@ -117,6 +117,10 @@ class LoginFormState extends State<LoginForm> {
                 width: double.infinity,
                 child: FilledButton(
                   style: ButtonStyle(
+                      backgroundColor:
+                          const WidgetStatePropertyAll(Colors.blueAccent),
+                      foregroundColor:
+                          const WidgetStatePropertyAll(Colors.white),
                       shape: WidgetStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)))),

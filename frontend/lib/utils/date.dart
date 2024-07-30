@@ -3,5 +3,5 @@ String parseToDueDate(DateTime dueDate) {
   if (diffInDays == 0) {
     return "Due today";
   }
-  return "Due in: ${diffInDays}d";
+  return "Due in $diffInDays days";
 }

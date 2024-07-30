@@ -203,7 +203,11 @@ class CreateTaskState extends State<CreateTask> {
                     // ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                        onPressed: handleSubmit, child: const Text("Submit")),
+                        style: const ButtonStyle(
+                            foregroundColor:
+                                WidgetStatePropertyAll(Colors.blueAccent)),
+                        onPressed: handleSubmit,
+                        child: const Text("Submit")),
                   ],
                 ))));
   }

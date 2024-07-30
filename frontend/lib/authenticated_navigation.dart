@@ -100,6 +100,9 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                   Text("Generated invite code: $inviteCode"),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                      style: const ButtonStyle(
+                          foregroundColor:
+                              WidgetStatePropertyAll(Colors.blueAccent)),
                       onPressed: () => Share.share(
                           "Join my Group on Flatshare by using this invite code: $inviteCodeUrl"),
                       child: const Text("Share this invite code"))
@@ -149,31 +152,13 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
           })
         ],
       ),
-      // TODO: We might want to directly go to the CreateTask screen if we now decide to only render one option here.
       floatingActionButton: userProvider.userGroup?.id != null
-          ? ExpandableFab(
-              children: [
-                // Row(children: [
-                //   const Text("New task group"),
-                //   const SizedBox(width: 16),
-                //   ActionButton(
-                //     onPressed: () => Navigator.of(context).push(
-                //         MaterialPageRoute(
-                //             builder: (context) => const CreateTaskGroup())),
-                //     icon: const Icon(Icons.group_work_outlined),
-                //   ),
-                // ]),
-                Row(children: [
-                  const Text("New task"),
-                  const SizedBox(width: 16),
-                  ActionButton(
-                    onPressed: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (context) => const CreateTask())),
-                    icon: const Icon(Icons.task_alt),
-                  ),
-                ]),
-              ],
+          ? FloatingActionButton(
+              backgroundColor: Colors.blueAccent,
+              foregroundColor: Colors.white,
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => const CreateTask())),
+              child: Icon(Icons.add),
             )
           : null,
       bottomNavigationBar: NavigationBar(
