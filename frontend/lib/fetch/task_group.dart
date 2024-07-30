@@ -11,7 +11,6 @@ Future<List<TaskGroup>> fetchTaskGroups({required int userGroupId}) async {
       .get(Uri.parse('$apiBaseUrl/task-group?userGroupId=$userGroupId'));
   if (response.statusCode == 200) {
     List<dynamic> taskGroups = jsonDecode(response.body);
-    print(taskGroups);
     final parsedTaskGroups = taskGroups
         .map<TaskGroup>((assignment) => TaskGroup.fromJson(assignment))
         .toList();

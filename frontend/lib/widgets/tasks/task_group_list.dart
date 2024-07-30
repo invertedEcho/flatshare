@@ -101,7 +101,7 @@ class TaskGroupList extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleMedium),
                         ],
                       ),
-                      // Text(taskGroup.description),
+                      Text(taskGroup.description ?? ""),
                       Text("Total tasks: ${taskGroup.numberOfTasks}"),
                     ],
                   ),
