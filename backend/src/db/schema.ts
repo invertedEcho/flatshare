@@ -23,6 +23,8 @@ export const userTable = pgTable('user', {
   password: text('password').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type SelectUser = typeof userTable.$inferSelect;
+export type InsertUser = typeof userTable.$inferInsert;
 
 /**
  * This table stores information about a group of users
@@ -32,6 +34,8 @@ export const userGroupTable = pgTable('user_group', {
   name: text('name').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type SelectUserGroup = typeof userGroupTable.$inferSelect;
+export type InsertUserGroup = typeof userGroupTable.$inferInsert;
 
 /**
  * This table stores invite codes of a specific group.
@@ -44,6 +48,8 @@ export const userGroupInviteTable = pgTable('user_group_invite', {
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type SelectUserGroupInvite = typeof userGroupInviteTable.$inferSelect;
+export type InsertUserGroupInvite = typeof userGroupInviteTable.$inferInsert;
 
 /**
  * This association table stores information about which user belong into which groups,
@@ -58,6 +64,8 @@ export const userUserGroupTable = pgTable('user_user_group', {
     .references(() => userGroupTable.id)
     .notNull(),
 });
+export type SelectUserUserGroup = typeof userUserGroupTable.$inferSelect;
+export type InsertUserUserGroup = typeof userUserGroupTable.$inferInsert;
 
 /**
  * This table stores all tasks that exist in the application. Note that these are merely "blueprints"
@@ -90,6 +98,8 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type SelectRecurringTaskGroup =
+  typeof recurringTaskGroupTable.$inferSelect;
 export type InsertRecurringTaskGroup =
   typeof recurringTaskGroupTable.$inferInsert;
 
@@ -109,6 +119,10 @@ export const recurringTaskGroupUserTable = pgTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
 );
+export type SelectRecurringTaskGroupUser =
+  typeof recurringTaskGroupUserTable.$inferSelect;
+export type InsertRecurringTaskGroupUser =
+  typeof recurringTaskGroupUserTable.$inferInsert;
 
 /**
  * This table stores information about tasks that need to be completed by a specific user
@@ -124,7 +138,8 @@ export const assignmentTable = pgTable('assignment', {
   state: assigmentStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
-export type CreateAssignment = typeof assignmentTable.$inferInsert;
+export type SelectAssignment = typeof assignmentTable.$inferSelect;
+export type InsertAssignment = typeof assignmentTable.$inferInsert;
 
 /**
  * This table stores information about which tasks belong to a user group.
@@ -139,3 +154,5 @@ export const taskUserGroupTable = pgTable('task_user_group', {
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+export type SelectTaskUserGroup = typeof taskUserGroupTable.$inferSelect;
+export type InsertTaskUserGroup = typeof taskUserGroupTable.$inferInsert;
