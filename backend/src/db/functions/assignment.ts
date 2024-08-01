@@ -141,7 +141,7 @@ export async function dbGetTasksToAssignForCurrentInterval() {
       .having(
         or(
           eq(count(assignmentTable.id), 0),
-          sql`MAX(${assignmentTable.createdAt}) <= (NOW() - ${recurringTaskGroupTable.interval})`,
+          sql`NOW() >= MAX(${assignmentTable.createdAt} + ${recurringTaskGroupTable.interval})`,
         ),
       );
 
