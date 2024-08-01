@@ -141,7 +141,12 @@ export async function dbGetTasksToAssignForCurrentInterval() {
       .having(
         or(
           eq(count(assignmentTable.id), 0),
-          sql`NOW() >= MAX(${assignmentTable.createdAt} + ${recurringTaskGroupTable.interval})`,
+          // TODO: make timezone dynamic
+          /* When the last assignment was for example created at 2024-06-30 22:00:00 (in UTC, which would be 2024-07-01 00:00:00 in CEST), 
+          this date plus one month would be 2024-07-30 22:00:00 (in UTC, which would be 2024-07-31 00:00:00 in CEST). 
+          But actually, we want the resulting date that we compare the current time with to be 2024-08-01 00:00:00,
+           so we need to convert the timestamps to the local time zone first. */
+          sql`NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
         ),
       );
 
