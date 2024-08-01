@@ -12,3 +12,14 @@ if (connectionString === undefined) {
 const client = postgres(connectionString);
 
 export const db = drizzle(client);
+
+// TODO: Switch to t3-oss/env
+export const testingConnectionString = process.env.TESTING_DATABASE_URL;
+
+if (testingConnectionString === undefined) {
+  throw new Error('TESTING_DATABASE_URL is undefined');
+}
+
+const testingClient = postgres(testingConnectionString);
+
+export const testingDb = drizzle(testingClient);

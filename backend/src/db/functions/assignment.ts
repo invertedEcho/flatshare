@@ -1,14 +1,14 @@
-import { count, desc, eq, isNull, or, sql, and } from 'drizzle-orm';
+import { and, count, desc, eq, isNull, or, sql } from 'drizzle-orm';
 import { AssignmentResponse } from 'src/types';
-import { db } from '..';
+import { db, testingDb } from '..';
 import {
   AssignmentState,
-  CreateAssignment,
+  InsertAssignment,
   assignmentTable,
   recurringTaskGroupTable,
   taskTable,
-  userUserGroupTable,
   userTable,
+  userUserGroupTable,
 } from '../schema';
 
 export async function dbGetAssignmentsFromCurrentInterval(
@@ -120,15 +120,19 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
   return currentAssignments;
 }
 
-export async function dbGetTasksToAssignForCurrentInterval() {
+// TODO: I haven't found a better way to mock the date than just passing it in here as a JS date instead of using `NOW()` in the queries.
+// Research if there is a better way.
+export async function dbGetTasksToAssignForCurrentInterval(
+  currentTime: Date = new Date(),
+) {
   try {
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period
-    const taskIdsToCreateAssignmentsFor = await db
+    const taskIdsToCreateAssignmentsFor = await testingDb
       .select({
         taskId: taskTable.id,
         taskGroupId: recurringTaskGroupTable.id,
         taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
-        isInFirstInterval: sql<boolean>`NOW() < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
+        isInFirstInterval: sql<boolean>`${currentTime?.toISOString()} < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
       })
       .from(recurringTaskGroupTable)
       .innerJoin(
@@ -136,7 +140,9 @@ export async function dbGetTasksToAssignForCurrentInterval() {
         eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
       )
       .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
-      .where(sql`${recurringTaskGroupTable.initialStartDate} <= NOW()`)
+      .where(
+        sql`${recurringTaskGroupTable.initialStartDate} <= ${currentTime?.toISOString()}`,
+      )
       .groupBy(recurringTaskGroupTable.id, taskTable.id)
       .having(
         or(
@@ -146,7 +152,7 @@ export async function dbGetTasksToAssignForCurrentInterval() {
           this date plus one month would be 2024-07-30 22:00:00 (in UTC, which would be 2024-07-31 00:00:00 in CEST). 
           But actually, we want the resulting date that we compare the current time with to be 2024-08-01 00:00:00,
           so we need to convert the timestamps to the local time zone first. */
-          sql`NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
+          sql`${currentTime?.toISOString()} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
         ),
       );
 
@@ -160,7 +166,7 @@ export async function dbGetTasksToAssignForCurrentInterval() {
 export async function dbAddAssignments({
   assignments,
 }: {
-  assignments: CreateAssignment[];
+  assignments: InsertAssignment[];
 }) {
   await db.insert(assignmentTable).values(assignments);
 }
