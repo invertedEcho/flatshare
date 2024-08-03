@@ -11,18 +11,22 @@ jobs:
     name: (Re)-Deploy backend
     runs-on: ubuntu-latest
     steps:
-    - name: update deployment
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.DEPLOY_SSH_HOST }}
-        username: ${{ secrets.DEPLOY_SSH_USERNAME }}
-        password: ${{ secrets.DEPLOY_SSH_PASSWORD }}
-        port: ${{ secrets.PORT }}
-        # TODO: lets move the cd into working-directory
-        script: |
-          cd ${{ secrets.DEPLOY_SSH_REPO_DIRECTORY}}
-          git pull
-          cd backend/
-          pnpm i
-          pnpm build
-          pnpm start:prod
+      - name: check out
+        uses: actions/checkout@master
+      - name: install cloudflared
+        run: |
+          curl -L https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-archive-keyring.gpg >/dev/null
+          echo "deb [signed-by=/usr/share/keyrings/cloudflare-archive-keyring.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | sudo tee  /etc/apt/sources.list.d/cloudflared.list
+          sudo apt update
+          sudo apt-get install cloudflared
+          cloudflared --version
+      - name: install-ssh-key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          name: id_rsa
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+          if_key_exists: fail
+      - name: deploy backend
+        run:
+          ssh -o ProxyCommand="cloudflared access ssh --hostname ssh.invertedecho.com" -o StrictHostKeyChecking=no echo@ssh.invertedecho.com < ./scripts/deploy_backend.sh
