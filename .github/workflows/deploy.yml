@@ -21,13 +21,6 @@ jobs:
           sudo apt update
           sudo apt-get install cloudflared
           cloudflared --version
-      - name: install-ssh-key
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          name: id_rsa
-          known_hosts: ${{ secrets.KNOWN_HOSTS }}
-          if_key_exists: fail
-      - name: deploy backend
+      - name: ssh
         run:
-          ssh -i ~/.ssh/id_rsa -o ProxyCommand="cloudflared access ssh --hostname ssh.invertedecho.com" echo@ssh.invertedecho.com < ./scripts/deploy_backend.sh
+          ssh -o StrictHostKeyChecking=no -o ProxyCommand="cloudflared access ssh --hostname ssh.invertedecho.com" echo@ssh.invertedecho.com < ./scripts/deploy_backend.sh
