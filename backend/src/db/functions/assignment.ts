@@ -120,13 +120,20 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
   return currentAssignments;
 }
 
+export type TaskToAssign = {
+  taskId: number;
+  taskGroupId: number;
+  taskGroupInitialStartDate: Date;
+  isInFirstInterval: boolean;
+};
+
 // TODO: I haven't found a better way to mock the date than just passing it in here as a JS date instead of using `NOW()` in the queries.
 // Research if there is a better way.
 export async function dbGetTasksToAssignForCurrentInterval({
   currentTime = new Date(),
 }: {
   currentTime?: Date;
-}) {
+}): Promise<TaskToAssign[]> {
   try {
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period
     const taskIdsToCreateAssignmentsFor = await db
