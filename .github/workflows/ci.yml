@@ -67,3 +67,7 @@ jobs:
       - name: Check Types
         run: pnpm types
         working-directory: ./backend
+
+      - name: Run tests
+        run: pnpm test
+        working-directory: ./backend
