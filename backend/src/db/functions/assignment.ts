@@ -11,6 +11,13 @@ import {
   userTable,
 } from '../schema';
 
+// FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
+// the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
+// than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
+//
+// Alternatively, we need make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
+//  for a weekly task group. If that were the case this function would correctly even in the current state.
+
 export async function dbGetAssignmentsFromCurrentInterval(
   groupId: number,
 ): Promise<AssignmentResponse[]> {
@@ -104,6 +111,13 @@ export async function dbGetAssignmentsForTaskGroup(
   return await result.limit(limit);
 }
 
+// FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
+// the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
+// than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
+//
+// Alternatively, we need make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
+//  for a weekly task group. If that were the case this function would correctly even in the current state.
+
 export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
   const currentAssignments = await db
     .select()
@@ -113,7 +127,9 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
       recurringTaskGroupTable,
       eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
     )
+
     .where(
+      // TODO: convert to local time zone before comparison
       sql`${assignmentTable.createdAt} >= NOW() - ${recurringTaskGroupTable.interval} AND ${recurringTaskGroupTable.id} = ${taskGroupId}`,
     );
 
@@ -128,6 +144,7 @@ export async function dbGetTasksToAssignForCurrentInterval() {
         taskId: taskTable.id,
         taskGroupId: recurringTaskGroupTable.id,
         taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
+        // TODO: convert to local time zone before comparison
         isInFirstInterval: sql<boolean>`NOW() < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
       })
       .from(recurringTaskGroupTable)

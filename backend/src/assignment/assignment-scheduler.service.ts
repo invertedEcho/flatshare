@@ -65,7 +65,8 @@ export class AssignmentSchedulerService {
           userId: nextResponsibleUserId,
           createdAt: isInFirstInterval
             ? taskGroupInitialStartDate
-            : // IDK if this is correct, what if its 23:00 for example in local time ozne
+            : // IDK if this is correct, what if its 23:00 for example in local time zone?
+              // FIXME: assignments should only ever have the very beginning of an interval as their `createdAt` date, see the comment above `dbGetCurrentAssignmentsForTaskGroup`.
               new Date(new Date().setHours(0, 0, 0, 0)),
         }),
       );
