@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+  pull_request:
 
 # Let's do this via a docker container in the future, this is pretty ugly.
 jobs:
