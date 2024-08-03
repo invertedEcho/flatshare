@@ -18,7 +18,7 @@
     "start:prod": "pm2 restart dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "types": "tsc --noEmit",
-    "test": "dotenv -e $(if [ \"$CI\" = \"true\" ]; then echo .env; else echo .env.test; fi) jest",
+    "test": "dotenv -e .env.test jest",
     "test:watch": "jest --watch",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx ./src/db/migrate.ts",

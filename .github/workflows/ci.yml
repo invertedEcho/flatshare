@@ -69,5 +69,7 @@ jobs:
         working-directory: ./backend
 
       - name: Run tests
-        run: pnpm test
+        run: |
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.test
+          pnpm test
         working-directory: ./backend
