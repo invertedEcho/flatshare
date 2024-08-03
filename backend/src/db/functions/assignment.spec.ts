@@ -70,41 +70,55 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
     expect(result).toHaveLength(0);
   });
 
-  it('returns a task where there is no assignment yet for the current period', async () => {
+  it('returns a task where there are no assignments yet', async () => {
     await setup();
+
+    const expectedTask = {
+      taskId: taskVacuuming.id,
+      taskGroupId: recurringTaskGroupWeekly.id,
+      isInFirstInterval: true,
+      taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+    } satisfies TaskToAssign;
+
     const result = await dbGetTasksToAssignForCurrentInterval({
       currentTime: new Date('2024-07-31 22:00:00Z'),
     });
-    console.debug({ result });
     expect(result).toHaveLength(1);
+    expect(result[0]).toStrictEqual(expectedTask);
   });
 
-  it('returns no tasks where there is no assignment yet for the current period', async () => {
+  it('returns no tasks where there is already an assignment for the current period', async () => {
     await setup();
     await db.insert(assignmentTable).values({
       taskId: taskVacuuming.id,
       userId: userJulian.id,
-      createdAt: new Date('2024-07-31 22:00:00Z'),
+      createdAt: new Date('2024-07-28 22:00:00Z'),
     });
     const result = await dbGetTasksToAssignForCurrentInterval({
-      currentTime: new Date('2024-08-01 22:00:00Z'),
+      currentTime: new Date('2024-08-04 21:59:00Z'),
     });
-    console.debug({ result });
     expect(result).toHaveLength(0);
   });
 
-  // FIXME: This test should pass, but it doesnt.
-  it.skip('returns an assignment when an assignment existed at the exact same time of the initial start date', async () => {
+  it('returns a task for which there exists an assignment in the previous period', async () => {
     await setup();
+    const expectedTask = {
+      taskId: taskVacuuming.id,
+      taskGroupId: recurringTaskGroupWeekly.id,
+      isInFirstInterval: false,
+      taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+    } satisfies TaskToAssign;
+
     await db.insert(assignmentTable).values({
       taskId: taskVacuuming.id,
       userId: userJulian.id,
-      createdAt: new Date('2024-07-25 22:30:00Z'),
+      createdAt: new Date('2024-07-28 22:00:00Z'),
     });
     const result = await dbGetTasksToAssignForCurrentInterval({
       currentTime: new Date('2024-08-04 22:00:00Z'),
     });
-    console.debug({ result });
+
     expect(result).toHaveLength(1);
+    expect(result[0]).toStrictEqual(expectedTask);
   });
 });
