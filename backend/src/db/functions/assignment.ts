@@ -1,5 +1,4 @@
 import { and, count, desc, eq, isNull, or, sql } from 'drizzle-orm';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
@@ -122,18 +121,15 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
 }
 
 // TODO: I haven't found a better way to mock the date than just passing it in here as a JS date instead of using `NOW()` in the queries.
-// Same for the db implementation.
 // Research if there is a better way.
 export async function dbGetTasksToAssignForCurrentInterval({
   currentTime = new Date(),
-  dbImplementation = db,
 }: {
-  currentTime: Date;
-  dbImplementation: PostgresJsDatabase;
+  currentTime?: Date;
 }) {
   try {
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period
-    const taskIdsToCreateAssignmentsFor = await dbImplementation
+    const taskIdsToCreateAssignmentsFor = await db
       .select({
         taskId: taskTable.id,
         taskGroupId: recurringTaskGroupTable.id,

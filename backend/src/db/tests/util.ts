@@ -1,10 +1,9 @@
 import { sql } from 'drizzle-orm';
-import { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { testingDb } from '..';
 import { userGroupTable, userTable, userUserGroupTable } from '../schema';
 import { userGroupWG1, userJakob, userJulian } from './mock-data';
+import { db } from '..';
 
-export async function clearDb(db: PostgresJsDatabase): Promise<void> {
+export async function truncateAllTables(): Promise<void> {
   const query = sql<string>`SELECT table_name
       FROM information_schema.tables
       WHERE table_schema = 'public'
@@ -20,9 +19,9 @@ export async function clearDb(db: PostgresJsDatabase): Promise<void> {
 }
 
 export async function seedDatabase() {
-  await testingDb.insert(userGroupTable).values(userGroupWG1);
-  await testingDb.insert(userTable).values([userJulian, userJakob]);
-  await testingDb.insert(userUserGroupTable).values({
+  await db.insert(userGroupTable).values(userGroupWG1);
+  await db.insert(userTable).values([userJulian, userJakob]);
+  await db.insert(userUserGroupTable).values({
     groupId: userGroupWG1.id,
     userId: userJulian.id,
   });

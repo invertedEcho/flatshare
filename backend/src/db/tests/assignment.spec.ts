@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { testingDb } from '..';
 import { dbGetTasksToAssignForCurrentInterval } from '../functions/assignment';
 import {
   InsertRecurringTaskGroup,
@@ -10,11 +9,12 @@ import {
   taskUserGroupTable,
 } from '../schema';
 import { userGroupWG1, userJulian } from './mock-data';
-import { clearDb, seedDatabase } from './util';
+import { truncateAllTables, seedDatabase } from './util';
+import { db } from '..';
 
 describe('dbGetTasksToAssignForCurrentInterval', () => {
   beforeEach(async () => {
-    await clearDb(testingDb);
+    await truncateAllTables();
     await seedDatabase();
   });
   afterAll(() => {
@@ -37,18 +37,15 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
     recurringTaskGroupId: recurringTaskGroupWeekly.id,
   } satisfies InsertTask;
 
-  // Insert a task group and a task
   async function setup() {
-    await testingDb
-      .insert(recurringTaskGroupTable)
-      .values(recurringTaskGroupWeekly);
-    await testingDb.insert(recurringTaskGroupUserTable).values({
+    await db.insert(recurringTaskGroupTable).values(recurringTaskGroupWeekly);
+    await db.insert(recurringTaskGroupUserTable).values({
       recurringTaskGroupId: recurringTaskGroupWeekly.id,
       userId: userJulian.id,
     });
 
-    await testingDb.insert(taskTable).values(taskVacuuming);
-    await testingDb
+    await db.insert(taskTable).values(taskVacuuming);
+    await db
       .insert(taskUserGroupTable)
       .values({ groupId: userGroupWG1.id, taskId: taskVacuuming.id });
   }
@@ -56,9 +53,9 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   it('returns tasks where the initalStartDate is less than or equal to the current date', async () => {
     await setup();
 
-    const result = await dbGetTasksToAssignForCurrentInterval(
-      recurringTaskGroupWeekly.initialStartDate,
-    );
+    const result = await dbGetTasksToAssignForCurrentInterval({
+      currentTime: recurringTaskGroupWeekly.initialStartDate,
+    });
 
     expect(result).toHaveLength(1);
   });
@@ -66,9 +63,9 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   it('does not return tasks where the initalStartDate is in the future', async () => {
     await setup();
 
-    const result = await dbGetTasksToAssignForCurrentInterval(
-      new Date('2024-07-28 21:59:59Z'),
-    );
+    const result = await dbGetTasksToAssignForCurrentInterval({
+      currentTime: new Date('2024-07-28 21:59:59Z'),
+    });
 
     expect(result).toHaveLength(0);
   });
