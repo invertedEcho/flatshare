@@ -135,13 +135,15 @@ export async function dbGetTasksToAssignForCurrentInterval({
   currentTime?: Date;
 }): Promise<TaskToAssign[]> {
   try {
+    const currentTimeString = currentTime.toISOString();
+
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period
     const taskIdsToCreateAssignmentsFor = await db
       .select({
         taskId: taskTable.id,
         taskGroupId: recurringTaskGroupTable.id,
         taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
-        isInFirstInterval: sql<boolean>`${currentTime?.toISOString()} < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
+        isInFirstInterval: sql<boolean>`CAST(${currentTimeString} AS timestamp) < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
       })
       .from(recurringTaskGroupTable)
       .innerJoin(
@@ -150,7 +152,7 @@ export async function dbGetTasksToAssignForCurrentInterval({
       )
       .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
       .where(
-        sql`${recurringTaskGroupTable.initialStartDate} <= ${currentTime?.toISOString()}`,
+        sql`${recurringTaskGroupTable.initialStartDate} <= CAST(${currentTimeString} AS timestamp)`,
       )
       .groupBy(recurringTaskGroupTable.id, taskTable.id)
       .having(
@@ -161,7 +163,7 @@ export async function dbGetTasksToAssignForCurrentInterval({
           this date plus one month would be 2024-07-30 22:00:00 (in UTC, which would be 2024-07-31 00:00:00 in CEST). 
           But actually, we want the resulting date that we compare the current time with to be 2024-08-01 00:00:00,
           so we need to convert the timestamps to the local time zone first. */
-          sql`${currentTime?.toISOString()} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
+          sql`CAST(${currentTimeString} AS timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
         ),
       );
 
