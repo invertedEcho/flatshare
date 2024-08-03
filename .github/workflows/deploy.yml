@@ -30,4 +30,4 @@ jobs:
           if_key_exists: fail
       - name: deploy backend
         run:
-          ssh -o ProxyCommand="cloudflared access ssh --hostname ssh.invertedecho.com" -o StrictHostKeyChecking=no echo@ssh.invertedecho.com < ./scripts/deploy_backend.sh
+          ssh -i ~/.ssh/id_rsa -o ProxyCommand="cloudflared access ssh --hostname ssh.invertedecho.com" -o StrictHostKeyChecking=no echo@ssh.invertedecho.com < ./scripts/deploy_backend.sh
