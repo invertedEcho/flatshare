@@ -1,5 +1,4 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
-import 'dotenv/config';
 import * as postgres from 'postgres';
 
 // TODO: Switch to t3-oss/env
@@ -9,6 +8,6 @@ if (connectionString === undefined) {
   throw new Error('DATABASE_URL is undefined');
 }
 
-const client = postgres(connectionString);
+export const client = postgres(connectionString);
 
 export const db = drizzle(client);
