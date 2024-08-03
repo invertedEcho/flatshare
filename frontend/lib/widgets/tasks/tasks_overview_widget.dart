@@ -147,7 +147,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                     future: _tasksFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return SafeArea(
                             child: Text(

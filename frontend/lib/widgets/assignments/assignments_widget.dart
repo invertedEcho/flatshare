@@ -144,7 +144,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
               child: Text('${snapshot.error}'),
             );
           }
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         });
   }
 }

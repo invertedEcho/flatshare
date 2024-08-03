@@ -4,7 +4,6 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_user_group.dart';
-import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
