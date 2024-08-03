@@ -1,4 +1,9 @@
-import { InsertUser, InsertUserGroup } from '../schema';
+import {
+  InsertRecurringTaskGroup,
+  InsertTask,
+  InsertUser,
+  InsertUserGroup,
+} from '../schema';
 
 export const userJulian = {
   email: 'julian@test.de',
@@ -18,3 +23,19 @@ export const userGroupWG1 = {
   name: 'WG No. 1',
   id: 1,
 } satisfies InsertUserGroup;
+
+export const recurringTaskGroupWeekly = {
+  id: 1,
+  initialStartDate: new Date('2024-07-28 22:00:00Z'),
+  interval: '1 week',
+  title: 'Every week',
+  userGroupId: 1,
+} satisfies InsertRecurringTaskGroup;
+
+export const taskVacuuming = {
+  id: 1,
+  title: 'Staubsaugen',
+  createdAt: new Date(),
+  description: 'Boden saugen',
+  recurringTaskGroupId: recurringTaskGroupWeekly.id,
+} satisfies InsertTask;

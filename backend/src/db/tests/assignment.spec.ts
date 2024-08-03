@@ -1,14 +1,16 @@
-import 'dotenv/config';
 import { dbGetTasksToAssignForCurrentInterval } from '../functions/assignment';
 import {
-  InsertRecurringTaskGroup,
-  InsertTask,
   recurringTaskGroupTable,
   recurringTaskGroupUserTable,
   taskTable,
   taskUserGroupTable,
 } from '../schema';
-import { userGroupWG1, userJulian } from './mock-data';
+import {
+  recurringTaskGroupWeekly,
+  taskVacuuming,
+  userGroupWG1,
+  userJulian,
+} from './mock-data';
 import { truncateAllTables, seedDatabase } from './util';
 import { db } from '..';
 
@@ -20,22 +22,6 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   afterAll(() => {
     jest.useRealTimers();
   });
-
-  const recurringTaskGroupWeekly = {
-    id: 1,
-    initialStartDate: new Date('2024-07-28 22:00:00Z'),
-    interval: '1 week',
-    title: 'Every week',
-    userGroupId: 1,
-  } satisfies InsertRecurringTaskGroup;
-
-  const taskVacuuming = {
-    id: 1,
-    title: 'Staubsaugen',
-    createdAt: new Date(),
-    description: 'Boden saugen',
-    recurringTaskGroupId: recurringTaskGroupWeekly.id,
-  } satisfies InsertTask;
 
   async function setup() {
     await db.insert(recurringTaskGroupTable).values(recurringTaskGroupWeekly);
