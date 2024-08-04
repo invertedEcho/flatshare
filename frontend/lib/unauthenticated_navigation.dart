@@ -12,41 +12,49 @@ class UnauthenticatedNavigation extends StatefulWidget {
 }
 
 class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
+  final PageController _pageController = PageController(initialPage: 0);
   int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        indicatorColor: Colors.blueAccent,
-        selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            icon: Icon(Icons.app_registration),
-            label: 'Register',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.login),
-            label: 'Login',
-          ),
-        ],
-      ),
-      body: <Widget>[
-        RegisterForm(
-          onRegister: () {
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            _pageController.animateToPage(index,
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.linear);
+          },
+          indicatorColor: Colors.blueAccent,
+          selectedIndex: currentPageIndex,
+          destinations: const <Widget>[
+            NavigationDestination(
+              icon: Icon(Icons.app_registration),
+              label: 'Register',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.login),
+              label: 'Login',
+            ),
+          ],
+        ),
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (int index) {
             setState(() {
-              currentPageIndex = 1;
+              currentPageIndex = index;
             });
           },
-          maybeInviteCode: widget.maybeInviteCode,
-        ),
-        const LoginForm(),
-      ][currentPageIndex],
-    );
+          children: [
+            RegisterForm(
+              onRegister: () {
+                _pageController.animateToPage(1,
+                    duration: const Duration(milliseconds: 150),
+                    curve: Curves.linear);
+              },
+              maybeInviteCode: widget.maybeInviteCode,
+            ),
+            const LoginForm(),
+          ],
+        ));
   }
 }
