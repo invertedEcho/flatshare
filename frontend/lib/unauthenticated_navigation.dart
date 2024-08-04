@@ -47,9 +47,9 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
           children: [
             RegisterForm(
               onRegister: () {
-                setState(() {
-                  currentPageIndex = 1;
-                });
+                _pageController.animateToPage(1,
+                    duration: const Duration(milliseconds: 150),
+                    curve: Curves.linear);
               },
               maybeInviteCode: widget.maybeInviteCode,
             ),
