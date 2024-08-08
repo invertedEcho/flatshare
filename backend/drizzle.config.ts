@@ -1,8 +1,5 @@
 import type { Config } from 'drizzle-kit';
 
-// TODO: Replace with t3-oss/env
-import 'dotenv/config';
-
 const databaseUrl = process.env.DATABASE_URL;
 
 if (databaseUrl === undefined) {

@@ -26,7 +26,7 @@ Future<String> login(String email, String password) async {
     case 401:
       throw Exception("Incorrect credentials");
     default:
-      throw Exception("Failed to login");
+      throw Exception("Failed to login: ${response.statusCode}");
   }
 }
 

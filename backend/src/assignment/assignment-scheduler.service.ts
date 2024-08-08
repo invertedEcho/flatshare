@@ -16,7 +16,7 @@ export class AssignmentSchedulerService {
   async handleCron() {
     if (process.env.NODE_ENV !== 'production') return;
     const tasksToCreateAssignmentsFor =
-      await dbGetTasksToAssignForCurrentInterval();
+      await dbGetTasksToAssignForCurrentInterval({});
 
     // TODO: create a arrayGroupBy util function
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<

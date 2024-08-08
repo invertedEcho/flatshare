@@ -32,11 +32,33 @@ cd backend && pnpm dev
 cd frontend && flutter run
 ```
 
+## tests
+
+the tests are currently mainly focused around the database functions used in the assignment scheduler.
+
+as you probably dont want to run the tests against your main database, the tests are setup to run via a different .env file, e.g. `.env.test`
+
+- setup .env.test:
+
+  ```bash
+  touch .env.test
+
+  # content 
+  DB_PASSWORD=postgres://***
+  ```
+
+- run the tests:
+
+  ```bash
+  pnpm test
+  # or pnpm test:watch for "hot-reloaded" tests
+  ```
+
 ## The Stack:
 
 - Backend:
   - NestJS
-  - drizzle
+  - drizzle (ORM)
 
 - Frontend:
   - flutter

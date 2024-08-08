@@ -7,6 +7,6 @@ async function bootstrap() {
   app.enableCors();
   await app.listen(3000, '0.0.0.0');
   const appUrl = await app.getUrl();
-  console.log(`WG-App Backend is running on: ${appUrl}`);
+  console.log(`Flatshare Backend is running on: ${appUrl}`);
 }
 bootstrap();

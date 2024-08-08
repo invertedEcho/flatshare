@@ -4,7 +4,6 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_user_group.dart';
-import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
@@ -65,6 +64,7 @@ class AuthenticatedNavigation extends StatefulWidget {
 }
 
 class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
+  final PageController _pageController = PageController(initialPage: 0);
   int currentPageIndex = 0;
   int? userGroupId;
 
@@ -120,59 +120,64 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
       });
     }
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: userProvider.userGroup?.name != null
-            ? Text(userProvider.userGroup!.name)
-            : null,
-        actions: [
-          PopupMenuButton(itemBuilder: (BuildContext context) {
-            return [
-              PopupMenuItem(
-                  onTap: handleLogout,
-                  child: const Row(children: [
-                    Icon(Icons.logout),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text("Logout"),
-                  ])),
-              PopupMenuItem(
-                  onTap: handleOpenGenerateInviteCode,
-                  child: const Row(
-                    children: [
-                      Icon(Icons.password),
+        appBar: AppBar(
+          centerTitle: true,
+          title: userProvider.userGroup?.name != null
+              ? Text(userProvider.userGroup!.name)
+              : null,
+          actions: [
+            PopupMenuButton(itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(
+                    onTap: handleLogout,
+                    child: const Row(children: [
+                      Icon(Icons.logout),
                       SizedBox(
                         width: 10,
                       ),
-                      Text("Invite new user to your group")
-                    ],
-                  ))
-            ];
-          })
-        ],
-      ),
-      floatingActionButton: userProvider.userGroup?.id != null
-          ? FloatingActionButton(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
-              onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const CreateTask())),
-              child: Icon(Icons.add),
-            )
-          : null,
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        indicatorColor: Colors.blueAccent,
-        selectedIndex: currentPageIndex,
-        destinations: getNavigationDestinations(userGroupId),
-      ),
-      body:
-          getWidgets(userGroupId, widget.userGroupInviteCode)[currentPageIndex],
-    );
+                      Text("Logout"),
+                    ])),
+                PopupMenuItem(
+                    onTap: handleOpenGenerateInviteCode,
+                    child: const Row(
+                      children: [
+                        Icon(Icons.password),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text("Invite new user to your group")
+                      ],
+                    ))
+              ];
+            })
+          ],
+        ),
+        floatingActionButton: userProvider.userGroup?.id != null
+            ? FloatingActionButton(
+                backgroundColor: Colors.blueAccent,
+                foregroundColor: Colors.white,
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const CreateTask())),
+                child: Icon(Icons.add),
+              )
+            : null,
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            _pageController.animateToPage(index,
+                duration: const Duration(milliseconds: 150),
+                curve: Curves.linear);
+          },
+          indicatorColor: Colors.blueAccent,
+          selectedIndex: currentPageIndex,
+          destinations: getNavigationDestinations(userGroupId),
+        ),
+        body: PageView(
+            controller: _pageController,
+            onPageChanged: (int index) {
+              setState(() {
+                currentPageIndex = index;
+              });
+            },
+            children: getWidgets(userGroupId, widget.userGroupInviteCode)));
   }
 }
