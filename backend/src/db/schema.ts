@@ -13,6 +13,17 @@ const assignmentState = z.enum(['pending', 'completed']);
 export const assigmentStateEnum = pgEnum('state', assignmentState.options);
 export type AssignmentState = z.infer<typeof assignmentState>;
 
+export const shoppingListItemState = z.enum([
+  'pending',
+  'purchased',
+  'deleted',
+]);
+export const shoppingListItemStateEnum = pgEnum(
+  'shopping_list_item_state',
+  shoppingListItemState.options,
+);
+export type ShoppingListItemState = z.infer<typeof shoppingListItemState>;
+
 /**
  * This table stores information about all users.
  */
@@ -142,7 +153,7 @@ export type SelectAssignment = typeof assignmentTable.$inferSelect;
 export type InsertAssignment = typeof assignmentTable.$inferInsert;
 
 /**
- * This table stores information about which tasks belong to a user group.
+ * This table stores information about which tasks belong to an user group.
  */
 export const taskUserGroupTable = pgTable('task_user_group', {
   id: serial('id').primaryKey(),
@@ -156,3 +167,16 @@ export const taskUserGroupTable = pgTable('task_user_group', {
 });
 export type SelectTaskUserGroup = typeof taskUserGroupTable.$inferSelect;
 export type InsertTaskUserGroup = typeof taskUserGroupTable.$inferInsert;
+
+// TODO: This table may be too specific, we could store this data in a more general way.
+/**
+ * This table stores information about shopping list items that belong to an user group.
+ */
+export const shoppingListItemTable = pgTable('shopping_list_item', {
+  id: serial('id').primaryKey(),
+  text: text('text').notNull(),
+  userGroupId: integer('user_group_id')
+    .references(() => userGroupTable.id)
+    .notNull(),
+  state: shoppingListItemStateEnum('state').notNull().default('pending'),
+});

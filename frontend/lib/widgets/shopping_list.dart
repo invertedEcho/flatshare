@@ -1,0 +1,238 @@
+import 'dart:io';
+
+import 'package:flatshare/const.dart';
+import 'package:flatshare/fetch/shopping_list.dart';
+import 'package:flatshare/models/shopping_list_item.dart';
+import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/utils/env.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_glow/flutter_glow.dart';
+import 'package:provider/provider.dart';
+import 'package:socket_io_client/socket_io_client.dart' as socket_io;
+
+class ShoppingListWidget extends StatefulWidget {
+  const ShoppingListWidget({super.key});
+
+  @override
+  ShoppingListWidgetState createState() => ShoppingListWidgetState();
+}
+
+class ShoppingListWidgetState extends State<ShoppingListWidget> {
+  final controller = TextEditingController();
+
+  late socket_io.Socket socket;
+  var isConnected = false;
+  List<ShoppingListItem> shoppingListItems = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    socket = socket_io.io(
+      getPureApiBaseUrl(),
+      socket_io.OptionBuilder()
+          // this is required for flutter
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .build(),
+    );
+
+    socket.onConnect((_) {
+      if (mounted) {
+        setState(() {
+          isConnected = true;
+        });
+      }
+    });
+
+    // TODO: when disposing this widget, the socket gets disconnected, and we try to mutate the state, which causes an exception to be thrown
+    // however, we do want to change the isConnected state when the socket disconnects, but even with the if mounted check the exception gets thrown
+    // socket.onDisconnect((_) {
+    //   if (mounted) {
+    //     setState(() {
+    //       isConnected = false;
+    //     });
+    //   }
+    // });
+
+    socket.on('shopping-list-item', (data) {
+      var parsedItem = ShoppingListItem.fromJson(data);
+      setState(() {
+        shoppingListItems.add(parsedItem);
+      });
+    });
+
+    socket.on('update-shopping-list-item', (data) {
+      var parsedItem = ShoppingListItem.fromJson(data);
+      if (parsedItem.state == 'deleted') return;
+      var itemsExceptUpdated =
+          shoppingListItems.where((item) => item.id != parsedItem.id).toList();
+      itemsExceptUpdated.add(parsedItem);
+      setState(() {
+        shoppingListItems = itemsExceptUpdated;
+      });
+    });
+
+    socket.connect();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    socket.onError((error) {
+      if (error is SocketException) {
+        if (error.osError?.errorCode == 111) {
+          setState(() {
+            isConnected = false;
+          });
+        }
+      }
+      // TODO: i really dont get whats going here, for some reason in this callback even if the user is still on this screen,
+      // the widget gets unmounted and accessing context will fail, thus we need the extra mounted check
+      // i guess i am not long enough in the flutter game yet.
+      // maybe the widget gets remounted and in that time we try to show the snackbar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to connect to websocket: $error')),
+        );
+      }
+    });
+
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var userGroupId = userProvider.userGroup?.id;
+    if (userGroupId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Failed to fetch initial shopping list items. Could not find your user group id. Try logging in again.')),
+      );
+    }
+    fetchShoppingList(userGroupId: userGroupId!).then((items) {
+      var nonDeletedItems =
+          items.where((item) => item.state != 'deleted').toList();
+      setState(() {
+        shoppingListItems = nonDeletedItems;
+      });
+    });
+  }
+
+  List<Widget> getConnectionStatusRowWidgets() {
+    if (isConnected) {
+      return const [
+        GlowIcon(
+          Icons.link,
+          glowColor: Colors.green,
+        ),
+        Text("Real-Time Synchronization: Connected")
+      ];
+    } else {
+      return const [
+        GlowIcon(
+          Icons.link,
+          glowColor: Colors.red,
+        ),
+        Text("Real-Time Synchronization: Not Connected")
+      ];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              children: getConnectionStatusRowWidgets(),
+            ),
+            Form(
+                child: TextFormField(
+              controller: controller,
+              decoration:
+                  const InputDecoration(labelText: "New Shopping List Item"),
+            )),
+            const SizedBox(height: generalSizedBoxHeight),
+            ElevatedButton(
+                onPressed: sendNewShoppingListItem, child: const Text("Add")),
+            const SizedBox(height: generalSizedBoxHeight),
+            Expanded(
+              child: ListView.builder(
+                  itemCount: shoppingListItems.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    var shoppingListItem = shoppingListItems[index];
+                    return Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        elevation: 15,
+                        shadowColor: Colors.black,
+                        child: Dismissible(
+                            onDismissed: (_) {
+                              updateShoppingListItem(
+                                  shoppingListItem, 'deleted');
+                              setState(() {
+                                shoppingListItems.remove(shoppingListItem);
+                              });
+                            },
+                            key: Key(shoppingListItem.id.toString()),
+                            child: ListTile(
+                              title: Row(
+                                children: [
+                                  Text(shoppingListItem.text),
+                                  const SizedBox(width: 8),
+                                ],
+                              ),
+                              subtitle: const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[],
+                              ),
+                              trailing: Checkbox(
+                                onChanged: (bool? value) {
+                                  final newState =
+                                      value! ? 'purchased' : 'pending';
+                                  updateShoppingListItem(
+                                      shoppingListItem, newState);
+                                },
+                                value: shoppingListItem.state == 'purchased',
+                              ),
+                            )));
+                  }),
+            )
+          ],
+        ));
+  }
+
+  void sendNewShoppingListItem() {
+    if (controller.text.isEmpty) {
+      return;
+    }
+    var userProvider = Provider.of<UserProvider>(context, listen: false);
+    var userGroupId = userProvider.userGroup?.id;
+    if (userGroupId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                'Failed to upload new shopping list item. Could not find your user group id. Try logging in again.')),
+      );
+    }
+
+    // TODO: we should use emit with ack to show error message to the user if something failed
+    socket.emit("shopping-list-item",
+        {'text': controller.text, 'userGroupId': userGroupId});
+  }
+
+  void updateShoppingListItem(
+      ShoppingListItem shoppingListItem, String newState) {
+    socket.emit('update-shopping-list-item',
+        {'id': shoppingListItem.id, 'state': newState});
+  }
+
+  @override
+  void dispose() {
+    socket.off('shopping-list-item');
+    socket.dispose();
+    controller.dispose();
+    super.dispose();
+  }
+}

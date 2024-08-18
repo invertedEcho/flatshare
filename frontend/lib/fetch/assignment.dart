@@ -7,7 +7,6 @@ import 'package:flatshare/utils/env.dart';
 Future<List<Assignment>> fetchAssignments({required int groupId}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
-      // TODO: correct groupid once group feature is implemented
       .get(Uri.parse("$apiBaseUrl/assignments?groupId=$groupId"));
 
   if (response.statusCode == 200) {

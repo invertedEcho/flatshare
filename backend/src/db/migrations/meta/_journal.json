@@ -22,6 +22,20 @@
       "when": 1720991061265,
       "tag": "0002_equal_major_mapleleaf",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1724003265793,
+      "tag": "0003_sticky_steve_rogers",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1724515225845,
+      "tag": "0004_natural_toxin",
+      "breakpoints": true
     }
   ]
 }
