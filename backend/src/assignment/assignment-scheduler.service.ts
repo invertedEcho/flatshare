@@ -5,30 +5,24 @@ import {
   dbGetAssignmentsForTaskGroup,
   dbGetCurrentAssignmentsForTaskGroup,
   dbGetTasksToAssignForCurrentInterval,
+  TaskToAssign,
 } from 'src/db/functions/assignment';
 import { dbGetTaskGroupUsers } from 'src/db/functions/task-group';
 import { randomFromArray } from 'src/utils/array';
+import { getStartOfInterval } from 'src/utils/date';
 
 // TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
-    if (process.env.NODE_ENV !== 'production') return;
+    // if (process.env.NODE_ENV !== 'production') return;
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval({});
 
     // TODO: create a arrayGroupBy util function
     const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
-      Map<
-        number,
-        {
-          taskId: number;
-          taskGroupId: number;
-          taskGroupInitialStartDate: Date;
-          isInFirstInterval: boolean;
-        }[]
-      >
+      Map<number, TaskToAssign[]>
     >((acc, curr) => {
       if (!acc.get(curr.taskGroupId)) {
         acc.set(curr.taskGroupId, []);
@@ -60,14 +54,17 @@ export class AssignmentSchedulerService {
       }
 
       const hydratedAssignments = tasks.map(
-        ({ taskId, isInFirstInterval, taskGroupInitialStartDate }) => ({
+        ({
+          taskId,
+          isInFirstInterval,
+          taskGroupInitialStartDate,
+          interval,
+        }) => ({
           taskId,
           userId: nextResponsibleUserId,
           createdAt: isInFirstInterval
             ? taskGroupInitialStartDate
-            : // IDK if this is correct, what if its 23:00 for example in local time zone?
-              // FIXME: assignments should only ever have the very beginning of an interval as their `createdAt` date, see the comment above `dbGetCurrentAssignmentsForTaskGroup`.
-              new Date(new Date().setHours(0, 0, 0, 0)),
+            : getStartOfInterval(interval),
         }),
       );
       console.info(

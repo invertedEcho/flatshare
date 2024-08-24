@@ -14,7 +14,7 @@ import {
 } from 'src/utils/interval';
 import { dbCreateTaskGroup } from './task-group';
 import { dbGetUsersOfUserGroup } from './user-group';
-import { getDefaultInitialStartDateForInterval } from 'src/utils/date';
+import { getStartOfInterval } from 'src/utils/date';
 
 export async function dbGetAllTasks({
   groupId,
@@ -86,7 +86,7 @@ export async function dbCreateRecurringTask({
             userIds: usersOfUserGroup.map(
               (userOfUserGroup) => userOfUserGroup.userId,
             ),
-            initialStartDate: getDefaultInitialStartDateForInterval(interval),
+            initialStartDate: getStartOfInterval(interval),
             userGroupId,
           })
         ).id

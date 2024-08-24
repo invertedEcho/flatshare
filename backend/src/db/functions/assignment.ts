@@ -10,12 +10,13 @@ import {
   userTable,
   userUserGroupTable,
 } from '../schema';
+import { DefaultPostgresInterval } from 'src/utils/interval';
 
 // FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
 // the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
 // than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
 //
-// Alternatively, we need make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
+// Alternatively, we need to make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
 //  for a weekly task group. If that were the case this function would correctly even in the current state.
 
 export async function dbGetAssignmentsFromCurrentInterval(
@@ -141,6 +142,7 @@ export type TaskToAssign = {
   taskGroupId: number;
   taskGroupInitialStartDate: Date;
   isInFirstInterval: boolean;
+  interval: DefaultPostgresInterval;
 };
 
 // TODO: I haven't found a better way to mock the date than just passing it in here as a JS date instead of using `NOW()` in the queries.
@@ -160,6 +162,7 @@ export async function dbGetTasksToAssignForCurrentInterval({
         taskGroupId: recurringTaskGroupTable.id,
         taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
         isInFirstInterval: sql<boolean>`CAST(${currentTimeString} AS timestamp) < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
+        interval: recurringTaskGroupTable.interval,
       })
       .from(recurringTaskGroupTable)
       .innerJoin(
@@ -183,7 +186,8 @@ export async function dbGetTasksToAssignForCurrentInterval({
         ),
       );
 
-    return taskIdsToCreateAssignmentsFor;
+    // TODO: remove asssertion
+    return taskIdsToCreateAssignmentsFor as TaskToAssign[];
   } catch (error) {
     console.error({ error });
     throw error;
