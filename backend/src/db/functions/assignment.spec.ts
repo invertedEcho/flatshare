@@ -25,6 +25,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   });
 
   afterAll(async () => {
+    await truncateAllTables();
     await client.end();
   });
 
@@ -53,6 +54,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       taskGroupId: recurringTaskGroupWeekly.id,
       isInFirstInterval: true,
       taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+      interval: '7 days',
     } satisfies TaskToAssign;
 
     expect(result).toHaveLength(1);
@@ -78,6 +80,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       taskGroupId: recurringTaskGroupWeekly.id,
       isInFirstInterval: true,
       taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+      interval: '7 days',
     } satisfies TaskToAssign;
 
     const result = await dbGetTasksToAssignForCurrentInterval({
@@ -107,6 +110,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       taskGroupId: recurringTaskGroupWeekly.id,
       isInFirstInterval: false,
       taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+      interval: '7 days',
     } satisfies TaskToAssign;
 
     await db.insert(assignmentTable).values({
