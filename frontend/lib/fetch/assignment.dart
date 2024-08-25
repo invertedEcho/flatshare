@@ -5,7 +5,7 @@ import 'package:flatshare/models/assignment.dart';
 import 'package:flatshare/utils/env.dart';
 
 Future<List<Assignment>> fetchAssignments({required int groupId}) async {
-  var apiBaseUrl = getApiBaseUrl();
+  var apiBaseUrl = getApiBaseUrl(withApiSuffix: true);
   final response = await authenticatedClient
       .get(Uri.parse("$apiBaseUrl/assignments?groupId=$groupId"));
 

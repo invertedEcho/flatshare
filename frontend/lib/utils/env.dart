@@ -1,21 +1,14 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// TODO: i dont like these two functions
-
-String getApiBaseUrl() {
+String getApiBaseUrl({bool withApiSuffix = true}) {
   String? maybeApibaseUrl = dotenv.env["API_BASE_URL"];
 
   assert(maybeApibaseUrl != null);
 
-  return "$maybeApibaseUrl/api";
-}
-
-String getPureApiBaseUrl() {
-  String? maybeApibaseUrl = dotenv.env["API_BASE_URL"];
-
-  assert(maybeApibaseUrl != null);
-
-  return "$maybeApibaseUrl";
+  if (withApiSuffix) {
+    return "$maybeApibaseUrl/api";
+  }
+  return maybeApibaseUrl!;
 }
 
 String getInviteCodeUrl({required String inviteCode}) {

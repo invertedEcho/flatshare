@@ -26,15 +26,8 @@
     {
       "idx": 3,
       "version": "6",
-      "when": 1724003265793,
-      "tag": "0003_sticky_steve_rogers",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1724515225845,
-      "tag": "0004_natural_toxin",
+      "when": 1724592372278,
+      "tag": "0003_famous_killmonger",
       "breakpoints": true
     }
   ]

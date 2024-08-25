@@ -1,5 +1,5 @@
 {
-  "id": "999ab38f-b6cd-409b-9fb4-057b123ba847",
+  "id": "606b33bc-a589-4467-856f-46ffd6b88372",
   "prevId": "93495801-ce44-4776-9f8b-5558563a7169",
   "version": "6",
   "dialect": "postgresql",
@@ -28,7 +28,7 @@
         },
         "state": {
           "name": "state",
-          "type": "state",
+          "type": "assignment_state",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
@@ -210,6 +210,14 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "shopping_list_item_state",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
         }
       },
       "indexes": {},
@@ -532,12 +540,21 @@
     }
   },
   "enums": {
-    "public.state": {
-      "name": "state",
+    "public.assignment_state": {
+      "name": "assignment_state",
       "schema": "public",
       "values": [
         "pending",
         "completed"
+      ]
+    },
+    "public.shopping_list_item_state": {
+      "name": "shopping_list_item_state",
+      "schema": "public",
+      "values": [
+        "pending",
+        "purchased",
+        "deleted"
       ]
     }
   },

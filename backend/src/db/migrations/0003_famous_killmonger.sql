@@ -1,7 +1,14 @@
+DO $$ BEGIN
+ CREATE TYPE "public"."shopping_list_item_state" AS ENUM('pending', 'purchased', 'deleted');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "shopping_list_item" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"text" text NOT NULL,
-	"user_group_id" integer NOT NULL
+	"user_group_id" integer NOT NULL,
+	"state" "shopping_list_item_state" DEFAULT 'pending' NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN

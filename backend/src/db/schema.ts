@@ -10,7 +10,10 @@ import {
 import { z } from 'zod';
 
 const assignmentState = z.enum(['pending', 'completed']);
-export const assigmentStateEnum = pgEnum('state', assignmentState.options);
+export const assigmentStateEnum = pgEnum(
+  'assignment_state',
+  assignmentState.options,
+);
 export type AssignmentState = z.infer<typeof assignmentState>;
 
 export const shoppingListItemState = z.enum([
@@ -168,7 +171,6 @@ export const taskUserGroupTable = pgTable('task_user_group', {
 export type SelectTaskUserGroup = typeof taskUserGroupTable.$inferSelect;
 export type InsertTaskUserGroup = typeof taskUserGroupTable.$inferInsert;
 
-// TODO: This table may be too specific, we could store this data in a more general way.
 /**
  * This table stores information about shopping list items that belong to an user group.
  */

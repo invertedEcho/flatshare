@@ -29,7 +29,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
     super.initState();
 
     socket = socket_io.io(
-      getPureApiBaseUrl(),
+      getApiBaseUrl(withApiSuffix: false),
       socket_io.OptionBuilder()
           // this is required for flutter
           .setTransports(['websocket'])
@@ -55,6 +55,27 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
     //   }
     // });
 
+    socket.onError((error) {
+      if (error is SocketException) {
+        if (error.osError?.errorCode == 111) {
+          if (mounted) {
+            setState(() {
+              isConnected = false;
+            });
+          }
+        }
+      }
+      // TODO: i really dont get whats going here, for some reason in this callback even if the user is still on this screen,
+      // the widget gets unmounted and accessing context will fail, thus we need the extra mounted check
+      // i guess i am not long enough in the flutter game yet.
+      // maybe the widget gets remounted and in that time we try to show the snackbar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      }
+    });
+
     socket.on('shopping-list-item', (data) {
       var parsedItem = ShoppingListItem.fromJson(data);
       setState(() {
@@ -79,25 +100,6 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    socket.onError((error) {
-      if (error is SocketException) {
-        if (error.osError?.errorCode == 111) {
-          setState(() {
-            isConnected = false;
-          });
-        }
-      }
-      // TODO: i really dont get whats going here, for some reason in this callback even if the user is still on this screen,
-      // the widget gets unmounted and accessing context will fail, thus we need the extra mounted check
-      // i guess i am not long enough in the flutter game yet.
-      // maybe the widget gets remounted and in that time we try to show the snackbar
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to connect to websocket: $error')),
-        );
-      }
-    });
 
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     var userGroupId = userProvider.userGroup?.id;
