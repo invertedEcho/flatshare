@@ -23,6 +23,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
 
   afterAll(async () => {
     await truncateAllTables();
+    // cleanup the client, else jest hangs
     await client.end();
   });
 
