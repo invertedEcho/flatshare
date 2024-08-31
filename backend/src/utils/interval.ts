@@ -1,4 +1,13 @@
-export type DefaultPostgresInterval = '1 day' | '7 days' | '1 month';
+import { z } from 'zod';
+
+export const defaultPostgresIntervalSchema = z.union([
+  z.literal('1 day'),
+  z.literal('7 days'),
+  z.literal('1 month'),
+]);
+export type DefaultPostgresInterval = z.infer<
+  typeof defaultPostgresIntervalSchema
+>;
 export type DefaultDisplayInterval = 'Daily' | 'Weekly' | 'Monthly';
 
 /** Maps the default display intervals we use in the frontend to the format that postgres expects. */

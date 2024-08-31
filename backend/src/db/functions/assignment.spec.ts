@@ -2,26 +2,23 @@ import {
   dbGetTasksToAssignForCurrentInterval,
   TaskToAssign,
 } from '../functions/assignment';
-import {
-  assignmentTable,
-  recurringTaskGroupTable,
-  recurringTaskGroupUserTable,
-  taskTable,
-  taskUserGroupTable,
-} from '../schema';
+import { assignmentTable } from '../schema';
 import { client, db } from '..';
 import {
   recurringTaskGroupWeekly,
   userJulian,
   taskVacuuming,
-  userGroupWG1,
 } from '../tests/mock-data';
-import { truncateAllTables, seedDatabase } from '../tests/util';
+import {
+  truncateAllTables,
+  seedDatabaseWithUserData as seedDatabaseWithUserData,
+  seedDatabaseWithTaskData,
+} from '../tests/util';
 
 describe('dbGetTasksToAssignForCurrentInterval', () => {
   beforeEach(async () => {
     await truncateAllTables();
-    await seedDatabase();
+    await seedDatabaseWithUserData();
   });
 
   afterAll(async () => {
@@ -29,21 +26,8 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
     await client.end();
   });
 
-  async function setup() {
-    await db.insert(recurringTaskGroupTable).values(recurringTaskGroupWeekly);
-    await db.insert(recurringTaskGroupUserTable).values({
-      recurringTaskGroupId: recurringTaskGroupWeekly.id,
-      userId: userJulian.id,
-    });
-
-    await db.insert(taskTable).values(taskVacuuming);
-    await db
-      .insert(taskUserGroupTable)
-      .values({ groupId: userGroupWG1.id, taskId: taskVacuuming.id });
-  }
-
   it('does return tasks where initial start date is in the past', async () => {
-    await setup();
+    await seedDatabaseWithTaskData();
 
     const result = await dbGetTasksToAssignForCurrentInterval({
       currentTime: new Date('2024-07-29 13:00:00Z'),
@@ -63,7 +47,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   });
 
   it('does not return tasks where the initalStartDate is in the future', async () => {
-    await setup();
+    await seedDatabaseWithTaskData();
 
     const result = await dbGetTasksToAssignForCurrentInterval({
       currentTime: new Date('2024-07-28 21:59:59Z'),
@@ -73,7 +57,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   });
 
   it('returns a task where there are no assignments yet', async () => {
-    await setup();
+    await seedDatabaseWithTaskData();
 
     const expectedTask = {
       taskId: taskVacuuming.id,
@@ -91,7 +75,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   });
 
   it('returns no tasks where there is already an assignment for the current period', async () => {
-    await setup();
+    await seedDatabaseWithTaskData();
     await db.insert(assignmentTable).values({
       taskId: taskVacuuming.id,
       userId: userJulian.id,
@@ -104,7 +88,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   });
 
   it('returns a task for which there exists an assignment in the previous period', async () => {
-    await setup();
+    await seedDatabaseWithTaskData();
     const expectedTask = {
       taskId: taskVacuuming.id,
       taskGroupId: recurringTaskGroupWeekly.id,

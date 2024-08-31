@@ -10,7 +10,8 @@ import {
   userTable,
   userUserGroupTable,
 } from '../schema';
-import { DefaultPostgresInterval } from 'src/utils/interval';
+import { z } from 'zod';
+import { defaultPostgresIntervalSchema } from 'src/utils/interval';
 
 // FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
 // the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
@@ -137,16 +138,17 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
   return currentAssignments;
 }
 
-export type TaskToAssign = {
-  taskId: number;
-  taskGroupId: number;
-  taskGroupInitialStartDate: Date;
-  isInFirstInterval: boolean;
-  interval: DefaultPostgresInterval;
-};
+const taskToAssignSchema = z.object({
+  taskId: z.number(),
+  taskGroupId: z.number(),
+  taskGroupInitialStartDate: z.date(),
+  isInFirstInterval: z.boolean(),
+  interval: defaultPostgresIntervalSchema,
+});
 
-// TODO: I haven't found a better way to mock the date than just passing it in here as a JS date instead of using `NOW()` in the queries.
-// Research if there is a better way.
+export type TaskToAssign = z.infer<typeof taskToAssignSchema>;
+
+// TODO: doesnt seem like you can (should?) mock the time of the database, so we use this argument instead of `NOW()`
 export async function dbGetTasksToAssignForCurrentInterval({
   currentTime = new Date(),
 }: {
@@ -156,7 +158,7 @@ export async function dbGetTasksToAssignForCurrentInterval({
     const currentTimeString = currentTime.toISOString();
 
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period
-    const taskIdsToCreateAssignmentsFor = await db
+    const tasksToAssign = await db
       .select({
         taskId: taskTable.id,
         taskGroupId: recurringTaskGroupTable.id,
@@ -186,8 +188,21 @@ export async function dbGetTasksToAssignForCurrentInterval({
         ),
       );
 
-    // TODO: remove asssertion
-    return taskIdsToCreateAssignmentsFor as TaskToAssign[];
+    // drizzle returns the interval as type string, so we use zod to "convert" them to the correct type
+    const parsedTasksToAssign = z
+      .array(taskToAssignSchema)
+      .safeParse(tasksToAssign);
+
+    if (!parsedTasksToAssign.success) {
+      // TODO: We need a logger connected to a logdrain, and a monitoring dashboard. This most likely never happens, but if it does,
+      // it would be quite critical.
+      console.error({
+        msg: 'Could not parse tasksToAssign result set from database to the expected type.',
+      });
+      return [];
+    }
+
+    return parsedTasksToAssign.data;
   } catch (error) {
     console.error({ error });
     throw error;
