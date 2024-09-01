@@ -5,6 +5,7 @@ import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_user_group.dart';
 import 'package:flatshare/widgets/join_group.dart';
+import 'package:flatshare/widgets/shopping_list.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
 import 'package:flatshare/widgets/tasks/tasks_overview_widget.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
     return [
       const AssignmentsWidget(),
       const TasksOverviewWidget(),
+      ShoppingListWidget(userGroupId: userGroupId),
     ];
   }
   return [
@@ -39,6 +41,8 @@ List<NavigationDestination> getNavigationDestinations(int? userGroupId) {
         icon: Icon(Icons.app_registration),
         label: 'Tasks',
       ),
+      const NavigationDestination(
+          icon: Icon(Icons.shopping_cart), label: "Shopping List")
     ];
   }
   return [
@@ -152,13 +156,15 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             })
           ],
         ),
-        floatingActionButton: userProvider.userGroup?.id != null
+        floatingActionButton: userProvider.userGroup?.id != null &&
+                // TODO: oh yeaaaah lets just put this random number here
+                currentPageIndex != 2
             ? FloatingActionButton(
                 backgroundColor: Colors.blueAccent,
                 foregroundColor: Colors.white,
                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const CreateTask())),
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
               )
             : null,
         bottomNavigationBar: NavigationBar(

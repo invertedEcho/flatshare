@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "pnpm": "~8"
+    "pnpm": "~9"
   },
   "scripts": {
     "build": "nest build",
@@ -36,12 +36,15 @@
     "pg": "^8.11.5",
     "postgres": "^3.4.4",
     "reflect-metadata": "^0.2.0",
+    "socket.io": "^4.7.5",
     "zod": "^3.23.4"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
+    "@nestjs/platform-socket.io": "^10.4.1",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.3.9",
+    "@nestjs/websockets": "^10.4.1",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
@@ -57,6 +60,7 @@
     "jest": "^29.5.0",
     "pm2": "^5.4.0",
     "prettier": "^3.0.0",
+    "run-script-webpack-plugin": "^0.2.0",
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
@@ -82,6 +86,5 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  },
-  "packageManager": "pnpm@8.15.5+sha1.a58c038faac410c947dbdb93eb30994037d0fce2"
+  }
 }

@@ -22,6 +22,13 @@
       "when": 1720991061265,
       "tag": "0002_equal_major_mapleleaf",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1724592372278,
+      "tag": "0003_famous_killmonger",
+      "breakpoints": true
     }
   ]
 }

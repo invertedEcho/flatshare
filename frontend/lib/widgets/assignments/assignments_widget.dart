@@ -1,3 +1,4 @@
+import 'package:flatshare/const.dart';
 import 'package:flatshare/fetch/assignment.dart';
 import 'package:flatshare/models/assignment.dart';
 import 'package:flatshare/models/user_group.dart';
@@ -90,7 +91,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                   const TextStyle(color: Colors.blueAccent)))
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: generalSizedBoxHeight),
                       ListView.builder(
                           shrinkWrap: true,
                           physics: const ClampingScrollPhysics(),
@@ -103,7 +104,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(13),
                               ),
-                              elevation: 1,
+                              elevation: 15,
                               shadowColor: Colors.black,
                               child: ListTile(
                                 title: Row(

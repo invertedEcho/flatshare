@@ -6,6 +6,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
   await app.listen(3000, '0.0.0.0');
+
   const appUrl = await app.getUrl();
   console.log(`Flatshare Backend is running on: ${appUrl}`);
 }

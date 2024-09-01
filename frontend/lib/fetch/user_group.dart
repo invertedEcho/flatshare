@@ -65,7 +65,6 @@ Future<String> generateInviteCodeForUserGroup(
   switch (response.statusCode) {
     case 200:
       Map<String, dynamic> result = jsonDecode(response.body);
-      // TODO
       return result['inviteCode'] as String;
     default:
       throw Exception(
