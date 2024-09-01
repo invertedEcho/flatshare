@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flatshare/const.dart';
 import 'package:flatshare/fetch/shopping_list.dart';
+import 'package:flatshare/main.dart';
 import 'package:flatshare/models/shopping_list_item.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
@@ -11,7 +12,9 @@ import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 
 class ShoppingListWidget extends StatefulWidget {
-  const ShoppingListWidget({super.key});
+  final int userGroupId;
+
+  const ShoppingListWidget({super.key, required this.userGroupId});
 
   @override
   ShoppingListWidgetState createState() => ShoppingListWidgetState();
@@ -28,73 +31,81 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
   void initState() {
     super.initState();
 
-    socket = socket_io.io(
-      getApiBaseUrl(withApiSuffix: false),
-      socket_io.OptionBuilder()
-          // this is required for flutter
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .build(),
-    );
-
-    socket.onConnect((_) {
-      if (mounted) {
-        setState(() {
-          isConnected = true;
-        });
+    storage.read(key: 'jwt-token').then((token) {
+      if (token == null) {
+        return;
       }
-    });
 
-    // TODO: when disposing this widget, the socket gets disconnected, and we try to mutate the state, which causes an exception to be thrown
-    // however, we do want to change the isConnected state when the socket disconnects, but even with the if mounted check the exception gets thrown
-    // socket.onDisconnect((_) {
-    //   if (mounted) {
-    //     setState(() {
-    //       isConnected = false;
-    //     });
-    //   }
-    // });
+      socket = socket_io.io(
+        getApiBaseUrl(withApiSuffix: false),
+        socket_io.OptionBuilder()
+            .setTransports(['websocket'])
+            .setExtraHeaders({'Authorization': 'Bearer $token'})
+            .setQuery({'userGroupId': widget.userGroupId})
+            .disableAutoConnect()
+            .build(),
+      );
 
-    socket.onError((error) {
-      if (error is SocketException) {
-        if (error.osError?.errorCode == 111) {
-          if (mounted) {
-            setState(() {
-              isConnected = false;
-            });
+      socket.onConnect((_) {
+        if (mounted) {
+          setState(() {
+            isConnected = true;
+          });
+        }
+      });
+
+      // TODO: when disposing this widget, the socket gets disconnected, and we try to mutate the state, which causes an exception to be thrown
+      // however, we do want to change the isConnected state when the socket disconnects, but even with the if mounted check the exception gets thrown
+      // socket.onDisconnect((_) {
+      //   if (mounted) {
+      //     setState(() {
+      //       isConnected = false;
+      //     });
+      //   }
+      // });
+
+      socket.onError((error) {
+        if (error is SocketException) {
+          if (error.osError?.errorCode == 111) {
+            if (mounted) {
+              setState(() {
+                isConnected = false;
+              });
+            }
           }
         }
-      }
-      // TODO: i really dont get whats going here, for some reason in this callback even if the user is still on this screen,
-      // the widget gets unmounted and accessing context will fail, thus we need the extra mounted check
-      // i guess i am not long enough in the flutter game yet.
-      // maybe the widget gets remounted and in that time we try to show the snackbar
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error)),
-        );
-      }
-    });
-
-    socket.on('shopping-list-item', (data) {
-      var parsedItem = ShoppingListItem.fromJson(data);
-      setState(() {
-        shoppingListItems.add(parsedItem);
+        // TODO: i really dont get whats going here, for some reason in this callback even if the user is still on this screen,
+        // the widget gets unmounted and accessing context will fail, thus we need the extra mounted check
+        // i guess i am not long enough in the flutter game yet.
+        // maybe the widget gets remounted and in that time we try to show the snackbar
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error)),
+          );
+        }
       });
-    });
 
-    socket.on('update-shopping-list-item', (data) {
-      var parsedItem = ShoppingListItem.fromJson(data);
-      if (parsedItem.state == 'deleted') return;
-      var itemsExceptUpdated =
-          shoppingListItems.where((item) => item.id != parsedItem.id).toList();
-      itemsExceptUpdated.add(parsedItem);
-      setState(() {
-        shoppingListItems = itemsExceptUpdated;
+      socket.on('shopping-list-item', (data) {
+        var parsedItem = ShoppingListItem.fromJson(data);
+        setState(() {
+          shoppingListItems.add(parsedItem);
+        });
       });
-    });
 
-    socket.connect();
+      socket.on('update-shopping-list-item', (data) {
+        var parsedItem = ShoppingListItem.fromJson(data);
+        if (parsedItem.state == 'deleted') return;
+        var itemsExceptUpdated = shoppingListItems
+            .where((item) => item.id != parsedItem.id)
+            .toList();
+        itemsExceptUpdated.add(parsedItem);
+        setState(() {
+          shoppingListItems = itemsExceptUpdated;
+        });
+      });
+
+      socket.connect();
+    });
   }
 
   @override

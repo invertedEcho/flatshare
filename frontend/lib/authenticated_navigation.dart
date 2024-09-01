@@ -18,7 +18,7 @@ List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
     return [
       const AssignmentsWidget(),
       const TasksOverviewWidget(),
-      const ShoppingListWidget(),
+      ShoppingListWidget(userGroupId: userGroupId),
     ];
   }
   return [
