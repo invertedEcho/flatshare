@@ -6,6 +6,6 @@ export class ShoppingListController {
   @Get(':userGroupId')
   async getAll(@Param('userGroupId') userGroupId: number) {
     const shoppingListItems = await dbGetAllShoppingListItems(userGroupId);
-    return shoppingListItems;
+    return shoppingListItems.sort((a, b) => a.id - b.id);
   }
 }
