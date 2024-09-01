@@ -80,7 +80,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
         // maybe the widget gets remounted and in that time we try to show the snackbar
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error)),
+            SnackBar(content: Text(error.toString())),
           );
         }
       });
@@ -99,6 +99,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
             .where((item) => item.id != parsedItem.id)
             .toList();
         itemsExceptUpdated.add(parsedItem);
+        itemsExceptUpdated.sort((a, b) => a.id.compareTo(b.id));
         setState(() {
           shoppingListItems = itemsExceptUpdated;
         });
