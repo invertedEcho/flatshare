@@ -16,7 +16,11 @@ import { getStartOfInterval } from 'src/utils/date';
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
-    if (process.env.NODE_ENV !== 'production') return;
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'test'
+    )
+      return;
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval({});
 
