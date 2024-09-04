@@ -10,6 +10,15 @@ import {
   userTable,
   userUserGroupTable,
 } from '../schema';
+import { z } from 'zod';
+import { defaultPostgresIntervalSchema } from 'src/utils/interval';
+
+// FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
+// the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
+// than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
+//
+// Alternatively, we need to make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
+//  for a weekly task group. If that were the case this function would correctly even in the current state.
 
 export async function dbGetAssignmentsFromCurrentInterval(
   groupId: number,
@@ -104,6 +113,13 @@ export async function dbGetAssignmentsForTaskGroup(
   return await result.limit(limit);
 }
 
+// FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
+// the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
+// than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
+//
+// Alternatively, we need make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
+//  for a weekly task group. If that were the case this function would correctly even in the current state.
+
 export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
   const currentAssignments = await db
     .select()
@@ -113,22 +129,26 @@ export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
       recurringTaskGroupTable,
       eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
     )
+
     .where(
+      // TODO: convert to local time zone before comparison
       sql`${assignmentTable.createdAt} >= NOW() - ${recurringTaskGroupTable.interval} AND ${recurringTaskGroupTable.id} = ${taskGroupId}`,
     );
 
   return currentAssignments;
 }
 
-export type TaskToAssign = {
-  taskId: number;
-  taskGroupId: number;
-  taskGroupInitialStartDate: Date;
-  isInFirstInterval: boolean;
-};
+const taskToAssignSchema = z.object({
+  taskId: z.number(),
+  taskGroupId: z.number(),
+  taskGroupInitialStartDate: z.date(),
+  isInFirstInterval: z.boolean(),
+  interval: defaultPostgresIntervalSchema,
+});
 
-// TODO: I haven't found a better way to mock the date than just passing it in here as a JS date instead of using `NOW()` in the queries.
-// Research if there is a better way.
+export type TaskToAssign = z.infer<typeof taskToAssignSchema>;
+
+// TODO: doesnt seem like you can (should?) mock the time of the database, so we use this argument instead of `NOW()`
 export async function dbGetTasksToAssignForCurrentInterval({
   currentTime = new Date(),
 }: {
@@ -138,12 +158,13 @@ export async function dbGetTasksToAssignForCurrentInterval({
     const currentTimeString = currentTime.toISOString();
 
     // Get all tasks that either have no assignments yet or don't have an assignment in the current period
-    const taskIdsToCreateAssignmentsFor = await db
+    const tasksToAssign = await db
       .select({
         taskId: taskTable.id,
         taskGroupId: recurringTaskGroupTable.id,
         taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
         isInFirstInterval: sql<boolean>`CAST(${currentTimeString} AS timestamp) < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
+        interval: recurringTaskGroupTable.interval,
       })
       .from(recurringTaskGroupTable)
       .innerJoin(
@@ -167,7 +188,21 @@ export async function dbGetTasksToAssignForCurrentInterval({
         ),
       );
 
-    return taskIdsToCreateAssignmentsFor;
+    // drizzle returns the interval as type string, so we use zod to "convert" them to the correct type
+    const parsedTasksToAssign = z
+      .array(taskToAssignSchema)
+      .safeParse(tasksToAssign);
+
+    if (!parsedTasksToAssign.success) {
+      // TODO: We need a logger connected to a logdrain, and a monitoring dashboard. This most likely never happens, but if it does,
+      // it would be quite critical.
+      console.error({
+        msg: 'Could not parse tasksToAssign result set from database to the expected type.',
+      });
+      return [];
+    }
+
+    return parsedTasksToAssign.data;
   } catch (error) {
     console.error({ error });
     throw error;
