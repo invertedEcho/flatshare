@@ -30,7 +30,7 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Tasks:")),
+      appBar: AppBar(title: const Text("Tasks:")),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(mainAxisSize: MainAxisSize.min, children: [

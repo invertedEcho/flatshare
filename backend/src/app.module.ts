@@ -9,6 +9,8 @@ import { AssignmentsModule } from './assignment/assignment.module';
 import { TasksController } from './tasks/task.controller';
 import { AssignmentController } from './assignment/assignment.controller';
 import { TaskGroupController } from './tasks/task-group.controller';
+import { EventsGateway } from './shopping-list/events.gateway';
+import { ShoppingListController } from './shopping-list/shopping-list.controller';
 
 const rootPathStatic = join(__dirname, '../../src/client/public/');
 
@@ -28,6 +30,8 @@ const rootPathStatic = join(__dirname, '../../src/client/public/');
     AuthController,
     TaskGroupController,
     UserGroupController,
+    ShoppingListController,
   ],
+  providers: [EventsGateway],
 })
 export class AppModule {}

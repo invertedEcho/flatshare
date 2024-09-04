@@ -11,7 +11,7 @@ if (databaseUrl === undefined) {
 }
 
 const databaseConnection = drizzle(
-  postgres(databaseUrl, { ssl: 'require', max: 1 }),
+  postgres(databaseUrl, { ssl: 'prefer', max: 1 }),
 );
 
 const main = async () => {
