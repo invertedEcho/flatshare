@@ -31,7 +31,7 @@ describe('Assignment scheduler', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers(); // Clean up to avoid side effects in other tests
+    jest.useRealTimers();
   });
 
   it('sets assignment creation date to start of interval when task is created in middle of interval', async () => {
@@ -57,7 +57,7 @@ describe('Assignment scheduler', () => {
       .values({ groupId: userGroupWG1.id, taskId: taskVacuuming.id });
 
     jest.setSystemTime(new Date('2024-09-03 22:00:00Z'));
-    // Run scheduler function ad Wednesday in week 2
+    // Run scheduler function at Wednesday in week 2
     await mockService.handleCron();
 
     // check that assignment with created at of Monday in week 2 exists
@@ -66,6 +66,5 @@ describe('Assignment scheduler', () => {
     expect(assignments[0]?.createdAt).toStrictEqual(
       new Date('2024-09-01 22:00:00Z'),
     );
-    console.debug({ assignments });
   });
 });
