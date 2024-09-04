@@ -57,20 +57,13 @@ export class AssignmentSchedulerService {
         );
       }
 
-      const hydratedAssignments = tasks.map(
-        ({
-          taskId,
-          isInFirstInterval,
-          taskGroupInitialStartDate,
-          interval,
-        }) => ({
-          taskId,
-          userId: nextResponsibleUserId,
-          createdAt: isInFirstInterval
-            ? taskGroupInitialStartDate
-            : getStartOfInterval(interval),
-        }),
-      );
+      const hydratedAssignments = tasks.map((task) => ({
+        taskId: task.taskId,
+        userId: nextResponsibleUserId,
+        createdAt: task.isInFirstInterval
+          ? task.taskGroupInitialStartDate
+          : getStartOfInterval(task.interval),
+      }));
       console.info(
         `Creating new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(tasks, null, 2)}`,
       );
