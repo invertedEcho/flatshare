@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "assignment-order-position" integer;

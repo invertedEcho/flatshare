@@ -7,21 +7,23 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { eq } from 'drizzle-orm';
+import { db } from './db';
 import {
   dbAddUserToUserGroup,
   dbCreateUserGroup,
-  dbGetUserGroupOfUser,
-  dbGetUserGroupByInviteCode,
+  dbGetRecurringTaskGroupsOfUserGroup,
   dbGetUserGroup,
+  dbGetUserGroupByInviteCode,
+  dbGetUserGroupOfUser,
 } from './db/functions/user-group';
-import { db } from './db';
 import {
+  recurringTaskGroupUserTable,
   userGroupInviteTable,
   userTable,
   userUserGroupTable,
 } from './db/schema';
 import { generateRandomAlphanumericalCode } from './utils/random';
-import { eq } from 'drizzle-orm';
 
 @Controller('user-group')
 export class UserGroupController {
@@ -48,6 +50,18 @@ export class UserGroupController {
     }
 
     await dbAddUserToUserGroup({ userId, groupId: maybeInviteCode.groupId });
+
+    const recurringTaskGroupsOfUserGroup =
+      await dbGetRecurringTaskGroupsOfUserGroup({
+        userGroupId: maybeInviteCode.groupId,
+      });
+    // Add user to all recurring task groups that already exist
+    await db.insert(recurringTaskGroupUserTable).values(
+      recurringTaskGroupsOfUserGroup.map((taskGroup) => ({
+        recurringTaskGroupId: taskGroup.id,
+        userId: userId,
+      })),
+    );
 
     const userGroup = await dbGetUserGroup({
       userGroupId: maybeInviteCode.groupId,

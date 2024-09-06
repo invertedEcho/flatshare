@@ -8,7 +8,6 @@ import {
   TaskToAssign,
 } from 'src/db/functions/assignment';
 import { dbGetTaskGroupUsers } from 'src/db/functions/task-group';
-import { randomFromArray } from 'src/utils/array';
 import { getStartOfInterval } from 'src/utils/date';
 
 // TODO: Clean up
@@ -99,6 +98,6 @@ async function getNextResponsibleUserId(
   if (userIdsWithoutAnyAssignments.length === 0) {
     return lastAssignments[lastAssignments.length - 1]?.assignment.userId;
   } else {
-    return randomFromArray(userIdsWithoutAnyAssignments);
+    return userIdsWithoutAnyAssignments[0];
   }
 }

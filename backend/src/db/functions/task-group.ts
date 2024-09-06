@@ -1,4 +1,4 @@
-import { count, eq, inArray } from 'drizzle-orm';
+import { asc, count, eq, inArray } from 'drizzle-orm';
 import { db } from '..';
 import {
   InsertRecurringTaskGroup,
@@ -70,7 +70,8 @@ export async function dbGetTaskGroupUsers(taskGroupId: number) {
     .select({ userId: userTable.id })
     .from(recurringTaskGroupUserTable)
     .innerJoin(userTable, eq(recurringTaskGroupUserTable.userId, userTable.id))
-    .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId));
+    .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId))
+    .orderBy(asc(recurringTaskGroupUserTable.assignmentOrdinal));
 
   return taskGroupUsers;
 }
