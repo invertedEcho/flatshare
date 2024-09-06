@@ -36,6 +36,20 @@
       "when": 1725490108925,
       "tag": "0004_gray_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1725651910161,
+      "tag": "0005_neat_zodiak",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1725652020448,
+      "tag": "0006_stormy_magus",
+      "breakpoints": true
     }
   ]
 }

@@ -36,7 +36,6 @@ export const userTable = pgTable('user', {
   username: text('username').notNull(),
   password: text('password').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  assignmentOrderPosition: integer('assignment-order-position'),
 });
 export type SelectUser = typeof userTable.$inferSelect;
 export type InsertUser = typeof userTable.$inferInsert;
@@ -131,6 +130,8 @@ export const recurringTaskGroupUserTable = pgTable(
     userId: integer('user_id')
       .references(() => userTable.id)
       .notNull(),
+    // The user with the lowest ordinal will be the first one to get assigned assignments from this task group
+    assignmentOrdinal: integer('assignment_ordinal'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
 );

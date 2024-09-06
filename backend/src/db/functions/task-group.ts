@@ -71,7 +71,7 @@ export async function dbGetTaskGroupUsers(taskGroupId: number) {
     .from(recurringTaskGroupUserTable)
     .innerJoin(userTable, eq(recurringTaskGroupUserTable.userId, userTable.id))
     .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId))
-    .orderBy(asc(userTable.assignmentOrderPosition));
+    .orderBy(asc(recurringTaskGroupUserTable.assignmentOrdinal));
 
   return taskGroupUsers;
 }

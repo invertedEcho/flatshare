@@ -1,0 +1,1 @@
+ALTER TABLE "recurring_task_group_user" RENAME COLUMN "assigment_ordinal" TO "assignment_ordinal";
