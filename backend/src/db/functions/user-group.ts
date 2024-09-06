@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '..';
 import {
+  recurringTaskGroupTable,
   userGroupInviteTable,
   userGroupTable,
   userUserGroupTable,
@@ -65,4 +66,15 @@ export async function dbGetUsersOfUserGroup({
     .select()
     .from(userUserGroupTable)
     .where(eq(userUserGroupTable.groupId, userGroupId));
+}
+
+export async function dbGetRecurringTaskGroupsOfUserGroup({
+  userGroupId,
+}: {
+  userGroupId: number;
+}) {
+  return await db
+    .select()
+    .from(recurringTaskGroupTable)
+    .where(eq(recurringTaskGroupTable.userGroupId, userGroupId));
 }
