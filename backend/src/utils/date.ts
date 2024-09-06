@@ -35,6 +35,7 @@ export function getStartOfInterval(interval: DefaultPostgresInterval): Date {
     }
     // Go back to last day of previous month at 22 o clock
     case '1 month':
+    case '1 mon':
       const now = new Date();
       const firstDayOfCurrentMonth = new Date(
         now.getUTCFullYear(),

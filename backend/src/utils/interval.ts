@@ -4,6 +4,7 @@ export const defaultPostgresIntervalSchema = z.union([
   z.literal('1 day'),
   z.literal('7 days'),
   z.literal('1 month'),
+  z.literal('1 mon'),
 ]);
 export type DefaultPostgresInterval = z.infer<
   typeof defaultPostgresIntervalSchema
@@ -28,6 +29,7 @@ export function getLongNameFromPostgresInterval(
     case '7 days':
       return 'Every week';
     case '1 month':
+    case '1 mon':
       return 'Every month';
   }
 }
