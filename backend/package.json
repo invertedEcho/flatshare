@@ -20,8 +20,8 @@
     "pm2:stop": "pm2 stop dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "types": "tsc --noEmit",
-    "test": "dotenv -e .env.test jest",
-    "test:watch": "jest --watch",
+    "test": "dotenv -e .env.test jest -- --runInBand",
+    "test:watch": "jest --runInBand --watch",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx ./src/db/migrate.ts",
     "db:studio": "drizzle-kit studio"

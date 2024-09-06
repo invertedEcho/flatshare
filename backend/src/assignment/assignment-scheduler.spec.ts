@@ -48,6 +48,7 @@ describe('Assignment scheduler', () => {
     await db.insert(recurringTaskGroupUserTable).values({
       recurringTaskGroupId: recurringTaskGroupWeekly.id,
       userId: userJulian.id,
+      assignmentOrdinal: 2,
     });
 
     // Create new Task
