@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
-import * as postgres from 'postgres';
+import postgres from 'postgres';
 
 // TODO: Switch to t3-oss/env
 const connectionString = process.env.DATABASE_URL;
