@@ -36,6 +36,7 @@ class TaskGroupList extends StatelessWidget {
               TextButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
+                    onRefresh();
                   },
                   child: const Text("Abort")),
               TextButton(
