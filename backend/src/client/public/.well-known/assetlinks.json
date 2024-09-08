@@ -4,7 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.invertedecho.flatshare",
-      "sha256_cert_fingerprints": "73:D0:8A:9A:A3:15:AE:17:02:26:58:4D:D1:11:5C:DE:43:B4:C9:2A:CA:9D:76:7C:C1:FE:8A:3A:B2:BC:14:D5"
+      "sha256_cert_fingerprints": ["73:D0:8A:9A:A3:15:AE:17:02:26:58:4D:D1:11:5C:DE:43:B4:C9:2A:CA:9D:76:7C:C1:FE:8A:3A:B2:BC:14:D5"]
     }
   }
 ]
