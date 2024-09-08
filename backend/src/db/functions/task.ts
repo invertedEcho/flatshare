@@ -17,9 +17,9 @@ import { dbGetUsersOfUserGroup } from './user-group';
 import { getStartOfInterval } from 'src/utils/date';
 
 export async function dbGetAllTasks({
-  groupId,
+  userGroupId,
 }: {
-  groupId?: number;
+  userGroupId?: number;
 }): Promise<SelectTask[]> {
   const query = db
     .select({
@@ -30,12 +30,12 @@ export async function dbGetAllTasks({
       recurringTaskGroupId: taskTable.recurringTaskGroupId,
     })
     .from(taskTable);
-  if (groupId === undefined) {
+  if (userGroupId === undefined) {
     return await query;
   }
   return await query
     .innerJoin(taskUserGroupTable, eq(taskUserGroupTable.taskId, taskTable.id))
-    .where(eq(taskUserGroupTable.groupId, groupId));
+    .where(eq(taskUserGroupTable.groupId, userGroupId));
 }
 
 export async function dbGetTaskById(taskId: number) {
@@ -110,6 +110,7 @@ export async function dbCreateRecurringTask({
   await db
     .insert(taskUserGroupTable)
     .values({ taskId: task.id, groupId: userGroupId });
+  return task;
 }
 
 export async function dbDeleteTask({ taskId }: { taskId: number }) {
@@ -141,7 +142,7 @@ export async function dbCreateOneOffTask({
   const tasks = await db
     .insert(taskTable)
     .values({ title, description })
-    .returning({ taskId: taskTable.id });
+    .returning();
   const task = tasks[0];
   if (task === undefined) {
     throw new Error('Failed to create one off task.');
@@ -149,11 +150,12 @@ export async function dbCreateOneOffTask({
 
   const hydratedAssignments = userIds.map((userId) => {
     return {
-      taskId: task.taskId,
+      taskId: task.id,
       userId,
     };
   });
-  await db.insert(taskUserGroupTable).values({ taskId: task.taskId, groupId });
+  await db.insert(taskUserGroupTable).values({ taskId: task.id, groupId });
 
   await db.insert(assignmentTable).values(hydratedAssignments);
+  return task;
 }

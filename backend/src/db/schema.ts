@@ -10,7 +10,7 @@ import {
 import { z } from 'zod';
 
 const assignmentState = z.enum(['pending', 'completed']);
-export const assigmentStateEnum = pgEnum(
+export const assignmentStateEnum = pgEnum(
   'assignment_state',
   assignmentState.options,
 );
@@ -151,7 +151,7 @@ export const assignmentTable = pgTable('assignment', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
-  state: assigmentStateEnum('state').notNull().default('pending'),
+  state: assignmentStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 export type SelectAssignment = typeof assignmentTable.$inferSelect;

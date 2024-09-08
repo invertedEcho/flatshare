@@ -1,5 +1,7 @@
 import 'package:flatshare/authenticated_navigation.dart';
 import 'package:flatshare/fetch/authenticated_client.dart';
+import 'package:flatshare/providers/task.dart';
+import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/unauthenticated_navigation.dart';
 import 'package:flatshare/widgets/screens/splash.dart';
@@ -12,7 +14,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 Future main() async {
   await dotenv.load(fileName: '.env');
   runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => UserProvider())],
+    providers: [
+      ChangeNotifierProvider(create: (_) => UserProvider()),
+      ChangeNotifierProvider(create: (_) => TaskProvider()),
+      ChangeNotifierProvider(create: (_) => TaskGroupProvider()),
+    ],
     child: const App(),
   ));
 }
@@ -48,11 +54,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  void handleLogout() async {
-    await storage.delete(key: 'jwt-token');
-    context.go('/login');
-  }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

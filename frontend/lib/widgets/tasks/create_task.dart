@@ -1,9 +1,9 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import 'package:flatshare/fetch/task.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +25,7 @@ class CreateTaskState extends State<CreateTask> {
   final descriptionController = TextEditingController();
   final multiSelectUserController = MultiSelectController<User>([]);
 
-  TaskType selectedTaskType = TaskType.oneOff;
+  TaskType selectedTaskType = TaskType.recurring;
   // TODO: use interval type
   String? selectedInterval;
 
@@ -34,7 +34,7 @@ class CreateTaskState extends State<CreateTask> {
   // TODO: will probably be gone when below todo is fixed.
   int? currentUserGroupId;
 
-  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
+  // TODO: we should not do async operations in this method, as it could cause unnecessary rebuilds
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -75,19 +75,21 @@ class CreateTaskState extends State<CreateTask> {
       List<int> selectedUserIds = multiSelectUserController.value
           .map((selectUser) => selectUser.userId)
           .toList();
+
       if (selectedTaskType == TaskType.oneOff && selectedUserIds.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('At least one user must be selected')),
         );
         return;
       }
+
       if (selectedTaskType == TaskType.recurring && selectedInterval == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select an interval first')),
         );
         return;
       }
-      // TODO: This should never happen.
+
       if (currentUserGroupId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -95,18 +97,20 @@ class CreateTaskState extends State<CreateTask> {
         );
         return;
       }
+      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       try {
         selectedTaskType == TaskType.oneOff
-            ? await createOneOffTask(
+            ? taskProvider.addOneOffTask(
                 title: title,
                 description: description,
-                groupId: currentUserGroupId!,
+                userGroupId: currentUserGroupId!,
                 userIds: selectedUserIds)
-            : await createRecurringTask(
+            : taskProvider.addRecurringTask(
                 title: title,
                 description: description,
                 userGroupId: currentUserGroupId!,
                 interval: selectedInterval!);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Created new task!')),
         );
@@ -153,16 +157,6 @@ class CreateTaskState extends State<CreateTask> {
                         const Spacer(),
                         ElevatedButton(
                             style: getSelectTaskTypeButtonStyle(
-                                TaskType.oneOff, selectedTaskType),
-                            onPressed: () {
-                              setState(() {
-                                selectedTaskType = TaskType.oneOff;
-                              });
-                            },
-                            child: const Text("One-Time Task")),
-                        const Spacer(),
-                        ElevatedButton(
-                            style: getSelectTaskTypeButtonStyle(
                                 TaskType.recurring, selectedTaskType),
                             onPressed: () {
                               setState(() {
@@ -170,6 +164,16 @@ class CreateTaskState extends State<CreateTask> {
                               });
                             },
                             child: const Text("Recurring Task")),
+                        const Spacer(),
+                        ElevatedButton(
+                            style: getSelectTaskTypeButtonStyle(
+                                TaskType.oneOff, selectedTaskType),
+                            onPressed: () {
+                              setState(() {
+                                selectedTaskType = TaskType.oneOff;
+                              });
+                            },
+                            child: const Text("One-Time Task")),
                         const Spacer(),
                       ],
                     ),
@@ -207,7 +211,7 @@ class CreateTaskState extends State<CreateTask> {
                             foregroundColor:
                                 WidgetStatePropertyAll(Colors.blueAccent)),
                         onPressed: handleSubmit,
-                        child: const Text("Submit")),
+                        child: const Text("Create")),
                   ],
                 ))));
   }
