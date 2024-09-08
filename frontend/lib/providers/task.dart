@@ -55,4 +55,11 @@ class TaskProvider extends ChangeNotifier {
     _tasks = tasks;
     notifyListeners();
   }
+
+  Future<void> updateTaskProvider(Task task) async {
+    await updateTask(task: task);
+    _tasks.removeWhere((task_) => task.id == task_.id);
+    _tasks.add(task);
+    notifyListeners();
+  }
 }

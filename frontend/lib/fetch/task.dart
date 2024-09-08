@@ -64,19 +64,15 @@ Future<Task> createRecurringTask(
   return Task.fromJson(taskResponse);
 }
 
-Future<void> updateTask(
-    {required int taskId,
-    required String title,
-    required String description,
-    int? taskGroupId}) async {
+Future<void> updateTask({required Task task}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
-      await authenticatedClient.put(Uri.parse('$apiBaseUrl/tasks/$taskId'),
+      await authenticatedClient.put(Uri.parse('$apiBaseUrl/tasks/${task.id}'),
           body: jsonEncode(
             {
-              'title': title,
-              'description': description,
-              'taskGroupId': taskGroupId
+              'title': task.title,
+              'description': task.description,
+              'taskGroupId': task.recurringTaskGroupId
             },
           ));
 

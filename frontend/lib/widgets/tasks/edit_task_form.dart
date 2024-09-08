@@ -1,10 +1,10 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:collection/collection.dart';
-import 'package:flatshare/fetch/task.dart';
 import 'package:flatshare/fetch/task_group.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,13 +54,11 @@ class EditTaskFormState extends State<EditTaskForm> {
     }
   }
 
-  Future<void> onSubmit(Task task) async {
-    await updateTask(
-      taskId: task.id,
-      title: titleController.text,
-      description: descriptionController.text,
-      taskGroupId: selectTaskGroupController?.value?.id,
-    );
+  Future<void> onUpdateTask(Task task) async {
+    print("3");
+    await Provider.of<TaskProvider>(context, listen: false)
+        .updateTaskProvider(task);
+    print("4");
   }
 
   @override
@@ -107,11 +105,17 @@ class EditTaskFormState extends State<EditTaskForm> {
               child: ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    await onSubmit(task);
+                    final updatedTask = Task(
+                        id: task.id,
+                        title: titleController.text,
+                        description: descriptionController.text,
+                        recurringTaskGroupId:
+                            selectTaskGroupController?.value?.id);
+                    await onUpdateTask(updatedTask);
                     Navigator.pop(context);
                   }
                 },
-                child: const Text("Submit"),
+                child: const Text("Update"),
               ),
             ),
           ],

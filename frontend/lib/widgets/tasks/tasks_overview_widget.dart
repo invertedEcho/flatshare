@@ -27,6 +27,9 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final tasks = Provider.of<TaskProvider>(context).tasks;
+    final oneTimeTasks =
+        tasks.where((task) => task.recurringTaskGroupId == null).toList();
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Column(children: [
@@ -110,7 +113,9 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
         Expanded(
             child: filterBy == TaskType.recurring
                 ? const TaskGroupList()
-                : const TaskList())
+                : TaskList(
+                    tasks: oneTimeTasks,
+                  ))
       ]),
     );
   }
