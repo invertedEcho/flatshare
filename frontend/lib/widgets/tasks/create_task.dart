@@ -187,7 +187,7 @@ class CreateTaskState extends State<CreateTask> {
                             hintText: "Select users",
                             items: userInUserGroup,
                             onListChanged: (value) {})
-                        : CustomDropdown.search(
+                        : CustomDropdown(
                             decoration: const CustomDropdownDecoration(
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
