@@ -1,4 +1,5 @@
 import 'package:flatshare/fetch/task_group.dart';
+import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/widgets/screens/edit_task_group.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +33,15 @@ class TaskGroupList extends StatelessWidget {
         return const Center(child: Text("No task groups found."));
       }
       return ListView.builder(
-          shrinkWrap:
-              true, // TODO: Get rid of this, theoretically this ListView won't have much data, but its still not recommended for performance reasons.
           itemCount: taskGroupProvider.taskGroups.length,
           itemBuilder: (context, index) {
             final taskGroup = taskGroupProvider.taskGroups[index];
+
+            // Feels stupid to get all tasks just to get the count of tasks in the current task group
+            final tasks = Provider.of<TaskProvider>(context).tasks;
+            final tasksInTaskGroup = tasks
+                .where((task) => task.recurringTaskGroupId == taskGroup.id);
+            final countOfTasksInTaskGroup = tasksInTaskGroup.length;
             return Dismissible(
                 key: Key(taskGroup.id.toString()),
                 direction: DismissDirection.endToStart,
@@ -99,7 +104,7 @@ class TaskGroupList extends StatelessWidget {
                           ],
                         ),
                         Text(taskGroup.description ?? ""),
-                        Text("Total tasks: ${taskGroup.numberOfTasks}"),
+                        Text("Total tasks: $countOfTasksInTaskGroup"),
                       ],
                     ),
                   ),
