@@ -13,13 +13,11 @@ import { getStartOfInterval } from 'src/utils/date';
 // TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async handleCron() {
-    if (
-      process.env.NODE_ENV !== 'production' &&
-      process.env.NODE_ENV !== 'test'
-    )
-      return;
+    const nodeEnvironment = process.env.NODE_ENV;
+    if (nodeEnvironment !== 'production' && nodeEnvironment !== 'test') return;
+
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval({});
 
