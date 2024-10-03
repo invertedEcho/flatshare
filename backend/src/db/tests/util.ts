@@ -46,6 +46,7 @@ export async function seedDatabaseWithTaskData() {
   await db.insert(recurringTaskGroupUserTable).values({
     recurringTaskGroupId: recurringTaskGroupWeekly.id,
     userId: userJulian.id,
+    assignmentOrdinal: 0,
   });
 
   await db.insert(taskTable).values(taskVacuuming);

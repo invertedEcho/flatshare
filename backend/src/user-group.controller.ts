@@ -24,6 +24,7 @@ import {
   userUserGroupTable,
 } from './db/schema';
 import { generateRandomAlphanumericalCode } from './utils/random';
+import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/task-group';
 
 @Controller('user-group')
 export class UserGroupController {
@@ -55,13 +56,19 @@ export class UserGroupController {
       await dbGetRecurringTaskGroupsOfUserGroup({
         userGroupId: maybeInviteCode.groupId,
       });
-    // Add user to all recurring task groups that already exist
-    await db.insert(recurringTaskGroupUserTable).values(
-      recurringTaskGroupsOfUserGroup.map((taskGroup) => ({
+
+    const values = await Promise.all(
+      recurringTaskGroupsOfUserGroup.map(async (taskGroup) => ({
         recurringTaskGroupId: taskGroup.id,
         userId: userId,
+        assignmentOrdinal: await dbGetHighestAssignmentOrdinalForTaskGroup({
+          taskGroupId: taskGroup.id,
+        }),
       })),
     );
+
+    // Add user to all recurring task groups that already exist
+    await db.insert(recurringTaskGroupUserTable).values(values);
 
     const userGroup = await dbGetUserGroup({
       userGroupId: maybeInviteCode.groupId,

@@ -1,4 +1,4 @@
-import { asc, count, eq, inArray } from 'drizzle-orm';
+import { asc, count, desc, eq, inArray } from 'drizzle-orm';
 import { db } from '..';
 import {
   InsertRecurringTaskGroup,
@@ -57,9 +57,10 @@ export async function dbCreateTaskGroup({
     throw new Error('Failed to create recurring task group');
   }
   await db.insert(recurringTaskGroupUserTable).values(
-    userIds.map((userId) => ({
+    userIds.map((userId, index) => ({
       recurringTaskGroupId: recurringTaskGroup.id,
       userId,
+      assignmentOrdinal: index,
     })),
   );
   return recurringTaskGroup;
@@ -67,7 +68,10 @@ export async function dbCreateTaskGroup({
 
 export async function dbGetTaskGroupUsers(taskGroupId: number) {
   const taskGroupUsers = await db
-    .select({ userId: userTable.id })
+    .select({
+      userId: userTable.id,
+      assignmentOrdinal: recurringTaskGroupUserTable.assignmentOrdinal,
+    })
     .from(recurringTaskGroupUserTable)
     .innerJoin(userTable, eq(recurringTaskGroupUserTable.userId, userTable.id))
     .where(eq(recurringTaskGroupUserTable.recurringTaskGroupId, taskGroupId))
@@ -102,4 +106,25 @@ export async function dbDeleteTaskGroup(taskGroupId: number) {
   await db
     .delete(recurringTaskGroupTable)
     .where(eq(recurringTaskGroupTable.id, taskGroupId));
+}
+
+export async function dbGetHighestAssignmentOrdinalForTaskGroup({
+  taskGroupId,
+}: {
+  taskGroupId: number;
+}) {
+  const userWithHighestOrdinal = (
+    await db
+      .select()
+      .from(recurringTaskGroupUserTable)
+      .where(eq(recurringTaskGroupTable.id, taskGroupId))
+      .orderBy(desc(recurringTaskGroupUserTable.assignmentOrdinal))
+      .limit(1)
+  )[0];
+
+  if (userWithHighestOrdinal === undefined) {
+    throw new Error(`No user with highest assignment ordinal found`);
+  }
+
+  return userWithHighestOrdinal.assignmentOrdinal;
 }
