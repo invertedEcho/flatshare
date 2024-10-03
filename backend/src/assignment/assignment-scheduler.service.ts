@@ -63,6 +63,7 @@ export class AssignmentSchedulerService {
           : getStartOfInterval(task.interval),
       }));
       console.info(
+        `Creating new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(tasks, null, 2)}`,
         `Creating new assignments for taskGroup ${taskGroupId}: ${tasks.length}`,
       );
       await dbAddAssignments({ assignments: hydratedAssignments });
