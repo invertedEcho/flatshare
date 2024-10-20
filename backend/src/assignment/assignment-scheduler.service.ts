@@ -17,8 +17,10 @@ export class AssignmentSchedulerService {
     if (
       process.env.NODE_ENV !== 'production' &&
       process.env.NODE_ENV !== 'test'
-    )
+    ) {
       return;
+    }
+
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval({});
 
@@ -62,30 +64,32 @@ export class AssignmentSchedulerService {
           ? task.taskGroupInitialStartDate
           : getStartOfInterval(task.interval),
       }));
-      console.info(
-        `Creating new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(tasks, null, 2)}`,
-        `Creating new assignments for taskGroup ${taskGroupId}: ${tasks.length}`,
-      );
+
       await dbAddAssignments({ assignments: hydratedAssignments });
+      console.info(
+        `Created new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(tasks, null, 2)}`,
+        `Created new assignments for taskGroup ${taskGroupId}: ${tasks.length}`,
+      );
     }
   }
 }
 
-// TODO: write unit test
 async function getNextResponsibleUserId(
   taskGroupId: number,
   usersOfTaskGroup: { userId: number; assignmentOrdinal: number }[],
 ) {
-  const lastAssignmentsOfTaskGroup = await dbGetAssignmentsForTaskGroup(
+  const lastAssignmentsOfTaskGroup = await dbGetAssignmentsForTaskGroup({
     taskGroupId,
-    1,
-  );
+    limit: 1,
+  });
 
   const lastAssignmentOfTaskGroup = lastAssignmentsOfTaskGroup[0];
 
   if (lastAssignmentOfTaskGroup === undefined) {
-    return usersOfTaskGroup.find((user) => user.assignmentOrdinal === 0)
-      ?.userId;
+    const sortedByAssignmentOrdinal = usersOfTaskGroup.sort(
+      (a, b) => a.assignmentOrdinal - b.assignmentOrdinal,
+    );
+    return sortedByAssignmentOrdinal[0]?.userId;
   }
 
   const lastUser = usersOfTaskGroup.find(
