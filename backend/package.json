@@ -15,7 +15,7 @@
     "start": "nest start",
     "dev": "dotenv -e .env nest start -- --watch",
     "start:debug": "nest start -- --debug --watch",
-    "pm2:start": "pm2 start dist/src/main.js",
+    "pm2:start": "dotenv -e .env pm2 -- start dist/src/main.js",
     "pm2:restart": "pm2 restart dist/src/main.js",
     "pm2:stop": "pm2 stop dist/src/main.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
