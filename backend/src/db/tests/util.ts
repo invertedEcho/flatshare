@@ -37,7 +37,7 @@ export async function truncateAllTables(): Promise<void> {
  * Seeds the database with initial mock user data for testing or development purposes.
  *
  * - Creates a user group.
- * - Inserts two users (Julian and Jakob).
+ * - Inserts two users (Julian, Jakob and Mustermann).
  * - Adds these users to the previously created user group.
  *
  * This function is intended to set up test data for scenarios involving user groups and their relationships.
