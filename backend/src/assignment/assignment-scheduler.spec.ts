@@ -18,7 +18,7 @@ import {
 import { seedDatabaseWithUserData, truncateAllTables } from 'src/db/tests/util';
 import { AssignmentSchedulerService } from './assignment-scheduler.service';
 import { getStartOfInterval } from 'src/utils/date';
-import { desc, eq } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 
 describe('Assignment scheduler', () => {
   const assignmentSchedulerService = new AssignmentSchedulerService();
@@ -187,11 +187,6 @@ describe('Assignment scheduler', () => {
     expect(firstExpectedAssignment.createdAt).toStrictEqual(
       new Date('2024-09-29T22:00:00.000Z'),
     );
-
-    await db
-      .update(assignmentTable)
-      .set({ state: 'completed' })
-      .where(eq(assignmentTable.id, firstExpectedAssignment.id));
 
     jest.setSystemTime(new Date('2024-10-10 14:00:00Z'));
     await assignmentSchedulerService.handleCron();
