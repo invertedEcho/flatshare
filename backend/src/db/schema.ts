@@ -112,6 +112,9 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+// TODO: the interval property on here is just of type string, but should be a type union instead of string literals.
+// also kinda shitty though because we can't just make a giant union type of all possible values for postgres
+// also see the `utils/interval.ts` file
 export type SelectRecurringTaskGroup =
   typeof recurringTaskGroupTable.$inferSelect;
 export type InsertRecurringTaskGroup =
