@@ -93,12 +93,15 @@ export async function dbChangeAssignmentState(
   }
 }
 
-export async function dbGetAssignmentsForTaskGroup(
-  taskGroupId: number,
-  limit?: number,
-) {
+export async function dbGetAssignmentsForTaskGroup({
+  taskGroupId,
+  limit,
+}: {
+  taskGroupId: number;
+  limit?: number;
+}) {
   const result = db
-    .select({ assignment: { ...assignmentTable } })
+    .select()
     .from(recurringTaskGroupTable)
     .innerJoin(
       taskTable,
