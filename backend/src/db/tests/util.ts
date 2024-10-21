@@ -9,11 +9,12 @@ import {
   userUserGroupTable,
 } from '../schema';
 import {
+  mockRecurringTaskGroupUserValues,
+  mockUserUserGroupValues,
+  mockUserValues,
   recurringTaskGroupWeekly,
   taskVacuuming,
   userGroupWG1,
-  userJakob,
-  userJulian,
 } from './mock-data';
 import { db } from '..';
 
@@ -32,21 +33,28 @@ export async function truncateAllTables(): Promise<void> {
   }
 }
 
+/**
+ * Seeds the database with initial mock user data for testing or development purposes.
+ *
+ * - Creates a user group.
+ * - Inserts two users (Julian, Jakob and Mustermann).
+ * - Adds these users to the previously created user group.
+ *
+ * This function is intended to set up test data for scenarios involving user groups and their relationships.
+ * It ensures that the database has basic data required for tests or initial state in a development environment.
+ */
 export async function seedDatabaseWithUserData() {
   await db.insert(userGroupTable).values(userGroupWG1);
-  await db.insert(userTable).values([userJulian, userJakob]);
-  await db.insert(userUserGroupTable).values({
-    groupId: userGroupWG1.id,
-    userId: userJulian.id,
-  });
+  await db.insert(userTable).values(mockUserValues);
+  await db.insert(userUserGroupTable).values(mockUserUserGroupValues);
 }
 
 export async function seedDatabaseWithTaskData() {
   await db.insert(recurringTaskGroupTable).values(recurringTaskGroupWeekly);
-  await db.insert(recurringTaskGroupUserTable).values({
-    recurringTaskGroupId: recurringTaskGroupWeekly.id,
-    userId: userJulian.id,
-  });
+
+  await db
+    .insert(recurringTaskGroupUserTable)
+    .values(mockRecurringTaskGroupUserValues);
 
   await db.insert(taskTable).values(taskVacuuming);
   await db

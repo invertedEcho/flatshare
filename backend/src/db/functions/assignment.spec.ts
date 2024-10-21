@@ -11,7 +11,7 @@ import {
 } from '../tests/mock-data';
 import {
   truncateAllTables,
-  seedDatabaseWithUserData as seedDatabaseWithUserData,
+  seedDatabaseWithUserData,
   seedDatabaseWithTaskData,
 } from '../tests/util';
 

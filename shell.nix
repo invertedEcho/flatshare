@@ -16,7 +16,7 @@ let
     build-tools-30-0-3
     platform-tools
     platforms-android-34
-    emulator
+    # emulator
     ndk-26-1-10909125
     cmake-3-22-1
   ]);
@@ -26,7 +26,7 @@ let
 in
 mkShell {
   buildInputs = [
-    android-studio
+    # android-studio
     android-sdk
     nodejs
     pnpm
