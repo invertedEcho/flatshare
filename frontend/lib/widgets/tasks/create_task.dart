@@ -100,7 +100,7 @@ class CreateTaskState extends State<CreateTask> {
                 description: description,
                 userGroupId: currentUserGroupId,
                 userIds: selectedUserIds)
-            : taskProvider.addRecurringTask(
+            : await taskProvider.addRecurringTask(
                 title: title,
                 description: description,
                 userGroupId: currentUserGroupId,
