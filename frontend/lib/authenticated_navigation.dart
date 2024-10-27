@@ -72,8 +72,8 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
   int currentPageIndex = 0;
   int? userGroupId;
 
-  void handleLogout() {
-    storage.delete(key: 'jwt-token');
+  void handleLogout() async {
+    await storage.delete(key: 'jwt-token');
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     userProvider.clearUser();
     userProvider.clearUserGroup();
@@ -101,7 +101,8 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Generated invite code: $inviteCode"),
+                  Text(
+                      "Share this invite code with others so they can join your group: $inviteCode"),
                   const SizedBox(height: 20),
                   ElevatedButton(
                       style: const ButtonStyle(
