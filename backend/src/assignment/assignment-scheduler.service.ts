@@ -12,7 +12,7 @@ import { getStartOfInterval } from 'src/utils/date';
 // TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval({});

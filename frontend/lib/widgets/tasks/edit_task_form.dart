@@ -55,10 +55,8 @@ class EditTaskFormState extends State<EditTaskForm> {
   }
 
   Future<void> onUpdateTask(Task task) async {
-    print("3");
     await Provider.of<TaskProvider>(context, listen: false)
         .updateTaskProvider(task);
-    print("4");
   }
 
   @override

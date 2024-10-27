@@ -38,6 +38,7 @@ class TaskProvider extends ChangeNotifier {
 
     final maybeTaskGroup = task.taskGroup;
     if (maybeTaskGroup != null) {
+      // TODO: I am not really happy with accessing another provider inside a provider.
       Provider.of<TaskGroupProvider>(context, listen: false)
           .addTaskGroup(maybeTaskGroup);
     }
