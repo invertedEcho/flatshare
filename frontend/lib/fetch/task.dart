@@ -2,7 +2,36 @@ import 'dart:convert';
 
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/task.dart';
+import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/utils/env.dart';
+
+// TODO: https://github.com/invertedEcho/flatshare/issues/121
+class TaskWithMaybeRecurringTaskGroup extends Task {
+  TaskGroup? taskGroup;
+
+  TaskWithMaybeRecurringTaskGroup(
+      {required super.id,
+      required super.title,
+      super.description,
+      super.recurringTaskGroupId,
+      this.taskGroup});
+
+  factory TaskWithMaybeRecurringTaskGroup.fromJson(Map<String, dynamic> json) {
+    try {
+      return TaskWithMaybeRecurringTaskGroup(
+          id: json['id'] as int,
+          title: json['title'] as String,
+          description: json['description'] as String?,
+          recurringTaskGroupId: json['recurringTaskGroupId'] as int?,
+          taskGroup: json['maybeCreatedRecurringTaskGroup'] != null
+              ? TaskGroup.fromJson(json['maybeCreatedRecurringTaskGroup'])
+              : null);
+    } catch (e) {
+      throw FormatException(
+          "Failed to parse task with maybe recurring task group: ${e.toString()}");
+    }
+  }
+}
 
 Future<List<Task>> fetchTasks({required int userGroupId}) async {
   var apiBaseUrl = getApiBaseUrl();
@@ -41,7 +70,7 @@ Future<Task> createOneOffTask(
   return Task.fromJson(taskResponse);
 }
 
-Future<Task> createRecurringTask(
+Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
     {required String title,
     required String? description,
     required int userGroupId,
@@ -61,7 +90,8 @@ Future<Task> createRecurringTask(
     throw Exception("Failed to create task: ${response.statusCode}");
   }
   dynamic taskResponse = jsonDecode(response.body);
-  return Task.fromJson(taskResponse);
+  print(taskResponse);
+  return TaskWithMaybeRecurringTaskGroup.fromJson(taskResponse);
 }
 
 Future<void> updateTask({required Task task}) async {

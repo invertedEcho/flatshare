@@ -31,20 +31,12 @@ class CreateTaskState extends State<CreateTask> {
 
   List<User> userInUserGroup = [];
 
-  // TODO: will probably be gone when below todo is fixed.
-  int? currentUserGroupId;
-
-  // TODO: we should not do async operations in this method, as it could cause unnecessary rebuilds
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     UserGroup? userGroup = userProvider.userGroup;
     final userGroupId = userGroup?.id;
-
-    setState(() {
-      currentUserGroupId = userGroupId;
-    });
 
     if (userGroupId != null) {
       fetchUsersInUserGroup(groupId: userGroupId).then((result) {
@@ -58,13 +50,13 @@ class CreateTaskState extends State<CreateTask> {
   ButtonStyle getSelectTaskTypeButtonStyle(
       TaskType taskTypeOfButton, TaskType selectedTaskType) {
     return ButtonStyle(
-      foregroundColor:
-          WidgetStatePropertyAll(taskTypeOfButton == selectedTaskType
-              // TODO: Fix nested ternary, you baaaaad
-              ? Colors.blue
-              : MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black),
+      foregroundColor: WidgetStatePropertyAll(taskTypeOfButton ==
+              selectedTaskType
+          // TODO: Fix nested ternary, you baaaaad -> this can be fixed by finally fixing theme colors in the app
+          ? Colors.blue
+          : MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? Colors.white
+              : Colors.black),
     );
   }
 
@@ -90,6 +82,9 @@ class CreateTaskState extends State<CreateTask> {
         return;
       }
 
+      final int? currentUserGroupId =
+          Provider.of<UserProvider>(context, listen: false).userGroup?.id;
+
       if (currentUserGroupId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -103,13 +98,14 @@ class CreateTaskState extends State<CreateTask> {
             ? taskProvider.addOneOffTask(
                 title: title,
                 description: description,
-                userGroupId: currentUserGroupId!,
+                userGroupId: currentUserGroupId,
                 userIds: selectedUserIds)
             : taskProvider.addRecurringTask(
                 title: title,
                 description: description,
-                userGroupId: currentUserGroupId!,
-                interval: selectedInterval!);
+                userGroupId: currentUserGroupId,
+                interval: selectedInterval!,
+                context: context);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Created new task!')),

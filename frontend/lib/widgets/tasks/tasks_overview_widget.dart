@@ -30,6 +30,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
     final tasks = Provider.of<TaskProvider>(context).tasks;
     final oneTimeTasks =
         tasks.where((task) => task.recurringTaskGroupId == null).toList();
+    final taskGroups = Provider.of<TaskGroupProvider>(context).taskGroups;
     return Padding(
       padding: const EdgeInsets.all(8),
       child: Column(children: [
@@ -112,7 +113,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
         const SizedBox(height: 20),
         Expanded(
             child: filterBy == TaskType.recurring
-                ? const TaskGroupList()
+                ? TaskGroupList(taskGroups: taskGroups)
                 : TaskList(
                     tasks: oneTimeTasks,
                   ))

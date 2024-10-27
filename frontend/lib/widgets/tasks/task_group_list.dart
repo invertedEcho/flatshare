@@ -1,4 +1,5 @@
 import 'package:flatshare/fetch/task_group.dart';
+import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/widgets/screens/edit_task_group.dart';
@@ -19,11 +20,9 @@ String formatPostgresInterval(String interval) {
 }
 
 class TaskGroupList extends StatelessWidget {
-  const TaskGroupList({super.key});
+  const TaskGroupList({super.key, required this.taskGroups});
 
-  void handleOnDismissed({required int taskGroupId}) async {
-    await deleteTaskGroup(taskGroupId: taskGroupId);
-  }
+  final List<TaskGroup> taskGroups;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +45,8 @@ class TaskGroupList extends StatelessWidget {
                 key: Key(taskGroup.id.toString()),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
-                  handleOnDismissed(taskGroupId: taskGroup.id);
+                  Provider.of<TaskGroupProvider>(context, listen: false)
+                      .removeTaskGroup(taskGroup.id);
                 },
                 confirmDismiss: (DismissDirection direction) async {
                   return await showDialog(

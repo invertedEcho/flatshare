@@ -158,8 +158,9 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
           ],
         ),
         floatingActionButton: userProvider.userGroup?.id != null &&
-                // TODO: oh yeaaaah lets just put this random number here
-                currentPageIndex != 2
+                // TODO: oh yeaaaah lets just put these random numbers here
+                currentPageIndex != 2 &&
+                currentPageIndex != 0
             ? FloatingActionButton(
                 backgroundColor: Colors.blueAccent,
                 foregroundColor: Colors.white,

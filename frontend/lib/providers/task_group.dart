@@ -21,4 +21,15 @@ class TaskGroupProvider extends ChangeNotifier {
     _taskGroups = taskGroups;
     notifyListeners();
   }
+
+  void addTaskGroup(TaskGroup taskGroup) {
+    _taskGroups.add(taskGroup);
+    notifyListeners();
+  }
+
+  Future<void> removeTaskGroup(int taskGroupId) async {
+    await deleteTaskGroup(taskGroupId: taskGroupId);
+    _taskGroups.removeWhere((taskGroup) => taskGroup.id == taskGroupId);
+    notifyListeners();
+  }
 }
