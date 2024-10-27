@@ -24,7 +24,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addRecurringTask(
+  Future<void> addRecurringTask(
       {required String title,
       String? description,
       required int userGroupId,
