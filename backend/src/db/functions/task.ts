@@ -6,7 +6,6 @@ import {
   taskUserGroupTable,
   taskTable,
   recurringTaskGroupTable,
-  InsertTask,
   SelectRecurringTaskGroup,
 } from '../schema';
 import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
