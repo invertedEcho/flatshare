@@ -2,7 +2,6 @@ import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import {
   dbDeleteTaskGroup,
   dbGetTaskGroups,
-  dbGetTasksOfTaskGroup,
 } from 'src/db/functions/task-group';
 
 export type CreateTaskGroup = {
@@ -21,28 +20,6 @@ export class TaskGroupController {
     const taskGroups = await dbGetTaskGroups({ userGroupId });
     return taskGroups;
   }
-
-  // TODO: this endpoint should be protected, only users with the correct groupId should be able to fetch this
-  @Get('/tasks/:taskGroupId')
-  async getTasksForTaskGroup(@Param('taskGroupId') taskGroupId: number) {
-    const tasks = await dbGetTasksOfTaskGroup(taskGroupId);
-    return tasks;
-  }
-
-  // NOTE: Manually creating a task group is unsupported atm, this will be reintroduced in the future
-  // @Post()
-  // async createTaskGroup(@Body() taskGroup: CreateTaskGroup) {
-  //   if (taskGroup.userIds.length === 0) {
-  //     throw new HttpException(
-  //       'userIds field must contain one or more values',
-  //       HttpStatus.BAD_REQUEST,
-  //     );
-  //   }
-  //   await dbCreateTaskGroup({
-  //     ...taskGroup,
-  //     initialStartDate: new Date(taskGroup.initialStartDate),
-  //   });
-  // }
 
   @Delete(':taskGroupId')
   async deleteTaskGroup(@Param('taskGroupId') taskGroupId: number) {

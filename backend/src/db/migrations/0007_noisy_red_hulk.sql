@@ -1,0 +1,1 @@
+ALTER TABLE "recurring_task_group_user" ALTER COLUMN "assignment_ordinal" SET NOT NULL;

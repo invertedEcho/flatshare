@@ -30,7 +30,7 @@ export type OneOffTask = {
   userIds: number[];
 };
 
-// TODO: this shouldnt be a seperate type
+// TODO: this shouldnt be a separate type
 export type UpdateTask = {
   title: string;
   description: string;
@@ -48,8 +48,10 @@ export type CreateRecurringTaskBody = {
 export class TasksController {
   @Get()
   // TODO: should be optional, query param
-  async getAll(@Query('groupId') groupId: number): Promise<SelectTask[]> {
-    const tasks = await dbGetAllTasks({ groupId });
+  async getAll(
+    @Query('userGroupId') userGroupId: number,
+  ): Promise<SelectTask[]> {
+    const tasks = await dbGetAllTasks({ userGroupId });
     return tasks;
   }
 
@@ -58,10 +60,11 @@ export class TasksController {
     const formattedInterval =
       displayIntervalToPostgresInterval[recurringTask.interval];
 
-    await dbCreateRecurringTask({
+    const task = await dbCreateRecurringTask({
       ...recurringTask,
       interval: formattedInterval,
     });
+    return task;
   }
 
   @Post('/one-off')
@@ -69,7 +72,8 @@ export class TasksController {
     if (Object.keys(oneOffTask).length === 0) {
       throw new BadRequestException();
     }
-    await dbCreateOneOffTask(oneOffTask);
+    const task = await dbCreateOneOffTask(oneOffTask);
+    return task;
   }
 
   @Put(':id')

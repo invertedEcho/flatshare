@@ -12,15 +12,8 @@ import { getStartOfInterval } from 'src/utils/date';
 // TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async handleCron() {
-    if (
-      process.env.NODE_ENV !== 'production' &&
-      process.env.NODE_ENV !== 'test'
-    ) {
-      return;
-    }
-
     const tasksToCreateAssignmentsFor =
       await dbGetTasksToAssignForCurrentInterval({});
 
@@ -67,8 +60,7 @@ export class AssignmentSchedulerService {
 
       await dbAddAssignments({ assignments: hydratedAssignments });
       console.info(
-        `Created new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(tasks, null, 2)}`,
-        `Created new assignments for taskGroup ${taskGroupId}: ${tasks.length}`,
+        `Created new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(hydratedAssignments, null, 2)}`,
       );
     }
   }
@@ -78,6 +70,10 @@ async function getNextResponsibleUserId(
   taskGroupId: number,
   usersOfTaskGroup: { userId: number; assignmentOrdinal: number }[],
 ) {
+  const usersSortedByAssignmentOrdinal = usersOfTaskGroup.sort(
+    (a, b) => a.assignmentOrdinal - b.assignmentOrdinal,
+  );
+
   const lastAssignmentsOfTaskGroup = await dbGetAssignmentsForTaskGroup({
     taskGroupId,
     limit: 1,
@@ -86,27 +82,16 @@ async function getNextResponsibleUserId(
   const lastAssignmentOfTaskGroup = lastAssignmentsOfTaskGroup[0];
 
   if (lastAssignmentOfTaskGroup === undefined) {
-    const sortedByAssignmentOrdinal = usersOfTaskGroup.sort(
-      (a, b) => a.assignmentOrdinal - b.assignmentOrdinal,
-    );
-    return sortedByAssignmentOrdinal[0]?.userId;
+    return usersSortedByAssignmentOrdinal[0]?.userId;
   }
 
-  const lastUser = usersOfTaskGroup.find(
-    (user) => user.userId === lastAssignmentOfTaskGroup.assignment.userId,
+  const lastAssignmentUserIndex = usersSortedByAssignmentOrdinal.findIndex(
+    (user) => user.userId === lastAssignmentOfTaskGroup.userId,
   );
 
-  if (lastUser === undefined) {
-    throw new Error(
-      `User in last assignment was not found in provided 'usersOfTaskGroup' array`,
-    );
+  if (lastAssignmentUserIndex === usersSortedByAssignmentOrdinal.length - 1) {
+    return usersSortedByAssignmentOrdinal[0]?.userId;
   }
 
-  const nextUser = usersOfTaskGroup.find(
-    (user) =>
-      user.assignmentOrdinal ===
-      (lastUser.assignmentOrdinal + 1) % usersOfTaskGroup.length,
-  );
-
-  return nextUser?.userId;
+  return usersSortedByAssignmentOrdinal[lastAssignmentUserIndex + 1]?.userId;
 }

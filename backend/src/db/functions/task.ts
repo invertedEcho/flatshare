@@ -6,6 +6,7 @@ import {
   taskUserGroupTable,
   taskTable,
   recurringTaskGroupTable,
+  SelectRecurringTaskGroup,
 } from '../schema';
 import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
 import {
@@ -17,9 +18,9 @@ import { dbGetUsersOfUserGroup } from './user-group';
 import { getStartOfInterval } from 'src/utils/date';
 
 export async function dbGetAllTasks({
-  groupId,
+  userGroupId,
 }: {
-  groupId?: number;
+  userGroupId?: number;
 }): Promise<SelectTask[]> {
   const query = db
     .select({
@@ -30,12 +31,12 @@ export async function dbGetAllTasks({
       recurringTaskGroupId: taskTable.recurringTaskGroupId,
     })
     .from(taskTable);
-  if (groupId === undefined) {
+  if (userGroupId === undefined) {
     return await query;
   }
   return await query
     .innerJoin(taskUserGroupTable, eq(taskUserGroupTable.taskId, taskTable.id))
-    .where(eq(taskUserGroupTable.groupId, groupId));
+    .where(eq(taskUserGroupTable.groupId, userGroupId));
 }
 
 export async function dbGetTaskById(taskId: number) {
@@ -59,7 +60,9 @@ export async function dbCreateRecurringTask({
   description,
   userGroupId,
   interval,
-}: CreateRecurringTask) {
+}: CreateRecurringTask): Promise<
+  SelectTask & { maybeCreatedRecurringTaskGroup: SelectRecurringTaskGroup }
+> {
   const recurringTaskGroupTitle = getLongNameFromPostgresInterval(interval);
 
   const usersOfUserGroup = await dbGetUsersOfUserGroup({ userGroupId });
@@ -77,20 +80,18 @@ export async function dbCreateRecurringTask({
       .limit(1)
   )[0];
 
-  const recurringTaskGroupId =
+  const recurringTaskGroup =
     maybeExistingRecurringTaskGroup === undefined
-      ? (
-          await dbCreateTaskGroup({
-            interval,
-            title: recurringTaskGroupTitle,
-            userIds: usersOfUserGroup.map(
-              (userOfUserGroup) => userOfUserGroup.userId,
-            ),
-            initialStartDate: getStartOfInterval(interval),
-            userGroupId,
-          })
-        ).id
-      : maybeExistingRecurringTaskGroup.id;
+      ? await dbCreateTaskGroup({
+          interval,
+          title: recurringTaskGroupTitle,
+          userIds: usersOfUserGroup.map(
+            (userOfUserGroup) => userOfUserGroup.userId,
+          ),
+          initialStartDate: getStartOfInterval(interval),
+          userGroupId,
+        })
+      : maybeExistingRecurringTaskGroup;
 
   const task = (
     await db
@@ -98,7 +99,7 @@ export async function dbCreateRecurringTask({
       .values({
         title,
         description,
-        recurringTaskGroupId,
+        recurringTaskGroupId: recurringTaskGroup.id,
       })
       .returning()
   )[0];
@@ -110,6 +111,13 @@ export async function dbCreateRecurringTask({
   await db
     .insert(taskUserGroupTable)
     .values({ taskId: task.id, groupId: userGroupId });
+  // TODO: this is really bad, this is an impure side effect.
+  // when the frontend creates a recurring task for an interval where no recurring task group exists yet,
+  // we manually create this recurring task group here, but the frontend needs to know about this change, so we will return here and include it in the response
+  // we could alternatively just refetch after creating task, but that feels even worse
+  // we could perhaps always have a static list of recurring task groups that always exist, e.g. the default ones, and you cant delete those
+  // yeah now where i think about that thats probably the best idea
+  return { ...task, maybeCreatedRecurringTaskGroup: recurringTaskGroup };
 }
 
 export async function dbDeleteTask({ taskId }: { taskId: number }) {
@@ -141,7 +149,7 @@ export async function dbCreateOneOffTask({
   const tasks = await db
     .insert(taskTable)
     .values({ title, description })
-    .returning({ taskId: taskTable.id });
+    .returning();
   const task = tasks[0];
   if (task === undefined) {
     throw new Error('Failed to create one off task.');
@@ -149,11 +157,12 @@ export async function dbCreateOneOffTask({
 
   const hydratedAssignments = userIds.map((userId) => {
     return {
-      taskId: task.taskId,
+      taskId: task.id,
       userId,
     };
   });
-  await db.insert(taskUserGroupTable).values({ taskId: task.taskId, groupId });
+  await db.insert(taskUserGroupTable).values({ taskId: task.id, groupId });
 
   await db.insert(assignmentTable).values(hydratedAssignments);
+  return task;
 }

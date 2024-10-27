@@ -1,9 +1,9 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import 'package:flatshare/fetch/task.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,26 +25,18 @@ class CreateTaskState extends State<CreateTask> {
   final descriptionController = TextEditingController();
   final multiSelectUserController = MultiSelectController<User>([]);
 
-  TaskType selectedTaskType = TaskType.oneOff;
+  TaskType selectedTaskType = TaskType.recurring;
   // TODO: use interval type
   String? selectedInterval;
 
   List<User> userInUserGroup = [];
 
-  // TODO: will probably be gone when below todo is fixed.
-  int? currentUserGroupId;
-
-  // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     UserGroup? userGroup = userProvider.userGroup;
     final userGroupId = userGroup?.id;
-
-    setState(() {
-      currentUserGroupId = userGroupId;
-    });
 
     if (userGroupId != null) {
       fetchUsersInUserGroup(groupId: userGroupId).then((result) {
@@ -58,13 +50,13 @@ class CreateTaskState extends State<CreateTask> {
   ButtonStyle getSelectTaskTypeButtonStyle(
       TaskType taskTypeOfButton, TaskType selectedTaskType) {
     return ButtonStyle(
-      foregroundColor:
-          WidgetStatePropertyAll(taskTypeOfButton == selectedTaskType
-              // TODO: Fix nested ternary, you baaaaad
-              ? Colors.blue
-              : MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? Colors.white
-                  : Colors.black),
+      foregroundColor: WidgetStatePropertyAll(taskTypeOfButton ==
+              selectedTaskType
+          // TODO: Fix nested ternary, you baaaaad -> this can be fixed by finally fixing theme colors in the app
+          ? Colors.blue
+          : MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? Colors.white
+              : Colors.black),
     );
   }
 
@@ -75,19 +67,24 @@ class CreateTaskState extends State<CreateTask> {
       List<int> selectedUserIds = multiSelectUserController.value
           .map((selectUser) => selectUser.userId)
           .toList();
+
       if (selectedTaskType == TaskType.oneOff && selectedUserIds.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('At least one user must be selected')),
         );
         return;
       }
+
       if (selectedTaskType == TaskType.recurring && selectedInterval == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Please select an interval first')),
         );
         return;
       }
-      // TODO: This should never happen.
+
+      final int? currentUserGroupId =
+          Provider.of<UserProvider>(context, listen: false).userGroup?.id;
+
       if (currentUserGroupId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -95,18 +92,21 @@ class CreateTaskState extends State<CreateTask> {
         );
         return;
       }
+      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       try {
         selectedTaskType == TaskType.oneOff
-            ? await createOneOffTask(
+            ? taskProvider.addOneOffTask(
                 title: title,
                 description: description,
-                groupId: currentUserGroupId!,
+                userGroupId: currentUserGroupId,
                 userIds: selectedUserIds)
-            : await createRecurringTask(
+            : taskProvider.addRecurringTask(
                 title: title,
                 description: description,
-                userGroupId: currentUserGroupId!,
-                interval: selectedInterval!);
+                userGroupId: currentUserGroupId,
+                interval: selectedInterval!,
+                context: context);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Created new task!')),
         );
@@ -153,16 +153,6 @@ class CreateTaskState extends State<CreateTask> {
                         const Spacer(),
                         ElevatedButton(
                             style: getSelectTaskTypeButtonStyle(
-                                TaskType.oneOff, selectedTaskType),
-                            onPressed: () {
-                              setState(() {
-                                selectedTaskType = TaskType.oneOff;
-                              });
-                            },
-                            child: const Text("One-Time Task")),
-                        const Spacer(),
-                        ElevatedButton(
-                            style: getSelectTaskTypeButtonStyle(
                                 TaskType.recurring, selectedTaskType),
                             onPressed: () {
                               setState(() {
@@ -170,6 +160,16 @@ class CreateTaskState extends State<CreateTask> {
                               });
                             },
                             child: const Text("Recurring Task")),
+                        const Spacer(),
+                        ElevatedButton(
+                            style: getSelectTaskTypeButtonStyle(
+                                TaskType.oneOff, selectedTaskType),
+                            onPressed: () {
+                              setState(() {
+                                selectedTaskType = TaskType.oneOff;
+                              });
+                            },
+                            child: const Text("One-Time Task")),
                         const Spacer(),
                       ],
                     ),
@@ -183,7 +183,7 @@ class CreateTaskState extends State<CreateTask> {
                             hintText: "Select users",
                             items: userInUserGroup,
                             onListChanged: (value) {})
-                        : CustomDropdown.search(
+                        : CustomDropdown(
                             decoration: const CustomDropdownDecoration(
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
@@ -207,7 +207,7 @@ class CreateTaskState extends State<CreateTask> {
                             foregroundColor:
                                 WidgetStatePropertyAll(Colors.blueAccent)),
                         onPressed: handleSubmit,
-                        child: const Text("Submit")),
+                        child: const Text("Create")),
                   ],
                 ))));
   }

@@ -50,6 +50,13 @@
       "when": 1725652020448,
       "tag": "0006_stormy_magus",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1730059691553,
+      "tag": "0007_noisy_red_hulk",
+      "breakpoints": true
     }
   ]
 }

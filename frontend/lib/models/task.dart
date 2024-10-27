@@ -18,7 +18,7 @@ class Task {
           description: json['description'] as String?,
           recurringTaskGroupId: json['recurringTaskGroupId'] as int?);
     } catch (e) {
-      throw FormatException("Failed to parse tasks: ${e.toString()}");
+      throw FormatException("Failed to parse task: ${e.toString()}");
     }
   }
 }

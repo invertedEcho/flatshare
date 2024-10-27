@@ -1,9 +1,19 @@
-import { and, count, desc, eq, isNull, or, sql } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  getTableColumns,
+  isNull,
+  or,
+  sql,
+} from 'drizzle-orm';
 import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
   AssignmentState,
   InsertAssignment,
+  SelectAssignment,
   assignmentTable,
   recurringTaskGroupTable,
   taskTable,
@@ -99,9 +109,9 @@ export async function dbGetAssignmentsForTaskGroup({
 }: {
   taskGroupId: number;
   limit?: number;
-}) {
+}): Promise<SelectAssignment[]> {
   const result = db
-    .select()
+    .select({ ...getTableColumns(assignmentTable) })
     .from(recurringTaskGroupTable)
     .innerJoin(
       taskTable,
