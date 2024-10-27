@@ -90,7 +90,6 @@ Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
     throw Exception("Failed to create task: ${response.statusCode}");
   }
   dynamic taskResponse = jsonDecode(response.body);
-  print(taskResponse);
   return TaskWithMaybeRecurringTaskGroup.fromJson(taskResponse);
 }
 
