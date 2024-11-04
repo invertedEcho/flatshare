@@ -1,3 +1,4 @@
+import 'package:flatshare/const.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -149,7 +150,7 @@ class ActionButton extends StatelessWidget {
         shape: const CircleBorder(),
         clipBehavior: Clip.antiAlias,
         color: theme.colorScheme.inversePrimary,
-        elevation: 4,
+        elevation: generalElevation,
         child: SizedBox(
             height: 56,
             width: 56,

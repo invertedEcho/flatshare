@@ -154,22 +154,30 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(generalRootPadding),
         child: Column(
           children: [
-            Row(
-              children: getConnectionStatusRowWidgets(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 0),
+              child: Column(
+                children: [
+                  Row(
+                    children: getConnectionStatusRowWidgets(),
+                  ),
+                  Form(
+                      child: TextFormField(
+                    controller: controller,
+                    decoration: const InputDecoration(
+                        labelText: "New Shopping List Item"),
+                  )),
+                  const SizedBox(height: generalSizedBoxHeight),
+                  ElevatedButton(
+                      onPressed: sendNewShoppingListItem,
+                      child: const Text("Add")),
+                  const SizedBox(height: generalSizedBoxHeight),
+                ],
+              ),
             ),
-            Form(
-                child: TextFormField(
-              controller: controller,
-              decoration:
-                  const InputDecoration(labelText: "New Shopping List Item"),
-            )),
-            const SizedBox(height: generalSizedBoxHeight),
-            ElevatedButton(
-                onPressed: sendNewShoppingListItem, child: const Text("Add")),
-            const SizedBox(height: generalSizedBoxHeight),
             Expanded(
               child: ListView.builder(
                   itemCount: shoppingListItems.length,
@@ -179,7 +187,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(13),
                         ),
-                        elevation: 15,
+                        elevation: generalElevation,
                         shadowColor: Colors.black,
                         child: Dismissible(
                             onDismissed: (_) {
@@ -209,6 +217,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
                                       shoppingListItem, newState);
                                 },
                                 value: shoppingListItem.state == 'purchased',
+                                activeColor: Colors.blueAccent,
                               ),
                             )));
                   }),
