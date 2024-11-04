@@ -1,3 +1,4 @@
+import 'package:flatshare/const.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
@@ -32,10 +33,10 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
         tasks.where((task) => task.recurringTaskGroupId == null).toList();
     final taskGroups = Provider.of<TaskGroupProvider>(context).taskGroups;
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(generalRootPadding),
       child: Column(children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: Container(
             decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -47,27 +48,28 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
                   Expanded(
                       child: ElevatedButton(
                           style: ButtonStyle(
-                            foregroundColor: WidgetStateProperty.all(
-                                filterBy == TaskType.recurring
-                                    ? Colors.white
-                                    : Colors.black),
-                            backgroundColor: WidgetStateProperty.all<Color>(
-                                filterBy == TaskType.recurring
-                                    ? Colors.blueAccent
-                                    : Colors.grey.shade300),
-                            textStyle: WidgetStateProperty.all<TextStyle>(
-                              TextStyle(
-                                fontWeight: filterBy == TaskType.recurring
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
+                              foregroundColor: WidgetStateProperty.all(
+                                  filterBy == TaskType.recurring
+                                      ? Colors.white
+                                      : Colors.black),
+                              backgroundColor: WidgetStateProperty.all<Color>(
+                                  filterBy == TaskType.recurring
+                                      ? Colors.blueAccent
+                                      : Colors.grey.shade300),
+                              textStyle: WidgetStateProperty.all<TextStyle>(
+                                TextStyle(
+                                  fontWeight: filterBy == TaskType.recurring
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
                               ),
-                            ),
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                              shape: WidgetStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                            ),
-                          ),
+                              elevation:
+                                  WidgetStateProperty.all(generalElevation)),
                           onPressed: () {
                             setState(() {
                               filterBy = TaskType.recurring;

@@ -1,3 +1,4 @@
+import 'package:flatshare/const.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/widgets/tasks/edit_task_form.dart';
@@ -61,6 +62,7 @@ class TaskList extends StatelessWidget {
                   ),
                 )),
             child: Card(
+              elevation: generalElevation,
               child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(

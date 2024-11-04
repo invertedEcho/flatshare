@@ -1,3 +1,4 @@
+import 'package:flatshare/const.dart';
 import 'package:flatshare/fetch/task_group.dart';
 import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/providers/task.dart';
@@ -84,31 +85,34 @@ class TaskGroupList extends StatelessWidget {
                       ),
                     )),
                 child: Card(
-                    child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            EditTaskGroupScreen(taskGroup: taskGroup)));
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.repeat),
-                            Text(formatPostgresInterval(taskGroup.interval),
-                                style: Theme.of(context).textTheme.titleMedium),
-                          ],
-                        ),
-                        Text(taskGroup.description ?? ""),
-                        Text("Total tasks: $countOfTasksInTaskGroup"),
-                      ],
+                  elevation: generalElevation,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              EditTaskGroupScreen(taskGroup: taskGroup)));
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.repeat),
+                              Text(formatPostgresInterval(taskGroup.interval),
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium),
+                            ],
+                          ),
+                          Text(taskGroup.description ?? ""),
+                          Text("Total tasks: $countOfTasksInTaskGroup"),
+                        ],
+                      ),
                     ),
                   ),
-                )));
+                ));
           });
     });
   }

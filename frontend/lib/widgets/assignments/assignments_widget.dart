@@ -75,14 +75,17 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                 final sectionAssignments = section.value;
 
                 return Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(generalRootPadding),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Text(sectionTitle ?? 'One-Time Tasks',
-                              style: theme.textTheme.titleLarge),
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 4, vertical: 0),
+                              child: Text(sectionTitle ?? 'One-Time Tasks',
+                                  style: theme.textTheme.titleLarge)),
                           const SizedBox(width: 8),
                           Icon(Icons.arrow_right_alt, color: theme.hintColor),
                           const SizedBox(width: 8),
@@ -104,7 +107,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(13),
                               ),
-                              elevation: 15,
+                              elevation: generalElevation,
                               shadowColor: Colors.black,
                               child: ListTile(
                                 title: Row(
@@ -128,6 +131,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                   ],
                                 ),
                                 trailing: Checkbox(
+                                  activeColor: Colors.blueAccent,
                                   onChanged: (bool? value) =>
                                       updateAssignment(assignment),
                                   value: assignment.isCompleted,
