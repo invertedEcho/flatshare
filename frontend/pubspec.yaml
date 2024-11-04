@@ -1,9 +1,9 @@
 name: flatshare
-description: " Track everything you need in your shared apartment with ease"
+description: "Track everything you need in your shared apartment with ease"
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+4
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
