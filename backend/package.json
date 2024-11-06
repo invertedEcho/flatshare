@@ -12,7 +12,6 @@
     "build": "nest build",
     "format": "prettier -w \"src/**/*.ts\"",
     "format:check": "prettier -c \"src/**/*.ts\"",
-    "start": "nest start",
     "dev": "dotenv -e .env nest start -- --watch",
     "start:debug": "nest start -- --debug --watch",
     "pm2:start": "dotenv -e .env pm2 -- start dist/src/main.js",

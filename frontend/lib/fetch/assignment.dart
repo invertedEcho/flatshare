@@ -19,7 +19,8 @@ Future<List<Assignment>> fetchAssignments({required int groupId}) async {
   }
 }
 
-void updateAssignmentState(int assignmentId, bool newAssignmentState) async {
+Future<void> updateAssignmentState(
+    int assignmentId, bool newAssignmentState) async {
   var assignmentState = newAssignmentState ? "pending" : 'completed';
   var apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient.post(

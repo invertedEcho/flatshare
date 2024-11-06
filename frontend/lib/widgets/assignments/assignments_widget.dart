@@ -1,9 +1,11 @@
 import 'package:flatshare/const.dart';
 import 'package:flatshare/fetch/assignment.dart';
 import 'package:flatshare/models/assignment.dart';
+import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/date.dart';
+import 'package:flatshare/widgets/task_type_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import "package:collection/collection.dart";
@@ -17,6 +19,7 @@ class AssignmentsWidget extends StatefulWidget {
 
 class AssignmentsWidgetState extends State<AssignmentsWidget> {
   late Future<List<Assignment>> _assignmentsFuture;
+  TaskType filterByTaskType = TaskType.recurring;
 
   // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
@@ -39,7 +42,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
     });
 
     try {
-      updateAssignmentState(assignment.id, !assignment.isCompleted);
+      await updateAssignmentState(assignment.id, !assignment.isCompleted);
     } catch (error) {
       setState(() {
         assignment.isCompleted = !assignment.isCompleted;
@@ -53,103 +56,158 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return FutureBuilder<List<Assignment>>(
-        future: _assignmentsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data!.isEmpty) {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                    "Currently, there are no assignments. To get started, use the + Action Button on the bottom right."),
-              );
-            }
-            var groupedAssignments = groupBy(
-                snapshot.data!, (assignment) => assignment.taskGroupTitle);
+    return Padding(
+      padding: const EdgeInsets.all(generalRootPadding),
+      child: Column(
+        children: [
+          TaskTypeSwitch(
+            selectedTaskType: filterByTaskType,
+            onTaskTypeSelect: (taskType) {
+              setState(() {
+                filterByTaskType = taskType;
+              });
+            },
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Expanded(
+              child: FutureBuilder<List<Assignment>>(
+                  future: _assignmentsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text(
+                              "Currently, there are no assignments. To get started, use the + Action Button on the bottom right."),
+                        );
+                      }
+                      Map<String, List<Assignment>> groupedAssignments = {};
 
-            return ListView.builder(
-              itemCount: groupedAssignments.length,
-              itemBuilder: (BuildContext context, int index) {
-                final section = groupedAssignments.entries.elementAt(index);
-                final sectionTitle = section.key;
-                final sectionAssignments = section.value;
+                      if (filterByTaskType == TaskType.recurring) {
+                        final filteredAssignments = snapshot.data!.where(
+                            (assignment) => assignment.taskGroupTitle != null);
+                        groupedAssignments = groupBy(filteredAssignments,
+                            (assignment) => assignment.taskGroupTitle!);
+                      } else if (filterByTaskType == TaskType.oneOff) {
+                        final filteredAssignments = snapshot.data!.where(
+                            (assignment) => assignment.taskGroupTitle == null);
+                        groupedAssignments = groupBy(filteredAssignments,
+                            (assignment) => assignment.assigneeName);
+                      }
 
-                return Padding(
-                  padding: const EdgeInsets.all(generalRootPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 4, vertical: 0),
-                              child: Text(sectionTitle ?? 'One-Time Tasks',
-                                  style: theme.textTheme.titleLarge)),
-                          const SizedBox(width: 8),
-                          Icon(Icons.arrow_right_alt, color: theme.hintColor),
-                          const SizedBox(width: 8),
-                          Text(sectionAssignments[0].assigneeName,
-                              style: theme.textTheme.titleLarge!.merge(
-                                  const TextStyle(color: Colors.blueAccent)))
-                        ],
-                      ),
-                      const SizedBox(height: generalSizedBoxHeight),
-                      ListView.builder(
-                          shrinkWrap: true,
-                          physics: const ClampingScrollPhysics(),
-                          itemCount: sectionAssignments.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final assignment = sectionAssignments[index];
-                            final description = assignment.description;
+                      return ListView.builder(
+                        itemCount: groupedAssignments.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final section =
+                              groupedAssignments.entries.elementAt(index);
+                          final sectionTitle = section.key;
+                          final sectionAssignments = section.value;
 
-                            return Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(13),
-                              ),
-                              elevation: generalElevation,
-                              shadowColor: Colors.black,
-                              child: ListTile(
-                                title: Row(
+                          // TODO: i dont like this.
+                          final isRecurringAssignments = sectionAssignments.any(
+                              (assignment) =>
+                                  assignment.taskGroupTitle != null);
+
+                          return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
                                   children: [
-                                    Text(assignment.title),
+                                    Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal:
+                                                isRecurringAssignments ? 4 : 0,
+                                            vertical: 0),
+                                        child: Text(
+                                            isRecurringAssignments
+                                                ? sectionTitle
+                                                : "",
+                                            style: theme.textTheme.titleLarge)),
+                                    Row(
+                                        children: isRecurringAssignments
+                                            ? const [
+                                                SizedBox(width: 8),
+                                                Icon(
+                                                  Icons.arrow_right_alt,
+                                                )
+                                              ]
+                                            : []),
                                     const SizedBox(width: 8),
-                                    if (!assignment.isOneOff)
-                                      Icon(Icons.repeat,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface,
-                                          size: 16)
+                                    Text(sectionAssignments[0].assigneeName,
+                                        style: theme.textTheme.titleLarge!
+                                            .merge(const TextStyle(
+                                                color: Colors.blueAccent)))
                                   ],
                                 ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    if (description != null) Text(description),
-                                    if (assignment.dueDate != null)
-                                      Text(parseToDueDate(assignment.dueDate!)),
-                                  ],
-                                ),
-                                trailing: Checkbox(
-                                  activeColor: Colors.blueAccent,
-                                  onChanged: (bool? value) =>
-                                      updateAssignment(assignment),
-                                  value: assignment.isCompleted,
-                                ),
-                              ),
-                            );
-                          })
-                    ],
-                  ),
-                );
-              },
-            );
-          } else if (snapshot.hasError) {
-            return SafeArea(
-              child: Text('${snapshot.error}'),
-            );
-          }
-          return const Center(child: CircularProgressIndicator());
-        });
+                                const SizedBox(height: generalSizedBoxHeight),
+                                ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: const ClampingScrollPhysics(),
+                                    itemCount: sectionAssignments.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final assignment =
+                                          sectionAssignments[index];
+                                      final description =
+                                          assignment.description;
+
+                                      return Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(13),
+                                        ),
+                                        elevation: generalElevation,
+                                        shadowColor: Colors.black,
+                                        child: ListTile(
+                                          title: Row(
+                                            children: [
+                                              Text(assignment.title),
+                                              const SizedBox(width: 8),
+                                              if (!assignment.isOneOff)
+                                                Icon(Icons.repeat,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface,
+                                                    size: 16)
+                                            ],
+                                          ),
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              if (description != null)
+                                                Text(description),
+                                              if (assignment.dueDate != null)
+                                                Text(parseToDueDate(
+                                                    assignment.dueDate!)),
+                                            ],
+                                          ),
+                                          trailing: Checkbox(
+                                            activeColor: Colors.blueAccent,
+                                            onChanged: (bool? value) =>
+                                                updateAssignment(assignment),
+                                            value: assignment.isCompleted,
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                const SizedBox(
+                                  height: generalSizedBoxHeight,
+                                )
+                              ]);
+                        },
+                      );
+                    } else if (snapshot.hasError) {
+                      return SafeArea(
+                        child: Text('${snapshot.error}'),
+                      );
+                    }
+                    return const Center(child: CircularProgressIndicator());
+                  }))
+        ],
+      ),
+    );
   }
 }
