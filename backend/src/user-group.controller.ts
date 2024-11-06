@@ -67,8 +67,9 @@ export class UserGroupController {
       })),
     );
 
-    // Add user to all recurring task groups that already exist
-    await db.insert(recurringTaskGroupUserTable).values(values);
+    if (values.length > 0) {
+      await db.insert(recurringTaskGroupUserTable).values(values);
+    }
 
     const userGroup = await dbGetUserGroup({
       userGroupId: maybeInviteCode.groupId,
