@@ -57,6 +57,13 @@
       "when": 1730059691553,
       "tag": "0007_noisy_red_hulk",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1730930311824,
+      "tag": "0008_far_adam_warlock",
+      "breakpoints": true
     }
   ]
 }
