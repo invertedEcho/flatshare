@@ -3,6 +3,7 @@ import {
   interval,
   pgEnum,
   pgTable,
+  primaryKey,
   serial,
   text,
   timestamp,
@@ -69,15 +70,22 @@ export type InsertUserGroupInvite = typeof userGroupInviteTable.$inferInsert;
  * This association table stores information about which user belong into which groups,
  * in a N-N relation, e.g. a user may be in multiple groups.
  */
-export const userUserGroupTable = pgTable('user_user_group', {
-  id: serial('id').primaryKey(),
-  userId: integer('user_id')
-    .references(() => userTable.id)
-    .notNull(),
-  groupId: integer('group_id')
-    .references(() => userGroupTable.id)
-    .notNull(),
-});
+export const userUserGroupTable = pgTable(
+  'user_user_group',
+  {
+    userId: integer('user_id')
+      .references(() => userTable.id)
+      .notNull(),
+    groupId: integer('group_id')
+      .references(() => userGroupTable.id)
+      .notNull(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.userId, table.groupId] }),
+    };
+  },
+);
 export type SelectUserUserGroup = typeof userUserGroupTable.$inferSelect;
 export type InsertUserUserGroup = typeof userUserGroupTable.$inferInsert;
 
