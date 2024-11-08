@@ -83,6 +83,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                   height: 24,
                   width: 24,
                   child: Checkbox(
+                      activeColor: Colors.blueAccent,
                       value: showOnlyCurrentUserAssignments,
                       onChanged: (newValue) {
                         setState(() {
