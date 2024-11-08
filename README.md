@@ -2,7 +2,12 @@
 
 This mobile app allows you to easily track all what you need in your shared apartment with ease and no useless features.
 
-## setup
+## Installing
+
+- IOS: https://testflight.apple.com/join/evmP9jag
+- Android: Install the latest apk from the [release](https://github.com/invertedEcho/flatshare/releases) tab
+
+## dev setup
 
 - Install all dependencies for backend
 
