@@ -42,4 +42,9 @@ class Assignment {
       taskGroupTitle: json['taskGroupTitle'] as String?,
     );
   }
+
+  @override
+  String toString() {
+    return "Assignment: $title ID: $id TaskGroupTitle: $taskGroupTitle";
+  }
 }

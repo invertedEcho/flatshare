@@ -1,5 +1,3 @@
-// TODO: this has to go somewhere else
-
 export type AssignmentResponse = {
   id: number;
   title: string;
