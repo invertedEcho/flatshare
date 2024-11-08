@@ -63,8 +63,8 @@ class _AppState extends State<App> {
           useMaterial3: true,
           brightness: Brightness.light,
           checkboxTheme: CheckboxThemeData(
-            fillColor: MaterialStateProperty.resolveWith((states) {
-              if (states.contains(MaterialState.selected)) {
+            fillColor: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.selected)) {
                 return Colors.blueAccent;
               }
               return Colors.white;
