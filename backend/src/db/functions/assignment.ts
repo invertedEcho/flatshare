@@ -8,7 +8,6 @@ import {
   or,
   sql,
 } from 'drizzle-orm';
-import { AssignmentResponse } from 'src/types';
 import { db } from '..';
 import {
   AssignmentState,
@@ -22,6 +21,7 @@ import {
 } from '../schema';
 import { z } from 'zod';
 import { defaultPostgresIntervalSchema } from 'src/utils/interval';
+import { AssignmentResponse } from 'src/assignment/types';
 
 // FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
 // the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer

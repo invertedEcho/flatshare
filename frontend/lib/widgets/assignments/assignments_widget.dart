@@ -20,12 +20,15 @@ class AssignmentsWidget extends StatefulWidget {
 class AssignmentsWidgetState extends State<AssignmentsWidget> {
   late Future<List<Assignment>> _assignmentsFuture;
   TaskType filterByTaskType = TaskType.recurring;
+  bool showOnlyCurrentUserAssignments = true;
+  int? currentUserId;
 
   // TODO: we should not do async operations in this method, as it could cause unneccessary rebuilds
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    currentUserId = userProvider.user?.userId;
     UserGroup? userGroup = userProvider.userGroup;
     final groupId = userGroup?.id;
 
@@ -68,8 +71,26 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
               });
             },
           ),
+          ListTile(
+              title: const Text("Show only my assignments"),
+              onTap: () {
+                setState(() {
+                  showOnlyCurrentUserAssignments =
+                      !showOnlyCurrentUserAssignments;
+                });
+              },
+              trailing: SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: Checkbox(
+                      value: showOnlyCurrentUserAssignments,
+                      onChanged: (newValue) {
+                        setState(() {
+                          showOnlyCurrentUserAssignments = newValue ?? false;
+                        });
+                      }))),
           const SizedBox(
-            height: 20,
+            height: 10,
           ),
           Expanded(
               child: FutureBuilder<List<Assignment>>(
@@ -86,13 +107,20 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                       Map<String, List<Assignment>> groupedAssignments = {};
 
                       if (filterByTaskType == TaskType.recurring) {
+                        // print(snapshot.data);
                         final filteredAssignments = snapshot.data!.where(
-                            (assignment) => assignment.taskGroupTitle != null);
+                            (assignment) =>
+                                assignment.taskGroupTitle != null &&
+                                (!showOnlyCurrentUserAssignments ||
+                                    assignment.assigneeId == currentUserId));
                         groupedAssignments = groupBy(filteredAssignments,
                             (assignment) => assignment.taskGroupTitle!);
                       } else if (filterByTaskType == TaskType.oneOff) {
                         final filteredAssignments = snapshot.data!.where(
-                            (assignment) => assignment.taskGroupTitle == null);
+                            (assignment) =>
+                                assignment.taskGroupTitle == null &&
+                                (!showOnlyCurrentUserAssignments ||
+                                    assignment.assigneeId == currentUserId));
                         groupedAssignments = groupBy(filteredAssignments,
                             (assignment) => assignment.assigneeName);
                       }
