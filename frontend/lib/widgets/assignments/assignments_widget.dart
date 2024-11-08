@@ -79,6 +79,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                       !showOnlyCurrentUserAssignments;
                 });
               },
+              splashColor: Colors.transparent,
               trailing: SizedBox(
                   height: 24,
                   width: 24,
