@@ -3,7 +3,7 @@ description: "Track everything you need in your shared apartment with ease"
 
 publish_to: 'none'
 
-version: 1.0.0+4
+version: 1.1.0
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
