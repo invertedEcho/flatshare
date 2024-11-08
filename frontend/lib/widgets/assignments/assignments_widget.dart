@@ -190,6 +190,9 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                         elevation: generalElevation,
                                         shadowColor: Colors.black,
                                         child: ListTile(
+                                          onTap: () async {
+                                            await updateAssignment(assignment);
+                                          },
                                           title: Row(
                                             children: [
                                               Text(assignment.title),
