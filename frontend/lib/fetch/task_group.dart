@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flatshare/main.dart';
-import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/utils/env.dart';
 

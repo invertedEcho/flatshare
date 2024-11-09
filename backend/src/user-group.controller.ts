@@ -28,9 +28,8 @@ import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/task-g
 
 @Controller('user-group')
 export class UserGroupController {
-  // TODO: we need to support multiple user groups
   @Get(':userId')
-  async getGroupOfUser(@Param('userId') userId: number) {
+  async getUserGroupOfUser(@Param('userId') userId: number) {
     const userGroup = await dbGetUserGroupOfUser(userId);
     return {
       id: userGroup?.user_user_group.groupId ?? null,

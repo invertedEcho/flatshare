@@ -161,65 +161,49 @@ const taskToAssignSchema = z.object({
 
 export type TaskToAssign = z.infer<typeof taskToAssignSchema>;
 
-// TODO: doesnt seem like you can (should?) mock the time of the database, so we use this argument instead of `NOW()`
+// doesnt seem like you can (should?) mock the time of the database, so we use this argument if its defined instead of `NOW()`
 export async function dbGetTasksToAssignForCurrentInterval({
   currentTime = new Date(),
 }: {
   currentTime?: Date;
 }): Promise<TaskToAssign[]> {
-  try {
-    const currentTimeString = currentTime.toISOString();
+  const currentTimeString = currentTime.toISOString();
 
-    // Get all tasks that either have no assignments yet or don't have an assignment in the current period
-    const tasksToAssign = await db
-      .select({
-        taskId: taskTable.id,
-        taskGroupId: recurringTaskGroupTable.id,
-        taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
-        isInFirstInterval: sql<boolean>`CAST(${currentTimeString} AS timestamp) < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
-        interval: recurringTaskGroupTable.interval,
-      })
-      .from(recurringTaskGroupTable)
-      .innerJoin(
-        taskTable,
-        eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
-      )
-      .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
-      .where(
-        sql`${recurringTaskGroupTable.initialStartDate} <= CAST(${currentTimeString} AS timestamp)`,
-      )
-      .groupBy(recurringTaskGroupTable.id, taskTable.id)
-      .having(
-        or(
-          eq(count(assignmentTable.id), 0),
-          // TODO: make timezone dynamic
-          /* When the last assignment was for example created at 2024-06-30 22:00:00 (in UTC, which would be 2024-07-01 00:00:00 in CEST), 
+  // Get all tasks that either have no assignments yet or don't have an assignment in the current period
+  const tasksToAssign = await db
+    .select({
+      taskId: taskTable.id,
+      taskGroupId: recurringTaskGroupTable.id,
+      taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
+      isInFirstInterval: sql<boolean>`CAST(${currentTimeString} AS timestamp) < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
+      interval: recurringTaskGroupTable.interval,
+    })
+    .from(recurringTaskGroupTable)
+    .innerJoin(
+      taskTable,
+      eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
+    )
+    .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
+    .where(
+      sql`${recurringTaskGroupTable.initialStartDate} <= CAST(${currentTimeString} AS timestamp)`,
+    )
+    .groupBy(recurringTaskGroupTable.id, taskTable.id)
+    .having(
+      or(
+        eq(count(assignmentTable.id), 0),
+        // TODO: make timezone dynamic
+        /* When the last assignment was for example created at 2024-06-30 22:00:00 (in UTC, which would be 2024-07-01 00:00:00 in CEST), 
           this date plus one month would be 2024-07-30 22:00:00 (in UTC, which would be 2024-07-31 00:00:00 in CEST). 
           But actually, we want the resulting date that we compare the current time with to be 2024-08-01 00:00:00,
           so we need to convert the timestamps to the local time zone first. */
-          sql`CAST(${currentTimeString} AS timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
-        ),
-      );
+        sql`CAST(${currentTimeString} AS timestamp) AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' >= MAX(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval})`,
+      ),
+    );
 
-    // drizzle returns the interval as type string, so we use zod to "convert" them to the correct type
-    const parsedTasksToAssign = z
-      .array(taskToAssignSchema)
-      .safeParse(tasksToAssign);
+  // drizzle returns the interval as type string, so we use zod to "convert" them to the correct type
+  const parsedTasksToAssign = z.array(taskToAssignSchema).parse(tasksToAssign);
 
-    if (!parsedTasksToAssign.success) {
-      // TODO: We need a logger connected to a logdrain, and a monitoring dashboard. This most likely never happens, but if it does,
-      // it would be quite critical.
-      console.error({
-        msg: 'Could not parse tasksToAssign result set from database to the expected type.',
-      });
-      return [];
-    }
-
-    return parsedTasksToAssign.data;
-  } catch (error) {
-    console.error({ error });
-    throw error;
-  }
+  return parsedTasksToAssign;
 }
 
 export async function dbAddAssignments({

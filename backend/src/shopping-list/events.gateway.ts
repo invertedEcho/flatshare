@@ -51,14 +51,16 @@ export class EventsGateway implements OnGatewayConnection {
   async verifyUserGroupOfClient(client: Socket): Promise<number | null> {
     const authorizationHeader = client.handshake.headers.authorization;
     if (authorizationHeader === undefined) {
-      throw new Error('Could not find the authorization header.');
+      console.info('Could not find the authorization header.');
+      return null;
     }
 
     const token = extractTokenFromAuthHeader(authorizationHeader);
     if (token === undefined) {
-      throw new Error(
+      console.info(
         'Could not extract the token from the authorization header.',
       );
+      return null;
     }
 
     const userGroupId = client.handshake.query['userGroupId'];
@@ -77,9 +79,10 @@ export class EventsGateway implements OnGatewayConnection {
     }
 
     if (userGroup.user_group.id !== parsedUserGroupId) {
-      throw new Error(
+      console.info(
         'This client is not allowed to join a room by the user-group-id included in the header.',
       );
+      return null;
     }
 
     return parsedUserGroupId;

@@ -22,27 +22,23 @@ import {
   displayIntervalToPostgresInterval,
 } from 'src/utils/interval';
 
-// TODO: make a base type for these three types below
-// TODO: extra type for this feels weird
-export type OneOffTask = {
-  title: string;
-  description: string;
-  userIds: number[];
-};
-
-// TODO: this shouldnt be a separate type
-export type UpdateTask = {
-  title: string;
-  description: string;
-  taskGroupId?: number;
-};
-
-export type CreateRecurringTaskBody = {
+export type BaseTask = {
   title: string;
   description?: string;
+};
+
+export type OneOffTask = {
+  userIds: number[];
+} & BaseTask;
+
+export type UpdateTask = {
+  taskGroupId?: number;
+} & BaseTask;
+
+export type CreateRecurringTaskBody = {
   interval: DefaultDisplayInterval;
   userGroupId: number;
-};
+} & BaseTask;
 
 @Controller('tasks')
 export class TasksController {
