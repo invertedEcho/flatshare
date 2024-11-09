@@ -109,7 +109,6 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                       Map<String, List<Assignment>> groupedAssignments = {};
 
                       if (filterByTaskType == TaskType.recurring) {
-                        // print(snapshot.data);
                         final filteredAssignments = snapshot.data!.where(
                             (assignment) =>
                                 assignment.taskGroupTitle != null &&
@@ -194,18 +193,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                           onTap: () async {
                                             await updateAssignment(assignment);
                                           },
-                                          title: Row(
-                                            children: [
-                                              Text(assignment.title),
-                                              const SizedBox(width: 8),
-                                              if (!assignment.isOneOff)
-                                                Icon(Icons.repeat,
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurface,
-                                                    size: 16)
-                                            ],
-                                          ),
+                                          title: Text(assignment.title),
                                           subtitle: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
