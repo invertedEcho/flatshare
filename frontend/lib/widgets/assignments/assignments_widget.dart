@@ -133,89 +133,97 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                           final sectionTitle = section.key;
                           final sectionAssignments = section.value;
 
-                          // TODO: i dont like this.
                           final isRecurringAssignments = sectionAssignments.any(
                               (assignment) =>
                                   assignment.taskGroupTitle != null);
 
-                          return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal:
-                                                isRecurringAssignments ? 4 : 0,
-                                            vertical: 0),
-                                        child: Text(
-                                            isRecurringAssignments
-                                                ? sectionTitle
-                                                : "",
-                                            style: theme.textTheme.titleLarge)),
-                                    Row(
-                                        children: isRecurringAssignments
-                                            ? const [
-                                                SizedBox(width: 8),
-                                                Icon(
-                                                  Icons.arrow_right_alt,
-                                                )
-                                              ]
-                                            : []),
-                                    const SizedBox(width: 8),
-                                    Text(sectionAssignments[0].assigneeName,
-                                        style: theme.textTheme.titleLarge!
-                                            .merge(const TextStyle(
-                                                color: Colors.blueAccent)))
-                                  ],
-                                ),
-                                const SizedBox(
-                                    height: generalSizedBoxHeight / 4),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 0, horizontal: 4),
-                                  // for now, we can just pick the first assginment because they are gouped together and all have the same due date.
-                                  child: Text(parseToDueDate(
-                                      sectionAssignments[0].dueDate!)),
-                                ),
-                                const SizedBox(
-                                    height: generalSizedBoxHeight / 2),
-                                ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: const ClampingScrollPhysics(),
-                                    itemCount: sectionAssignments.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final assignment =
-                                          sectionAssignments[index];
-                                      final description =
-                                          assignment.description;
+                          return Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 4),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8))),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: isRecurringAssignments
+                                                  ? 4
+                                                  : 0,
+                                              vertical: 0),
+                                          child: Text(
+                                              isRecurringAssignments
+                                                  ? sectionTitle
+                                                  : "",
+                                              style:
+                                                  theme.textTheme.titleLarge)),
+                                      Row(
+                                          children: isRecurringAssignments
+                                              ? const [
+                                                  SizedBox(width: 8),
+                                                  Icon(
+                                                    Icons.arrow_right_alt,
+                                                  )
+                                                ]
+                                              : []),
+                                      const SizedBox(width: 8),
+                                      Text(sectionAssignments[0].assigneeName,
+                                          style: theme.textTheme.titleLarge!
+                                              .merge(const TextStyle(
+                                                  color: Colors.blueAccent)))
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                      height: generalSizedBoxHeight / 4),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 0, horizontal: 4),
+                                    // for now, we can just pick the first assginment because they are gouped together and all have the same due date.
+                                    child: Text(parseToDueDate(
+                                        sectionAssignments[0].dueDate!)),
+                                  ),
+                                  const SizedBox(
+                                      height: generalSizedBoxHeight / 2),
+                                  ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const ClampingScrollPhysics(),
+                                      itemCount: sectionAssignments.length,
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        final assignment =
+                                            sectionAssignments[index];
+                                        final description =
+                                            assignment.description;
 
-                                      return Card(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(13),
-                                        ),
-                                        elevation: generalElevation,
-                                        shadowColor: Colors.black,
-                                        child: ListTile(
-                                          onTap: () async {
-                                            await updateAssignment(assignment);
-                                          },
-                                          title: Text(assignment.title),
-                                          subtitle: Text(description ?? ""),
-                                          trailing: Checkbox(
-                                            onChanged: (bool? value) =>
-                                                updateAssignment(assignment),
-                                            value: assignment.isCompleted,
+                                        return Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(13),
                                           ),
-                                        ),
-                                      );
-                                    }),
-                                const SizedBox(
-                                  height: generalSizedBoxHeight,
-                                )
-                              ]);
+                                          elevation: generalElevation,
+                                          shadowColor: Colors.black,
+                                          child: ListTile(
+                                            onTap: () async {
+                                              await updateAssignment(
+                                                  assignment);
+                                            },
+                                            title: Text(assignment.title),
+                                            subtitle: Text(description ?? ""),
+                                            trailing: Checkbox(
+                                              onChanged: (bool? value) =>
+                                                  updateAssignment(assignment),
+                                              value: assignment.isCompleted,
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                ]),
+                          );
                         },
                       );
                     } else if (snapshot.hasError) {
