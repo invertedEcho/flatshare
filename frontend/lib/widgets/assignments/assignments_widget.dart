@@ -133,6 +133,14 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                           final sectionTitle = section.key;
                           final sectionAssignments = section.value;
 
+                          // for now, we can just pick the first assginment because they are gouped together and all have the same due date.
+                          final firstAssignmentDueDate =
+                              sectionAssignments[0].dueDate;
+                          final maybeParsedDueDate =
+                              firstAssignmentDueDate != null
+                                  ? parseToDueDate(firstAssignmentDueDate)
+                                  : "";
+
                           final isRecurringAssignments = sectionAssignments.any(
                               (assignment) =>
                                   assignment.taskGroupTitle != null);
@@ -183,9 +191,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 0, horizontal: 4),
-                                    // for now, we can just pick the first assginment because they are gouped together and all have the same due date.
-                                    child: Text(parseToDueDate(
-                                        sectionAssignments[0].dueDate!)),
+                                    child: Text(maybeParsedDueDate),
                                   ),
                                   const SizedBox(
                                       height: generalSizedBoxHeight / 2),
