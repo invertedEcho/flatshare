@@ -22,6 +22,7 @@ class ShoppingListWidget extends StatefulWidget {
 
 class ShoppingListWidgetState extends State<ShoppingListWidget> {
   final controller = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
   late socket_io.Socket socket;
   var isConnected = false;
@@ -165,11 +166,18 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
                     children: getConnectionStatusRowWidgets(),
                   ),
                   Form(
+                      key: formKey,
                       child: TextFormField(
-                    controller: controller,
-                    decoration: const InputDecoration(
-                        labelText: "New Shopping List Item"),
-                  )),
+                        controller: controller,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter a title";
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                            labelText: "New Shopping List Item"),
+                      )),
                   const SizedBox(height: generalSizedBoxHeight),
                   ElevatedButton(
                       onPressed: sendNewShoppingListItem,
@@ -236,9 +244,10 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
   }
 
   void sendNewShoppingListItem() {
-    if (controller.text.isEmpty) {
+    if (!formKey.currentState!.validate()) {
       return;
     }
+
     var userProvider = Provider.of<UserProvider>(context, listen: false);
     var userGroupId = userProvider.userGroup?.id;
     if (userGroupId == null) {

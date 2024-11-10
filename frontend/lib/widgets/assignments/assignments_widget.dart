@@ -5,10 +5,10 @@ import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/date.dart';
+import 'package:flatshare/widgets/assignments/utils.dart';
 import 'package:flatshare/widgets/task_type_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import "package:collection/collection.dart";
 
 class AssignmentsWidget extends StatefulWidget {
   const AssignmentsWidget({super.key});
@@ -105,33 +105,38 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                               "Currently, there are no assignments. To get started, use the + Action Button on the bottom right."),
                         );
                       }
-                      Map<String, List<Assignment>> groupedAssignments = {};
+                      List<List<Assignment>> sortedAssignmentGroups = [];
 
                       if (filterByTaskType == TaskType.recurring) {
-                        final filteredAssignments = snapshot.data!.where(
-                            (assignment) =>
-                                assignment.taskGroupTitle != null &&
-                                (!showOnlyCurrentUserAssignments ||
-                                    assignment.assigneeId == currentUserId));
-                        groupedAssignments = groupBy(filteredAssignments,
-                            (assignment) => assignment.taskGroupTitle!);
+                        final recurringAssignments =
+                            snapshot.data!.where((assignment) {
+                          return assignment.taskGroupTitle != null;
+                        }).toList();
+                        sortedAssignmentGroups = sortRecurringAssignmentGroups(
+                            groupRecurringAssignments(recurringAssignments));
                       } else if (filterByTaskType == TaskType.oneOff) {
-                        final filteredAssignments = snapshot.data!.where(
-                            (assignment) =>
-                                assignment.taskGroupTitle == null &&
-                                (!showOnlyCurrentUserAssignments ||
-                                    assignment.assigneeId == currentUserId));
-                        groupedAssignments = groupBy(filteredAssignments,
-                            (assignment) => assignment.assigneeName);
+                        final oneOffAssignments =
+                            snapshot.data!.where((assignment) {
+                          return assignment.taskGroupTitle == null;
+                        }).toList();
+                        // we dont have due dates yet for one off tasks, so only grouping here
+                        sortedAssignmentGroups =
+                            groupOneOffAssignments(oneOffAssignments);
                       }
 
+                      final filteredAssignments = filterGroupedAssignments(
+                          sortedAssignmentGroups,
+                          showOnlyCurrentUserAssignments,
+                          currentUserId);
+
                       return ListView.builder(
-                        itemCount: groupedAssignments.length,
+                        itemCount: filteredAssignments.length,
                         itemBuilder: (BuildContext context, int index) {
-                          final section =
-                              groupedAssignments.entries.elementAt(index);
-                          final sectionTitle = section.key;
-                          final sectionAssignments = section.value;
+                          final sectionAssignments = filteredAssignments[index];
+                          final sectionTitle =
+                              sectionAssignments[0].taskGroupTitle == null
+                                  ? sectionAssignments[0].assigneeName
+                                  : sectionAssignments[0].taskGroupTitle!;
 
                           // for now, we can just pick the first assginment because they are gouped together and all have the same due date.
                           final firstAssignmentDueDate =
