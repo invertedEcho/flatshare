@@ -53,7 +53,7 @@ class CreateTaskState extends State<CreateTask> {
       foregroundColor: WidgetStatePropertyAll(taskTypeOfButton ==
               selectedTaskType
           // TODO: Fix nested ternary, you baaaaad -> this can be fixed by finally fixing theme colors in the app
-          ? Colors.blue
+          ? Colors.blueAccent
           : MediaQuery.of(context).platformBrightness == Brightness.dark
               ? Colors.white
               : Colors.black),
@@ -187,6 +187,7 @@ class CreateTaskState extends State<CreateTask> {
                             onListChanged: (value) {})
                         : CustomDropdown(
                             decoration: const CustomDropdownDecoration(
+                                headerStyle: TextStyle(color: Colors.black),
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
                             hintText: "Select interval",
