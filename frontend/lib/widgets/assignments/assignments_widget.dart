@@ -164,7 +164,9 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                             : []),
                                     const SizedBox(width: 8),
                                     Text(sectionAssignments[0].assigneeName,
-                                        style: theme.textTheme.titleLarge!)
+                                        style: theme.textTheme.titleLarge!
+                                            .merge(const TextStyle(
+                                                color: Colors.blueAccent)))
                                   ],
                                 ),
                                 const SizedBox(height: generalSizedBoxHeight),
