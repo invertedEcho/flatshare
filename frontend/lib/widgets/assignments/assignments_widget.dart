@@ -153,7 +153,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                           return Container(
                             margin: const EdgeInsets.symmetric(
                                 horizontal: 0, vertical: 4),
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                                 color: theme.brightness == Brightness.light
                                     ? Colors.grey.shade100
