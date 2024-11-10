@@ -169,7 +169,17 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                                 color: Colors.blueAccent)))
                                   ],
                                 ),
-                                const SizedBox(height: generalSizedBoxHeight),
+                                const SizedBox(
+                                    height: generalSizedBoxHeight / 4),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 0, horizontal: 4),
+                                  // for now, we can just pick the first assginment because they are gouped together and all have the same due date.
+                                  child: Text(parseToDueDate(
+                                      sectionAssignments[0].dueDate!)),
+                                ),
+                                const SizedBox(
+                                    height: generalSizedBoxHeight / 2),
                                 ListView.builder(
                                     shrinkWrap: true,
                                     physics: const ClampingScrollPhysics(),
@@ -193,17 +203,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                             await updateAssignment(assignment);
                                           },
                                           title: Text(assignment.title),
-                                          subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              if (description != null)
-                                                Text(description),
-                                              if (assignment.dueDate != null)
-                                                Text(parseToDueDate(
-                                                    assignment.dueDate!)),
-                                            ],
-                                          ),
+                                          subtitle: Text(description ?? ""),
                                           trailing: Checkbox(
                                             onChanged: (bool? value) =>
                                                 updateAssignment(assignment),
