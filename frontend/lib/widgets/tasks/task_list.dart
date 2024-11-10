@@ -10,6 +10,30 @@ class TaskList extends StatelessWidget {
 
   final List<Task> tasks;
 
+  void editTask(BuildContext context, Task task) {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+                height: 350,
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text("Edit Task",
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 20),
+                    EditTaskForm(
+                      task: task,
+                    )
+                  ],
+                )),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -66,36 +90,15 @@ class TaskList extends StatelessWidget {
                 child: ListTile(
                   title: Text(task.title),
                   subtitle: Text(task.description ?? ""),
+                  onTap: () {
+                    editTask(context, task);
+                  },
                   trailing: ElevatedButton(
                       onPressed: () {
-                        showModalBottomSheet<void>(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: SizedBox(
-                                    height: 350,
-                                    width: double.infinity,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text("Edit Task",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headlineMedium),
-                                        const SizedBox(height: 20),
-                                        EditTaskForm(
-                                          task: task,
-                                        )
-                                      ],
-                                    )),
-                              );
-                            });
+                        editTask(context, task);
                       },
                       child: const Icon(
                         Icons.edit,
-                        color: Colors.blueAccent,
                       )),
                 )),
           ),

@@ -137,7 +137,9 @@ class CreateTaskState extends State<CreateTask> {
                         }
                         return null;
                       },
-                      decoration: const InputDecoration(labelText: "Title"),
+                      decoration: const InputDecoration(
+                        labelText: "Title",
+                      ),
                     ),
                     TextFormField(
                       controller: descriptionController,
@@ -191,21 +193,12 @@ class CreateTaskState extends State<CreateTask> {
                             items: const ['Daily', 'Weekly', 'Monthly'],
                             onChanged: (value) {
                               setState(() {
-                                // im kinda scared that the value can be null here... why?
                                 selectedInterval = value!;
                               });
                             }),
-                    // Tooltip(
-                    //   message: 'Please note that',
-                    //   triggerMode: TooltipTriggerMode.tap,
-                    //   child: IconButton(
-                    //       onPressed: () {}, icon: const Icon(Icons.help)),
-                    // ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                        style: const ButtonStyle(
-                            foregroundColor:
-                                WidgetStatePropertyAll(Colors.blueAccent)),
+                        style: const ButtonStyle(),
                         onPressed: handleSubmit,
                         child: const Text("Create")),
                   ],

@@ -84,7 +84,6 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                   height: 24,
                   width: 24,
                   child: Checkbox(
-                      activeColor: Colors.blueAccent,
                       value: showOnlyCurrentUserAssignments,
                       onChanged: (newValue) {
                         setState(() {
@@ -165,9 +164,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                             : []),
                                     const SizedBox(width: 8),
                                     Text(sectionAssignments[0].assigneeName,
-                                        style: theme.textTheme.titleLarge!
-                                            .merge(const TextStyle(
-                                                color: Colors.blueAccent)))
+                                        style: theme.textTheme.titleLarge!)
                                   ],
                                 ),
                                 const SizedBox(height: generalSizedBoxHeight),
@@ -206,7 +203,6 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                             ],
                                           ),
                                           trailing: Checkbox(
-                                            activeColor: Colors.blueAccent,
                                             onChanged: (bool? value) =>
                                                 updateAssignment(assignment),
                                             value: assignment.isCompleted,

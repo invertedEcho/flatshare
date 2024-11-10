@@ -24,7 +24,6 @@ class _UnauthenticatedNavigationState extends State<UnauthenticatedNavigation> {
                 duration: const Duration(milliseconds: 150),
                 curve: Curves.linear);
           },
-          indicatorColor: Colors.blueAccent,
           selectedIndex: currentPageIndex,
           destinations: const <Widget>[
             NavigationDestination(

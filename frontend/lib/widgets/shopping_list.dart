@@ -209,15 +209,24 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[],
                               ),
+                              onTap: () {
+                                final newState =
+                                    shoppingListItem.state == 'purchased'
+                                        ? 'pending'
+                                        : 'purchased';
+                                updateShoppingListItem(
+                                    shoppingListItem, newState);
+                              },
                               trailing: Checkbox(
                                 onChanged: (bool? value) {
                                   final newState =
-                                      value! ? 'purchased' : 'pending';
+                                      shoppingListItem.state == 'purchased'
+                                          ? 'pending'
+                                          : 'purchased';
                                   updateShoppingListItem(
                                       shoppingListItem, newState);
                                 },
                                 value: shoppingListItem.state == 'purchased',
-                                activeColor: Colors.blueAccent,
                               ),
                             )));
                   }),

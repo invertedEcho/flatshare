@@ -113,7 +113,9 @@ class EditTaskFormState extends State<EditTaskForm> {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text("Update"),
+                child: const Text(
+                  "Update",
+                ),
               ),
             ),
           ],
