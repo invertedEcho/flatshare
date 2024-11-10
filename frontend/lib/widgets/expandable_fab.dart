@@ -97,7 +97,6 @@ class _ExpandableFabState extends State<ExpandableFab>
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
-            backgroundColor: Colors.blueAccent,
             shape: const CircleBorder(),
             heroTag: "closeFAB",
             child:
@@ -121,7 +120,6 @@ class _ExpandableFabState extends State<ExpandableFab>
           duration: const Duration(milliseconds: 250),
           child: FloatingActionButton(
             onPressed: _toggle,
-            backgroundColor: Colors.blueAccent,
             shape: const CircleBorder(),
             heroTag: "openFAB",
             child: const Icon(Icons.add),
