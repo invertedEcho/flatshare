@@ -146,9 +146,8 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                   ? parseToDueDate(firstAssignmentDueDate)
                                   : "";
 
-                          final isRecurringAssignments = sectionAssignments.any(
-                              (assignment) =>
-                                  assignment.taskGroupTitle != null);
+                          final isRecurringAssignments = sectionAssignments
+                              .any((assignment) => !assignment.isOneOff);
 
                           return Container(
                             margin: const EdgeInsets.symmetric(
@@ -193,15 +192,27 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                                   color: Colors.blueAccent)))
                                     ],
                                   ),
-                                  const SizedBox(
-                                      height: generalSizedBoxHeight / 4),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 0, horizontal: 4),
-                                    child: Text(maybeParsedDueDate),
-                                  ),
-                                  const SizedBox(
-                                      height: generalSizedBoxHeight / 2),
+                                  SizedBox(
+                                      height: isRecurringAssignments
+                                          ? generalSizedBoxHeight / 4
+                                          : 0),
+                                  isRecurringAssignments
+                                      ? Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 0,
+                                              horizontal: isRecurringAssignments
+                                                  ? 4
+                                                  : 0),
+                                          child: Text(maybeParsedDueDate),
+                                        )
+                                      : const SizedBox(
+                                          width: 0,
+                                          height: 0,
+                                        ),
+                                  SizedBox(
+                                      height: isRecurringAssignments
+                                          ? generalSizedBoxHeight / 2
+                                          : 0),
                                   ListView.builder(
                                       shrinkWrap: true,
                                       physics: const ClampingScrollPhysics(),
