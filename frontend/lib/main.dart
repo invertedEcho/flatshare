@@ -88,6 +88,6 @@ class _AppState extends State<App> {
               surface: Colors.grey.shade900,
               onSurface: Colors.white),
         ),
-        themeMode: ThemeMode.light);
+        themeMode: ThemeMode.system);
   }
 }

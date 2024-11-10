@@ -150,7 +150,9 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                                 horizontal: 0, vertical: 4),
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
+                                color: theme.brightness == Brightness.light
+                                    ? Colors.grey.shade100
+                                    : Colors.black26,
                                 borderRadius:
                                     const BorderRadius.all(Radius.circular(8))),
                             child: Column(
