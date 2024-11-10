@@ -13,9 +13,14 @@ class TaskList extends StatelessWidget {
   void editTask(BuildContext context, Task task) {
     showModalBottomSheet<void>(
         context: context,
+        isScrollControlled: true,
         builder: (BuildContext context) {
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(
+                top: 16,
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom),
             child: SizedBox(
                 height: 350,
                 width: double.infinity,
