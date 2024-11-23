@@ -95,24 +95,24 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
     showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
-          return SizedBox(
-              height: 200,
-              width: double.infinity,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                      "Share this invite code with others so they can join your group: $inviteCode"),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                      style: const ButtonStyle(
-                          foregroundColor:
-                              WidgetStatePropertyAll(Colors.blueAccent)),
-                      onPressed: () => Share.share(
-                          "Join my Group on Flatshare by using this invite code: $inviteCodeUrl"),
-                      child: const Text("Share this invite code"))
-                ],
-              ));
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        "Share this invite code with others so they can join your group: $inviteCode"),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                        onPressed: () => Share.share(
+                            "Join my Group on Flatshare by using this invite code: $inviteCodeUrl"),
+                        child: const Text("Share this invite code"))
+                  ],
+                )),
+          );
         });
   }
 
@@ -162,8 +162,6 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                 currentPageIndex != 2 &&
                 currentPageIndex != 0
             ? FloatingActionButton(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const CreateTask())),
                 child: const Icon(Icons.add),
@@ -175,7 +173,6 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                 duration: const Duration(milliseconds: 150),
                 curve: Curves.linear);
           },
-          indicatorColor: Colors.blueAccent,
           selectedIndex: currentPageIndex,
           destinations: getNavigationDestinations(userGroupId),
         ),

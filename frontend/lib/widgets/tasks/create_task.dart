@@ -53,7 +53,7 @@ class CreateTaskState extends State<CreateTask> {
       foregroundColor: WidgetStatePropertyAll(taskTypeOfButton ==
               selectedTaskType
           // TODO: Fix nested ternary, you baaaaad -> this can be fixed by finally fixing theme colors in the app
-          ? Colors.blue
+          ? Colors.blueAccent
           : MediaQuery.of(context).platformBrightness == Brightness.dark
               ? Colors.white
               : Colors.black),
@@ -137,7 +137,9 @@ class CreateTaskState extends State<CreateTask> {
                         }
                         return null;
                       },
-                      decoration: const InputDecoration(labelText: "Title"),
+                      decoration: const InputDecoration(
+                        labelText: "Title",
+                      ),
                     ),
                     TextFormField(
                       controller: descriptionController,
@@ -185,27 +187,19 @@ class CreateTaskState extends State<CreateTask> {
                             onListChanged: (value) {})
                         : CustomDropdown(
                             decoration: const CustomDropdownDecoration(
+                                headerStyle: TextStyle(color: Colors.black),
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
                             hintText: "Select interval",
                             items: const ['Daily', 'Weekly', 'Monthly'],
                             onChanged: (value) {
                               setState(() {
-                                // im kinda scared that the value can be null here... why?
                                 selectedInterval = value!;
                               });
                             }),
-                    // Tooltip(
-                    //   message: 'Please note that',
-                    //   triggerMode: TooltipTriggerMode.tap,
-                    //   child: IconButton(
-                    //       onPressed: () {}, icon: const Icon(Icons.help)),
-                    // ),
                     const SizedBox(height: 20),
                     ElevatedButton(
-                        style: const ButtonStyle(
-                            foregroundColor:
-                                WidgetStatePropertyAll(Colors.blueAccent)),
+                        style: const ButtonStyle(),
                         onPressed: handleSubmit,
                         child: const Text("Create")),
                   ],

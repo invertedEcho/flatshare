@@ -62,16 +62,32 @@ class _AppState extends State<App> {
         theme: ThemeData(
           useMaterial3: true,
           brightness: Brightness.light,
-          checkboxTheme: CheckboxThemeData(
-            fillColor: WidgetStateProperty.resolveWith((states) {
-              if (states.contains(WidgetState.selected)) {
-                return Colors.blueAccent;
-              }
-              return Colors.white;
-            }),
-          ),
+          colorScheme: const ColorScheme(
+              brightness: Brightness.light,
+              primary: Colors.blueAccent,
+              onPrimary: Colors.white,
+              secondary: Colors.blueAccent,
+              onSecondary: Colors.white,
+              error: Colors.red,
+              onError: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black),
         ),
-        darkTheme: ThemeData(brightness: Brightness.dark),
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          colorScheme: ColorScheme(
+              brightness: Brightness.dark,
+              primary: Colors.blueAccent,
+              onPrimary: Colors.white,
+              secondary: Colors.blueAccent,
+              onSecondary: Colors.white,
+              error: Colors.red,
+              onError: Colors.white,
+              surfaceContainer: Colors.grey[850],
+              surface: Colors.grey.shade900,
+              onSurface: Colors.white),
+        ),
         themeMode: ThemeMode.system);
   }
 }

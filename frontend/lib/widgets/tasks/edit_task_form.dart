@@ -85,19 +85,20 @@ class EditTaskFormState extends State<EditTaskForm> {
                   const InputDecoration(labelText: "Description (optional)"),
             ),
             const SizedBox(height: 20),
+            // TODO: ensure this still actually works
             // I don't think you should have to do this, but without it the dropdown always displays the initial value as selected
-            if (selectTaskGroupController != null)
-              CustomDropdown.search(
-                controller: selectTaskGroupController,
-                decoration: const CustomDropdownDecoration(
-                  listItemStyle: TextStyle(color: Colors.black),
-                  hintStyle: TextStyle(color: Colors.black),
-                ),
-                hintText: "Select task group",
-                items: taskGroups,
-                onChanged: (value) {},
-              ),
-            const SizedBox(height: 20),
+            // if (selectTaskGroupController != null)
+            //   CustomDropdown.search(
+            //     controller: selectTaskGroupController,
+            //     decoration: const CustomDropdownDecoration(
+            //       listItemStyle: TextStyle(color: Colors.black),
+            //       hintStyle: TextStyle(color: Colors.black),
+            //     ),
+            //     hintText: "Select task group",
+            //     items: taskGroups,
+            //     onChanged: (value) {},
+            //   ),
+            // const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -107,13 +108,14 @@ class EditTaskFormState extends State<EditTaskForm> {
                         id: task.id,
                         title: titleController.text,
                         description: descriptionController.text,
-                        recurringTaskGroupId:
-                            selectTaskGroupController?.value?.id);
+                        recurringTaskGroupId: task.recurringTaskGroupId);
                     await onUpdateTask(updatedTask);
                     Navigator.pop(context);
                   }
                 },
-                child: const Text("Update"),
+                child: const Text(
+                  "Update",
+                ),
               ),
             ),
           ],
