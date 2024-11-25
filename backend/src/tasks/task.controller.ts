@@ -43,7 +43,6 @@ export type CreateRecurringTaskBody = {
 @Controller('tasks')
 export class TasksController {
   @Get()
-  // TODO: should be optional, query param
   async getAll(
     @Query('userGroupId') userGroupId: number,
   ): Promise<SelectTask[]> {

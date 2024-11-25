@@ -75,12 +75,15 @@ export class AuthController {
 
     if (registerDto.inviteCode !== null) {
       try {
-        // TODO: this whole thing should be a sql transaction, and if this fails, we dont have to worry about deleting the created user.
         const maybeGroup = await dbGetUserGroupByInviteCode(
           registerDto.inviteCode,
         );
-        // TODO: because here, we probably want to return a BAD_REQUEST instead, e.g. the invite code is invalid.
-        if (maybeGroup !== undefined) {
+        if (maybeGroup === undefined) {
+          throw new HttpException(
+            'The given invite code is invalid',
+            HttpStatus.BAD_REQUEST,
+          );
+        } else {
           await dbAddUserToUserGroup({
             userId: newUser.id,
             groupId: maybeGroup.groupId,

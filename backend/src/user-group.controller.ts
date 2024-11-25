@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { db } from './db';
@@ -28,8 +29,8 @@ import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/task-g
 
 @Controller('user-group')
 export class UserGroupController {
-  @Get(':userId')
-  async getUserGroupOfUser(@Param('userId') userId: number) {
+  @Get()
+  async getUserGroupOfUser(@Query('userId') userId: number) {
     const userGroup = await dbGetUserGroupOfUser(userId);
     return {
       id: userGroup?.user_user_group.groupId ?? null,

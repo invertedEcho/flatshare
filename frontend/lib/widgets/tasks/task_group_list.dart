@@ -1,5 +1,4 @@
 import 'package:flatshare/const.dart';
-import 'package:flatshare/fetch/task_group.dart';
 import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';

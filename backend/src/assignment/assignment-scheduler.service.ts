@@ -4,36 +4,23 @@ import {
   dbAddAssignments,
   dbGetAssignmentsForTaskGroup,
   dbGetTasksToAssignForCurrentInterval,
-  TaskToAssign,
 } from 'src/db/functions/assignment';
 import { dbGetTaskGroupUsers } from 'src/db/functions/task-group';
 import { getStartOfInterval } from 'src/utils/date';
+import { groupTasksToAssignByTaskGroupId } from './utils';
 
 // TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
   @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
-    const tasksToCreateAssignmentsFor =
-      await dbGetTasksToAssignForCurrentInterval({});
+    const tasksToAssign = await dbGetTasksToAssignForCurrentInterval({});
 
-    // TODO: create a arrayGroupBy util function
-    const tasksByGroup = tasksToCreateAssignmentsFor.reduce<
-      Map<number, TaskToAssign[]>
-    >((acc, curr) => {
-      if (!acc.get(curr.taskGroupId)) {
-        acc.set(curr.taskGroupId, []);
-      }
-      acc.get(curr.taskGroupId)?.push({
-        ...curr,
-        taskGroupInitialStartDate: curr.taskGroupInitialStartDate,
-      });
-      return acc;
-    }, new Map());
+    const tasksByTaskGroupId = groupTasksToAssignByTaskGroupId(tasksToAssign);
 
     // TODO: yeaaahhhhh, we probably want to just have a db query with a join instead of iterating over a result set and querying
     // the db for each item.
-    for (const [taskGroupId, tasks] of tasksByGroup) {
+    for (const [taskGroupId, tasks] of tasksByTaskGroupId) {
       const usersOfTaskGroup = await dbGetTaskGroupUsers(taskGroupId);
       if (usersOfTaskGroup.length === 0) {
         continue;

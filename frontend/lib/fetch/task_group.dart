@@ -13,8 +13,6 @@ Future<List<TaskGroup>> fetchTaskGroups({required int userGroupId}) async {
     final parsedTaskGroups = taskGroups
         .map<TaskGroup>((assignment) => TaskGroup.fromJson(assignment))
         .toList();
-    // TODO: sort by something that makes more sense
-    parsedTaskGroups.sort((a, b) => a.id - b.id);
     return parsedTaskGroups;
   } else {
     throw Exception("Failed to load taskGroups: ${response.statusCode}");

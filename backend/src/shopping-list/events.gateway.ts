@@ -1,8 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
@@ -11,6 +7,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JWT_SECRET } from 'src/auth/constants';
@@ -91,7 +88,6 @@ export class EventsGateway implements OnGatewayConnection {
   async handleConnection(client: Socket) {
     const maybeUserGroupId = await this.verifyUserGroupOfClient(client);
     if (maybeUserGroupId !== null) {
-      console.log(`Joining client to userGroup: ${maybeUserGroupId}`);
       client.join(`room-user-group-${maybeUserGroupId}`);
     } else {
       client.disconnect();
@@ -111,8 +107,10 @@ export class EventsGateway implements OnGatewayConnection {
 
     if (!safeParsed.success) {
       console.error({ safeParsed: safeParsed.error });
-      // TODO: do you even do httpexception in websockets?
-      throw new HttpException(safeParsed.error, HttpStatus.BAD_REQUEST);
+      throw new WsException({
+        msg: 'Failed to parse data',
+        details: safeParsed.error,
+      });
     }
 
     const { text, userGroupId } = safeParsed.data;
@@ -137,8 +135,10 @@ export class EventsGateway implements OnGatewayConnection {
 
     if (!safeParsed.success) {
       console.error({ safeParsed: safeParsed.error });
-      // TODO: do you even do httpexception in websockets?
-      throw new HttpException('Invalid schema', HttpStatus.BAD_REQUEST);
+      throw new WsException({
+        msg: 'Failed to parse data',
+        details: safeParsed.error,
+      });
     }
     const { id, state: newState } = safeParsed.data;
     const updatedShoppingListItem = await dbUpdateShoppingListItem({

@@ -10,7 +10,6 @@ import { AssignmentResponse } from './types';
 export class AssignmentController {
   @Get()
   async getAllAssignments(
-    // TODO: make this optional, just like a query param should be
     @Query('groupId') groupId: number,
   ): Promise<AssignmentResponse[]> {
     return await dbGetAssignmentsFromCurrentInterval(groupId);
