@@ -58,12 +58,13 @@ export class UserGroupController {
       });
 
     const values = await Promise.all(
-      recurringTaskGroupsOfUserGroup.map(async (taskGroup) => ({
-        recurringTaskGroupId: taskGroup.id,
+      recurringTaskGroupsOfUserGroup.map(async (recurringTaskGroup) => ({
+        recurringTaskGroupId: recurringTaskGroup.id,
         userId: userId,
-        assignmentOrdinal: await dbGetHighestAssignmentOrdinalForTaskGroup({
-          taskGroupId: taskGroup.id,
-        }),
+        assignmentOrdinal:
+          ((await dbGetHighestAssignmentOrdinalForTaskGroup({
+            recurringTaskGroupId: recurringTaskGroup.id,
+          })) ?? 0) + 1,
       })),
     );
 

@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Put, Query } from '@nestjs/common';
 import {
   dbChangeAssignmentState,
   dbGetAssignmentsFromCurrentInterval,
@@ -16,7 +16,7 @@ export class AssignmentController {
   }
 
   // TODO: should be put
-  @Post('/:id/:state')
+  @Put('/:id/:state')
   async changeAssignmentState(
     @Param('id') id: number,
     @Param('state') state: AssignmentState,

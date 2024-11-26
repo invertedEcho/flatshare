@@ -15,6 +15,7 @@ import {
   SelectAssignment,
   assignmentTable,
   recurringTaskGroupTable,
+  recurringTaskGroupUserTable,
   taskTable,
   userTable,
   userUserGroupTable,
@@ -33,77 +34,67 @@ import { AssignmentResponse } from 'src/assignment/types';
 export async function dbGetAssignmentsFromCurrentInterval(
   groupId: number,
 ): Promise<AssignmentResponse[]> {
-  try {
-    const queryResult = await db
-      .select({
-        id: assignmentTable.id,
-        title: taskTable.title,
-        description: taskTable.description,
-        assigneeId: userTable.id,
-        assigneeName: userTable.username,
-        isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
-        createdAt: assignmentTable.createdAt,
-        isOneOff: sql<boolean>`${taskTable.recurringTaskGroupId} IS NULL`,
-        // TODO: make timezone dynamic
-        dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
-        taskGroupId: recurringTaskGroupTable.id,
-        taskGroupTitle: recurringTaskGroupTable.title,
-      })
-      .from(assignmentTable)
-      .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
-      .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
-      .innerJoin(
-        userUserGroupTable,
-        and(
-          eq(userUserGroupTable.groupId, groupId),
-          eq(userUserGroupTable.userId, userTable.id),
+  const queryResult = await db
+    .select({
+      id: assignmentTable.id,
+      title: taskTable.title,
+      description: taskTable.description,
+      assigneeId: userTable.id,
+      assigneeName: userTable.username,
+      isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
+      createdAt: assignmentTable.createdAt,
+      isOneOff: sql<boolean>`${taskTable.recurringTaskGroupId} IS NULL`,
+      // TODO: make timezone dynamic
+      dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
+      taskGroupId: recurringTaskGroupTable.id,
+      taskGroupTitle: recurringTaskGroupTable.title,
+    })
+    .from(assignmentTable)
+    .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
+    .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
+    .innerJoin(
+      userUserGroupTable,
+      and(
+        eq(userUserGroupTable.groupId, groupId),
+        eq(userUserGroupTable.userId, userTable.id),
+      ),
+    )
+    .leftJoin(
+      recurringTaskGroupTable,
+      eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
+    )
+    // Only get assignments from the current interval
+    .where(
+      // TODO: make timezone dynamic
+      and(
+        or(
+          sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
+          isNull(recurringTaskGroupTable.id),
         ),
-      )
-      .leftJoin(
-        recurringTaskGroupTable,
-        eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
-      )
-      // Only get assignments from the current interval
-      .where(
-        // TODO: make timezone dynamic
-        and(
-          or(
-            sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
-            isNull(recurringTaskGroupTable.id),
-          ),
-        ),
-      );
+      ),
+    );
 
-    return queryResult.map((assignment) => {
-      // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the 'Z' to make the date constructor interpret it as UTC.
-      const date = new Date(assignment.dueDate + 'Z');
-      return {
-        ...assignment,
-        dueDate: assignment.isOneOff ? null : date,
-      };
-    });
-  } catch (error) {
-    console.error({ error });
-    throw error;
-  }
+  return queryResult.map((assignment) => {
+    // This is dirty. Drizzle returns dueDate as a string with no timezone information, so I need to add the 'Z' to make the date constructor interpret it as UTC.
+    const date = new Date(assignment.dueDate + 'Z');
+    return {
+      ...assignment,
+      dueDate: assignment.isOneOff ? null : date,
+    };
+  });
 }
 
 export async function dbChangeAssignmentState(
   assignmentId: number,
   state: AssignmentState,
 ) {
-  try {
-    await db
-      .update(assignmentTable)
-      .set({ state })
-      .where(eq(assignmentTable.id, assignmentId));
-  } catch (error) {
-    console.error({ error });
-    throw error;
-  }
+  await db
+    .update(assignmentTable)
+    .set({ state })
+    .where(eq(assignmentTable.id, assignmentId));
 }
 
-export async function dbGetAssignmentsForTaskGroup({
+export async function dbGetAssignmentsForRecurringTaskGroup({
   taskGroupId,
   limit,
 }: {
@@ -126,62 +117,54 @@ export async function dbGetAssignmentsForTaskGroup({
   return await result.limit(limit);
 }
 
-// FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
-// the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
-// than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
-//
-// Alternatively, we need make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
-//  for a weekly task group. If that were the case this function would correctly even in the current state.
-
-export async function dbGetCurrentAssignmentsForTaskGroup(taskGroupId: number) {
-  const currentAssignments = await db
-    .select()
-    .from(assignmentTable)
-    .innerJoin(taskTable, eq(taskTable.id, assignmentTable.taskId))
-    .innerJoin(
-      recurringTaskGroupTable,
-      eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
-    )
-
-    .where(
-      // TODO: convert to local time zone before comparison
-      sql`${assignmentTable.createdAt} >= NOW() - ${recurringTaskGroupTable.interval} AND ${recurringTaskGroupTable.id} = ${taskGroupId}`,
-    );
-
-  return currentAssignments;
-}
-
-const taskToAssignSchema = z.object({
-  taskId: z.number(),
-  taskGroupId: z.number(),
+const recurringTaskGroupToAssignSchema = z.object({
+  recurringTaskGroupId: z.number(),
+  taskIds: z.number().array(),
   taskGroupInitialStartDate: z.date(),
   isInFirstInterval: z.boolean(),
   interval: defaultPostgresIntervalSchema,
+  userIdsOfRecurringTaskGroup: z.number().array(),
+  assignmentOrdinals: z.number().array(),
 });
 
-export type TaskToAssign = z.infer<typeof taskToAssignSchema>;
+export type RecurringTaskGroupToAssign = z.infer<
+  typeof recurringTaskGroupToAssignSchema
+>;
 
 // doesnt seem like you can (should?) mock the time of the database, so we use this argument if its defined instead of `NOW()`
-export async function dbGetTasksToAssignForCurrentInterval({
+export async function dbGetRecurringTaskGroupsToAssignForCurrentInterval({
   currentTime = new Date(),
 }: {
   currentTime?: Date;
-}): Promise<TaskToAssign[]> {
+}): Promise<RecurringTaskGroupToAssign[]> {
   const currentTimeString = currentTime.toISOString();
 
   // Get all tasks that either have no assignments yet or don't have an assignment in the current period
   const tasksToAssign = await db
     .select({
-      taskId: taskTable.id,
-      taskGroupId: recurringTaskGroupTable.id,
+      recurringTaskGroupId: recurringTaskGroupTable.id,
+      taskIds: sql`array_agg(distinct(${taskTable.id}))`,
       taskGroupInitialStartDate: recurringTaskGroupTable.initialStartDate,
       isInFirstInterval: sql<boolean>`CAST(${currentTimeString} AS timestamp) < (${recurringTaskGroupTable.initialStartDate} + ${recurringTaskGroupTable.interval})`,
       interval: recurringTaskGroupTable.interval,
+      userIdsOfRecurringTaskGroup: sql<
+        number[]
+      >`array_agg(${recurringTaskGroupUserTable.userId})`,
+      assignmentOrdinals: sql<
+        number[]
+      >`array_agg(${recurringTaskGroupUserTable.assignmentOrdinal})`,
     })
     .from(recurringTaskGroupTable)
     .innerJoin(
       taskTable,
       eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
+    )
+    .innerJoin(
+      recurringTaskGroupUserTable,
+      eq(
+        recurringTaskGroupUserTable.recurringTaskGroupId,
+        recurringTaskGroupTable.id,
+      ),
     )
     .leftJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
     .where(
@@ -201,7 +184,9 @@ export async function dbGetTasksToAssignForCurrentInterval({
     );
 
   // drizzle returns the interval as type string, so we use zod to "convert" them to the correct type
-  const parsedTasksToAssign = z.array(taskToAssignSchema).parse(tasksToAssign);
+  const parsedTasksToAssign = z
+    .array(recurringTaskGroupToAssignSchema)
+    .parse(tasksToAssign);
 
   return parsedTasksToAssign;
 }

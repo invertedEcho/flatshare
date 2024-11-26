@@ -75,7 +75,7 @@ describe('Assignment scheduler', () => {
   });
 
   it('correctly inserts assignments to user in right order after after everyone was assigned once', async () => {
-    jest.setSystemTime(new Date('2024-09-10 08:00:00:Z'));
+    jest.setSystemTime(new Date('2024-09-10 08:00:00Z'));
     const intervalStr = '7 days';
     const mockRecurringTaskGroup = {
       title: 'Weekly Tasks',
@@ -113,7 +113,7 @@ describe('Assignment scheduler', () => {
     const firstAssignment = {
       taskId: insertedTask.id,
       userId: firstUserId,
-      createdAt: new Date('2024-09-08 22:00:00Z'),
+      createdAt: new Date('2024-09-08T22:00:00Z'),
       state: 'completed',
     } satisfies InsertAssignment;
 
@@ -126,7 +126,7 @@ describe('Assignment scheduler', () => {
     const secondAssignment = {
       taskId: insertedTask.id,
       userId: secondUserId,
-      createdAt: new Date('2024-09-15 22:00:00Z'),
+      createdAt: new Date('2024-09-15T22:00:00Z'),
       state: 'completed',
     } satisfies InsertAssignment;
 
@@ -139,7 +139,7 @@ describe('Assignment scheduler', () => {
     const thirdAssignment = {
       taskId: insertedTask.id,
       userId: thirdUserId,
-      createdAt: new Date('2024-09-22 22:00:00Z'),
+      createdAt: new Date('2024-09-22T22:00:00Z'),
       state: 'completed',
     } satisfies InsertAssignment;
 
@@ -165,7 +165,7 @@ describe('Assignment scheduler', () => {
       .insert(assignmentTable)
       .values([firstAssignment, secondAssignment, thirdAssignment]);
 
-    jest.setSystemTime(new Date('2024-10-05 14:00:00Z'));
+    jest.setSystemTime(new Date('2024-10-05T14:00:00Z'));
 
     await assignmentSchedulerService.handleCron();
 
@@ -176,6 +176,7 @@ describe('Assignment scheduler', () => {
         .orderBy(desc(assignmentTable.createdAt))
         .limit(1)
     )[0];
+    console.log({ firstExpectedAssignment });
 
     if (firstExpectedAssignment === undefined) {
       throw new Error(
@@ -188,7 +189,7 @@ describe('Assignment scheduler', () => {
       new Date('2024-09-29T22:00:00.000Z'),
     );
 
-    jest.setSystemTime(new Date('2024-10-10 14:00:00Z'));
+    jest.setSystemTime(new Date('2024-10-10T14:00:00Z'));
     await assignmentSchedulerService.handleCron();
 
     const secondExpectedAssignment = (
@@ -210,7 +211,7 @@ describe('Assignment scheduler', () => {
       new Date('2024-10-06T22:00:00.000Z'),
     );
 
-    jest.setSystemTime(new Date('2024-10-17 14:00:00Z'));
+    jest.setSystemTime(new Date('2024-10-17T14:00:00Z'));
 
     await assignmentSchedulerService.handleCron();
 

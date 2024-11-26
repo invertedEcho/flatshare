@@ -2,52 +2,60 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import {
   dbAddAssignments,
-  dbGetAssignmentsForTaskGroup,
-  dbGetTasksToAssignForCurrentInterval,
+  dbGetAssignmentsForRecurringTaskGroup,
+  dbGetRecurringTaskGroupsToAssignForCurrentInterval,
 } from 'src/db/functions/assignment';
-import { dbGetTaskGroupUsers } from 'src/db/functions/task-group';
 import { getStartOfInterval } from 'src/utils/date';
-import { groupTasksToAssignByTaskGroupId } from './utils';
 
-// TODO: Clean up
 @Injectable()
 export class AssignmentSchedulerService {
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCron() {
-    const tasksToAssign = await dbGetTasksToAssignForCurrentInterval({});
+    const recurringTaskGroupsToAssign =
+      await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
+        currentTime: undefined,
+      });
 
-    const tasksByTaskGroupId = groupTasksToAssignByTaskGroupId(tasksToAssign);
+    for (const recurringTaskGroup of recurringTaskGroupsToAssign) {
+      const recurringTaskGroupId = recurringTaskGroup.recurringTaskGroupId;
 
-    // TODO: yeaaahhhhh, we probably want to just have a db query with a join instead of iterating over a result set and querying
-    // the db for each item.
-    for (const [taskGroupId, tasks] of tasksByTaskGroupId) {
-      const usersOfTaskGroup = await dbGetTaskGroupUsers(taskGroupId);
-      if (usersOfTaskGroup.length === 0) {
-        continue;
-      }
+      const usersOfTaskGroup =
+        recurringTaskGroup.userIdsOfRecurringTaskGroup.map((userId, index) => {
+          const assignmentOrdinal =
+            recurringTaskGroup.assignmentOrdinals[index];
+          if (assignmentOrdinal === undefined) {
+            throw new Error('No assignment ordinal for userId');
+          }
+          return {
+            userId,
+            assignmentOrdinal,
+          };
+        });
 
+      // TODO: we should also do this in the main query
       const nextResponsibleUserId = await getNextResponsibleUserId(
-        taskGroupId,
+        recurringTaskGroupId,
         usersOfTaskGroup,
       );
 
       if (nextResponsibleUserId === undefined) {
         throw new Error(
-          `Failed to find the next responsible user for the task group ${taskGroupId}`,
+          `Failed to find the next responsible user for the task group ${recurringTaskGroupId}`,
         );
       }
 
-      const hydratedAssignments = tasks.map((task) => ({
-        taskId: task.taskId,
+      const taskIds = recurringTaskGroup.taskIds;
+      const hydratedAssignments = taskIds.map((taskId) => ({
+        taskId: taskId,
         userId: nextResponsibleUserId,
-        createdAt: task.isInFirstInterval
-          ? task.taskGroupInitialStartDate
-          : getStartOfInterval(task.interval),
+        createdAt: recurringTaskGroup.isInFirstInterval
+          ? recurringTaskGroup.taskGroupInitialStartDate
+          : getStartOfInterval(recurringTaskGroup.interval),
       }));
 
       await dbAddAssignments({ assignments: hydratedAssignments });
       console.info(
-        `Created new assignments for taskGroup ${taskGroupId}: ${JSON.stringify(hydratedAssignments, null, 2)}`,
+        `Created new assignments for recurringTaskGroup ${recurringTaskGroupId}: ${JSON.stringify(hydratedAssignments, null, 2)}`,
       );
     }
   }
@@ -61,10 +69,11 @@ async function getNextResponsibleUserId(
     (a, b) => a.assignmentOrdinal - b.assignmentOrdinal,
   );
 
-  const lastAssignmentsOfTaskGroup = await dbGetAssignmentsForTaskGroup({
-    taskGroupId,
-    limit: 1,
-  });
+  const lastAssignmentsOfTaskGroup =
+    await dbGetAssignmentsForRecurringTaskGroup({
+      taskGroupId,
+      limit: 1,
+    });
 
   const lastAssignmentOfTaskGroup = lastAssignmentsOfTaskGroup[0];
 
