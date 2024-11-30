@@ -9,6 +9,6 @@ if (connectionString === undefined) {
   );
 }
 
-export const client = postgres(connectionString);
+export const client = postgres(connectionString, { onnotice: () => {} });
 
 export const db = drizzle(client);

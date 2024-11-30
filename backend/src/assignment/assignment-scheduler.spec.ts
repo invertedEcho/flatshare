@@ -64,7 +64,7 @@ describe('Assignment scheduler', () => {
 
     // Run scheduler function at Wednesday in week 2
     jest.setSystemTime(new Date('2024-09-03 22:00:00Z'));
-    await assignmentSchedulerService.handleCron();
+    await assignmentSchedulerService.handleCreateAssignmentsCron();
 
     // check that assignment with created at of Monday in week 2 exists
     const assignments = await db.select().from(assignmentTable);
@@ -167,7 +167,7 @@ describe('Assignment scheduler', () => {
 
     jest.setSystemTime(new Date('2024-10-05T14:00:00Z'));
 
-    await assignmentSchedulerService.handleCron();
+    await assignmentSchedulerService.handleCreateAssignmentsCron();
 
     const firstExpectedAssignment = (
       await db
@@ -190,7 +190,7 @@ describe('Assignment scheduler', () => {
     );
 
     jest.setSystemTime(new Date('2024-10-10T14:00:00Z'));
-    await assignmentSchedulerService.handleCron();
+    await assignmentSchedulerService.handleCreateAssignmentsCron();
 
     const secondExpectedAssignment = (
       await db
@@ -213,7 +213,7 @@ describe('Assignment scheduler', () => {
 
     jest.setSystemTime(new Date('2024-10-17T14:00:00Z'));
 
-    await assignmentSchedulerService.handleCron();
+    await assignmentSchedulerService.handleCreateAssignmentsCron();
 
     const thirdExpectedAssignment = (
       await db

@@ -39,7 +39,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
     await seedDatabaseWithTaskData();
 
     const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
-      currentTime: new Date('2024-07-29 13:00:00Z'),
+      overrideNow: new Date('2024-07-29T13:00:00Z'),
     });
 
     const expectedRecurringTaskGroup = {
@@ -50,6 +50,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       interval: '7 days',
       userIdsOfRecurringTaskGroup,
       assignmentOrdinals,
+      userIdOfLatestAssignment: null,
     } satisfies RecurringTaskGroupToAssign;
 
     expect(result).toHaveLength(1);
@@ -61,7 +62,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
     await seedDatabaseWithTaskData();
 
     const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
-      currentTime: new Date('2024-07-28 21:59:59Z'),
+      overrideNow: new Date('2024-07-28 21:59:59Z'),
     });
 
     expect(result).toHaveLength(0);
@@ -78,10 +79,11 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       interval: '7 days',
       userIdsOfRecurringTaskGroup,
       assignmentOrdinals,
+      userIdOfLatestAssignment: null,
     } satisfies RecurringTaskGroupToAssign;
 
     const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
-      currentTime: new Date('2024-07-31 22:00:00Z'),
+      overrideNow: new Date('2024-07-31 22:00:00Z'),
     });
     expect(result).toHaveLength(1);
     expect(result[0]).toStrictEqual(expectedTask);
@@ -95,7 +97,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       createdAt: new Date('2024-07-28 22:00:00Z'),
     });
     const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
-      currentTime: new Date('2024-08-04 21:59:00Z'),
+      overrideNow: new Date('2024-08-04 21:59:00Z'),
     });
     expect(result).toHaveLength(0);
   });
@@ -110,6 +112,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       interval: '7 days',
       userIdsOfRecurringTaskGroup,
       assignmentOrdinals,
+      userIdOfLatestAssignment: userJulian.id,
     } satisfies RecurringTaskGroupToAssign;
 
     await db.insert(assignmentTable).values({
@@ -118,7 +121,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       createdAt: new Date('2024-07-28 22:00:00Z'),
     });
     const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
-      currentTime: new Date('2024-08-04 22:00:00Z'),
+      overrideNow: new Date('2024-08-04 22:00:00Z'),
     });
 
     expect(result).toHaveLength(1);

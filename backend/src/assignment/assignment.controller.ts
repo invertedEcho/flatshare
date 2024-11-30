@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Put, Query } from '@nestjs/common';
 import {
   dbChangeAssignmentState,
-  dbGetAssignmentsFromCurrentInterval,
+  dbGetAssignmentsForUserGroupFromCurrentInterval,
 } from 'src/db/functions/assignment';
 import { AssignmentState } from 'src/db/schema';
 import { AssignmentResponse } from './types';
@@ -12,7 +12,7 @@ export class AssignmentController {
   async getAllAssignments(
     @Query('groupId') groupId: number,
   ): Promise<AssignmentResponse[]> {
-    return await dbGetAssignmentsFromCurrentInterval(groupId);
+    return await dbGetAssignmentsForUserGroupFromCurrentInterval(groupId);
   }
 
   // TODO: should be put
