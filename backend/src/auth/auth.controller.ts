@@ -79,6 +79,12 @@ export class AuthController {
           registerDto.inviteCode,
         );
         if (maybeGroup === undefined) {
+          // TODO: this is bad. we will create the user, but the request will fail if invalid invite code included.
+          // user will still be on register screen. if he registers again, he is stuck there as user already exists.
+          // we need a sql transaction for this.
+          // but we should first add message in case register fails because of invalid invite code given, otherwise user could
+          // be very confused if he just registers and is not really aware that a invite code was included, e.g. because he
+          // clicked on a join group link.
           throw new HttpException(
             'The given invite code is invalid',
             HttpStatus.BAD_REQUEST,
