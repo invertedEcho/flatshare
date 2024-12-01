@@ -5,8 +5,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -71,7 +71,7 @@ export class TasksController {
     return task;
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateTask(@Param('id') id: string, @Body() task: UpdateTask) {
     await dbUpdateTask({ ...task, id: Number(id) });
   }

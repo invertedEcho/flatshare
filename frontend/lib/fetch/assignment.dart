@@ -23,9 +23,9 @@ Future<void> updateAssignmentState(
     int assignmentId, bool newAssignmentState) async {
   var assignmentState = newAssignmentState ? "pending" : 'completed';
   var apiBaseUrl = getApiBaseUrl();
-  final response = await authenticatedClient
-      .put(Uri.parse('$apiBaseUrl/assignments/$assignmentId/$assignmentState'));
-  if (response.statusCode != 201) {
+  final response = await authenticatedClient.patch(
+      Uri.parse('$apiBaseUrl/assignments/$assignmentId/$assignmentState'));
+  if (response.statusCode != 200) {
     throw Exception("Failed to update assignment state");
   }
 }

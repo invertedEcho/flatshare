@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
   dbChangeAssignmentState,
   dbGetAssignmentsForUserGroupFromCurrentInterval,
@@ -15,8 +15,7 @@ export class AssignmentController {
     return await dbGetAssignmentsForUserGroupFromCurrentInterval(groupId);
   }
 
-  // TODO: should be put
-  @Put('/:id/:state')
+  @Patch('/:id/:state')
   async changeAssignmentState(
     @Param('id') id: number,
     @Param('state') state: AssignmentState,

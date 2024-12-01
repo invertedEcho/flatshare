@@ -98,7 +98,7 @@ Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
 Future<void> updateTask({required Task task}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
-      await authenticatedClient.put(Uri.parse('$apiBaseUrl/tasks/${task.id}'),
+      await authenticatedClient.patch(Uri.parse('$apiBaseUrl/tasks/${task.id}'),
           body: jsonEncode(
             {
               'title': task.title,
