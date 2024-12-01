@@ -2,6 +2,7 @@ import 'package:flatshare/fetch/task.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/providers/user.dart';
+import 'package:flatshare/widgets/tasks/create_task.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +29,7 @@ class TaskProvider extends ChangeNotifier {
       {required String title,
       String? description,
       required int userGroupId,
-      required String interval,
+      required IntervalType interval,
       required BuildContext context}) async {
     final task = await createRecurringTask(
         title: title,

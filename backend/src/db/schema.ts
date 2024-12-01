@@ -120,9 +120,6 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
-// TODO: the interval property on here is just of type string, but should be a type union instead of string literals.
-// also kinda shitty though because we can't just make a giant union type of all possible values for postgres
-// also see the `utils/interval.ts` file
 export type SelectRecurringTaskGroup =
   typeof recurringTaskGroupTable.$inferSelect;
 export type InsertRecurringTaskGroup =
@@ -134,7 +131,6 @@ export type InsertRecurringTaskGroup =
 export const recurringTaskGroupUserTable = pgTable(
   'recurring_task_group_user',
   {
-    id: serial('id').primaryKey(),
     recurringTaskGroupId: integer('recurring_task_group_id')
       .references(() => recurringTaskGroupTable.id)
       .notNull(),
@@ -144,6 +140,17 @@ export const recurringTaskGroupUserTable = pgTable(
     // The user with the lowest ordinal will be the first one to get assigned assignments from this task group
     assignmentOrdinal: integer('assignment_ordinal').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({
+        columns: [
+          table.recurringTaskGroupId,
+          table.userId,
+          table.assignmentOrdinal,
+        ],
+      }),
+    };
   },
 );
 export type SelectRecurringTaskGroupUser =

@@ -5,8 +5,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -22,32 +22,27 @@ import {
   displayIntervalToPostgresInterval,
 } from 'src/utils/interval';
 
-// TODO: make a base type for these three types below
-// TODO: extra type for this feels weird
-export type OneOffTask = {
-  title: string;
-  description: string;
-  userIds: number[];
-};
-
-// TODO: this shouldnt be a separate type
-export type UpdateTask = {
-  title: string;
-  description: string;
-  taskGroupId?: number;
-};
-
-export type CreateRecurringTaskBody = {
+export type BaseTask = {
   title: string;
   description?: string;
+};
+
+export type OneOffTask = {
+  userIds: number[];
+} & BaseTask;
+
+export type UpdateTask = {
+  taskGroupId?: number;
+} & BaseTask;
+
+export type CreateRecurringTaskBody = {
   interval: DefaultDisplayInterval;
   userGroupId: number;
-};
+} & BaseTask;
 
 @Controller('tasks')
 export class TasksController {
   @Get()
-  // TODO: should be optional, query param
   async getAll(
     @Query('userGroupId') userGroupId: number,
   ): Promise<SelectTask[]> {
@@ -76,7 +71,7 @@ export class TasksController {
     return task;
   }
 
-  @Put(':id')
+  @Patch(':id')
   async updateTask(@Param('id') id: string, @Body() task: UpdateTask) {
     await dbUpdateTask({ ...task, id: Number(id) });
   }

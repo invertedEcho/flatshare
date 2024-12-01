@@ -1,3 +1,4 @@
+import 'package:flatshare/const.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/providers/user.dart';
@@ -15,6 +16,8 @@ import 'package:share_plus/share_plus.dart';
 
 List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
   if (userGroupId != null) {
+    // if you change the order here, please also update the page indices in const.dart
+    // not an optimal solution.
     return [
       const AssignmentsWidget(),
       const TasksOverviewWidget(),
@@ -158,9 +161,8 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
           ],
         ),
         floatingActionButton: userProvider.userGroup?.id != null &&
-                // TODO: oh yeaaaah lets just put these random numbers here
-                currentPageIndex != 2 &&
-                currentPageIndex != 0
+                currentPageIndex != shoppingListPageIndex &&
+                currentPageIndex != assignmentPageIndex
             ? FloatingActionButton(
                 onPressed: () => Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const CreateTask())),

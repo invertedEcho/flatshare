@@ -4,6 +4,7 @@ import 'package:flatshare/main.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/task_group.dart';
 import 'package:flatshare/utils/env.dart';
+import 'package:flatshare/widgets/tasks/create_task.dart';
 
 // TODO: https://github.com/invertedEcho/flatshare/issues/121
 class TaskWithMaybeRecurringTaskGroup extends Task {
@@ -74,7 +75,7 @@ Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
     {required String title,
     required String? description,
     required int userGroupId,
-    required String interval}) async {
+    required IntervalType interval}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
       await authenticatedClient.post(Uri.parse('$apiBaseUrl/tasks/recurring'),
@@ -83,7 +84,8 @@ Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
               'title': title,
               'description': description,
               'userGroupId': userGroupId,
-              'interval': interval
+              'interval': interval.name[0].toUpperCase() +
+                  interval.name.substring(1, interval.name.length)
             },
           ));
   if (response.statusCode != 201) {
@@ -96,7 +98,7 @@ Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
 Future<void> updateTask({required Task task}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
-      await authenticatedClient.put(Uri.parse('$apiBaseUrl/tasks/${task.id}'),
+      await authenticatedClient.patch(Uri.parse('$apiBaseUrl/tasks/${task.id}'),
           body: jsonEncode(
             {
               'title': task.title,

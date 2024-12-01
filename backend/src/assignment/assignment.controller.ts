@@ -1,7 +1,7 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
   dbChangeAssignmentState,
-  dbGetAssignmentsFromCurrentInterval,
+  dbGetAssignmentsForUserGroupFromCurrentInterval,
 } from 'src/db/functions/assignment';
 import { AssignmentState } from 'src/db/schema';
 import { AssignmentResponse } from './types';
@@ -10,14 +10,12 @@ import { AssignmentResponse } from './types';
 export class AssignmentController {
   @Get()
   async getAllAssignments(
-    // TODO: make this optional, just like a query param should be
     @Query('groupId') groupId: number,
   ): Promise<AssignmentResponse[]> {
-    return await dbGetAssignmentsFromCurrentInterval(groupId);
+    return await dbGetAssignmentsForUserGroupFromCurrentInterval(groupId);
   }
 
-  // TODO: should be put
-  @Post('/:id/:state')
+  @Patch('/:id/:state')
   async changeAssignmentState(
     @Param('id') id: number,
     @Param('state') state: AssignmentState,

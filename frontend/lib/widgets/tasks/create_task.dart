@@ -26,8 +26,7 @@ class CreateTaskState extends State<CreateTask> {
   final multiSelectUserController = MultiSelectController<User>([]);
 
   TaskType selectedTaskType = TaskType.recurring;
-  // TODO: use interval type
-  String? selectedInterval;
+  IntervalType? selectedInterval;
 
   List<User> userInUserGroup = [];
 
@@ -92,6 +91,7 @@ class CreateTaskState extends State<CreateTask> {
         );
         return;
       }
+
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       try {
         selectedTaskType == TaskType.oneOff
@@ -112,6 +112,7 @@ class CreateTaskState extends State<CreateTask> {
         );
         Navigator.of(context).pop();
       } catch (e) {
+        print(e);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.toString())),
         );
@@ -191,12 +192,22 @@ class CreateTaskState extends State<CreateTask> {
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
                             hintText: "Select interval",
-                            items: const ['Daily', 'Weekly', 'Monthly'],
+                            items: IntervalType.values,
                             onChanged: (value) {
                               setState(() {
-                                selectedInterval = value!;
+                                selectedInterval = value;
                               });
-                            }),
+                            },
+                            listItemBuilder:
+                                (context, item, isSelected, onItemSelect) {
+                              return Text(item.name[0].toUpperCase() +
+                                  item.name.substring(1, item.name.length));
+                            },
+                            headerBuilder: (context, item, isSelected) {
+                              return Text(item.name[0].toUpperCase() +
+                                  item.name.substring(1, item.name.length));
+                            },
+                          ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                         style: const ButtonStyle(),

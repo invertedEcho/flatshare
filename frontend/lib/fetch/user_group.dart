@@ -21,7 +21,7 @@ Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
 Future<UserGroup?> fetchUserGroupForUser({required int userId}) async {
   final apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
-      .get(Uri.parse("$apiBaseUrl/user-group/$userId"));
+      .get(Uri.parse("$apiBaseUrl/user-group?userId=$userId"));
   if (response.statusCode != 200) {
     throw Exception(
         "Failed to fetch user group for user: ${response.statusCode}");

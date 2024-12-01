@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { db } from './db';
@@ -24,13 +25,12 @@ import {
   userUserGroupTable,
 } from './db/schema';
 import { generateRandomAlphanumericalCode } from './utils/random';
-import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/task-group';
+import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/recurring-task-group';
 
 @Controller('user-group')
 export class UserGroupController {
-  // TODO: we need to support multiple user groups
-  @Get(':userId')
-  async getGroupOfUser(@Param('userId') userId: number) {
+  @Get()
+  async getUserGroupOfUser(@Query('userId') userId: number) {
     const userGroup = await dbGetUserGroupOfUser(userId);
     return {
       id: userGroup?.user_user_group.groupId ?? null,
@@ -58,12 +58,13 @@ export class UserGroupController {
       });
 
     const values = await Promise.all(
-      recurringTaskGroupsOfUserGroup.map(async (taskGroup) => ({
-        recurringTaskGroupId: taskGroup.id,
+      recurringTaskGroupsOfUserGroup.map(async (recurringTaskGroup) => ({
+        recurringTaskGroupId: recurringTaskGroup.id,
         userId: userId,
-        assignmentOrdinal: await dbGetHighestAssignmentOrdinalForTaskGroup({
-          taskGroupId: taskGroup.id,
-        }),
+        assignmentOrdinal:
+          ((await dbGetHighestAssignmentOrdinalForTaskGroup({
+            recurringTaskGroupId: recurringTaskGroup.id,
+          })) ?? 0) + 1,
       })),
     );
 
