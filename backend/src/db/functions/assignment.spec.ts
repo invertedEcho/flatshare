@@ -1,7 +1,3 @@
-import {
-  dbGetRecurringTaskGroupsToAssignForCurrentInterval,
-  RecurringTaskGroupToAssign,
-} from '../functions/assignment';
 import { assignmentTable } from '../schema';
 import { client, db } from '..';
 import {
@@ -15,6 +11,10 @@ import {
   seedDatabaseWithUserData,
   seedDatabaseWithTaskData,
 } from '../tests/util';
+import {
+  RecurringTaskGroupToAssign,
+  dbGetRecurringTaskGroupsToAssignForCurrentInterval,
+} from './recurring-task-group';
 
 const userIdsOfRecurringTaskGroup = mockRecurringTaskGroupUserValues.map(
   (value) => value.userId,
@@ -50,7 +50,6 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       interval: '7 days',
       userIdsOfRecurringTaskGroup,
       assignmentOrdinals,
-      userIdOfLatestAssignment: null,
     } satisfies RecurringTaskGroupToAssign;
 
     expect(result).toHaveLength(1);
@@ -79,7 +78,6 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       interval: '7 days',
       userIdsOfRecurringTaskGroup,
       assignmentOrdinals,
-      userIdOfLatestAssignment: null,
     } satisfies RecurringTaskGroupToAssign;
 
     const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
@@ -112,7 +110,6 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       interval: '7 days',
       userIdsOfRecurringTaskGroup,
       assignmentOrdinals,
-      userIdOfLatestAssignment: userJulian.id,
     } satisfies RecurringTaskGroupToAssign;
 
     await db.insert(assignmentTable).values({

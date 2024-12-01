@@ -17,10 +17,8 @@ const main = async () => {
     await migrate(databaseConnection, {
       migrationsFolder: './src/db/migrations',
     });
-    /* eslint-disable-next-line no-console */
     console.log('Migration complete');
   } catch (error) {
-    /* eslint-disable-next-line no-console */
     console.log(error);
   }
   process.exit(0);

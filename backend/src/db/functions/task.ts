@@ -13,7 +13,7 @@ import {
   DefaultPostgresInterval,
   getLongNameFromPostgresInterval,
 } from 'src/utils/interval';
-import { dbCreateTaskGroup } from './task-group';
+import { dbCreateTaskGroup } from './recurring-task-group';
 import { dbGetUsersOfUserGroup } from './user-group';
 import { getStartOfInterval } from 'src/utils/date';
 

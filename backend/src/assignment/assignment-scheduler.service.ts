@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import {
-  dbInsertAssignments,
-  dbGetRecurringTaskGroupsToAssignForCurrentInterval,
-} from 'src/db/functions/assignment';
+import { dbInsertAssignments } from 'src/db/functions/assignment';
 import { hydrateRecurringTaskGroupsToAssignToAssignments } from './util';
+import { dbGetRecurringTaskGroupsToAssignForCurrentInterval } from 'src/db/functions/recurring-task-group';
 
 @Injectable()
 export class AssignmentSchedulerService {
@@ -15,13 +13,20 @@ export class AssignmentSchedulerService {
         overrideNow: undefined,
       });
 
-    const assignmentsToCreate = hydrateRecurringTaskGroupsToAssignToAssignments(
-      recurringTaskGroupsToAssign,
-    );
+    if (recurringTaskGroupsToAssign.length === 0) {
+      return;
+    }
+
+    const assignmentsToCreate =
+      await hydrateRecurringTaskGroupsToAssignToAssignments(
+        recurringTaskGroupsToAssign,
+      );
 
     if (assignmentsToCreate.length > 0) {
       await dbInsertAssignments({ assignments: assignmentsToCreate });
-      console.info(`Created new assignments: ${assignmentsToCreate}`);
+      console.info(
+        `Created new assignments: ${JSON.stringify(assignmentsToCreate, null, 2)}`,
+      );
     }
   }
 }

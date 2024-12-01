@@ -25,7 +25,7 @@ import {
   userUserGroupTable,
 } from './db/schema';
 import { generateRandomAlphanumericalCode } from './utils/random';
-import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/task-group';
+import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/recurring-task-group';
 
 @Controller('user-group')
 export class UserGroupController {

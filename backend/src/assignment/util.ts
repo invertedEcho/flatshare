@@ -1,25 +1,42 @@
-import { RecurringTaskGroupToAssign } from 'src/db/functions/assignment';
+import { dbGetAssignmentsForTaskGroup } from 'src/db/functions/assignment';
+import { RecurringTaskGroupToAssign } from 'src/db/functions/recurring-task-group';
 import { InsertAssignment } from 'src/db/schema';
 import { getStartOfInterval } from 'src/utils/date';
 
 /**
  * Hydrates recurringTaskGroupsToAssign to "ready-to-insert" assignments.
  *
- * This is done by finding the next responsible user id for each recurring task group by looping over a provided database result set.
+ * This is done by finding the next responsible user id for each recurring task group.
+ 
+ * Note that this function queries the database to retrieve the latest assignment for each `recurringTaskGroup`.
  *
  * @param recurringTaskGroupsToAssign The recurring task groups where assignments need to be created.
  */
-export function hydrateRecurringTaskGroupsToAssignToAssignments(
+export async function hydrateRecurringTaskGroupsToAssignToAssignments(
   recurringTaskGroupsToAssign: RecurringTaskGroupToAssign[],
-) {
-  const assignmentsToCreate: InsertAssignment[] = [];
+): Promise<InsertAssignment[]> {
+  const latestAssignmentUserIdForEachRecurringTaskGroup: {
+    recTaskGroupId: number;
+    userId: number | undefined;
+  }[] = await Promise.all(
+    recurringTaskGroupsToAssign.map(async (rec) => {
+      const latestAssignment = (
+        await dbGetAssignmentsForTaskGroup({
+          taskGroupId: rec.recurringTaskGroupId,
+          limit: 1,
+        })
+      )[0];
+      return {
+        recTaskGroupId: rec.recurringTaskGroupId,
+        userId: latestAssignment?.userId,
+      };
+    }),
+  );
 
+  const assignmentsToCreate: InsertAssignment[] = [];
   for (const recurringTaskGroup of recurringTaskGroupsToAssign) {
-    const {
-      recurringTaskGroupId,
-      userIdsOfRecurringTaskGroup,
-      userIdOfLatestAssignment,
-    } = recurringTaskGroup;
+    const { recurringTaskGroupId, userIdsOfRecurringTaskGroup } =
+      recurringTaskGroup;
 
     const usersOfTaskGroup = userIdsOfRecurringTaskGroup.map(
       (userId, index) => {
@@ -33,6 +50,11 @@ export function hydrateRecurringTaskGroupsToAssignToAssignments(
         };
       },
     );
+
+    const userIdOfLatestAssignment =
+      latestAssignmentUserIdForEachRecurringTaskGroup.find(
+        (item) => item.recTaskGroupId === recurringTaskGroupId,
+      )?.userId;
 
     const nextResponsibleUserId =
       findNextResponsibleUserIdForRecurringTaskGroup(
@@ -67,7 +89,7 @@ export function hydrateRecurringTaskGroupsToAssignToAssignments(
  * @param usersOfRecurringTaskGroup All users (with their `assignmentOrdinal`) belonging to the recurring task group.
  */
 export function findNextResponsibleUserIdForRecurringTaskGroup(
-  userIdOfLatestAssignment: number | null,
+  userIdOfLatestAssignment: number | undefined,
   usersOfRecurringTaskGroup: { userId: number; assignmentOrdinal: number }[],
 ) {
   const usersSortedByAssignmentOrdinal = usersOfRecurringTaskGroup.sort(
