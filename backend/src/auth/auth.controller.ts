@@ -23,6 +23,8 @@ import { dbGetUserById } from 'src/db/functions/user';
 import { AuthGuard } from './auth.guard';
 import { Public } from './constants';
 
+// TODO: why exactly are classes needed here? seems like we want a type instead.
+
 class RegisterDto {
   username: string;
   email: string;

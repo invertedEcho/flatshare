@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import {
-  dbChangeAssignmentState,
+  dbUpdateAssignmentState,
   dbGetAssignmentsForUserGroupFromCurrentInterval,
 } from 'src/db/functions/assignment';
 import { AssignmentState } from 'src/db/schema';
@@ -16,10 +16,10 @@ export class AssignmentController {
   }
 
   @Patch('/:id/:state')
-  async changeAssignmentState(
+  async updateAssignmentState(
     @Param('id') id: number,
     @Param('state') state: AssignmentState,
   ) {
-    await dbChangeAssignmentState(id, state);
+    await dbUpdateAssignmentState(id, state);
   }
 }

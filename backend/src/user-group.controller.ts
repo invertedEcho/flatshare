@@ -38,7 +38,7 @@ export class UserGroupController {
     };
   }
 
-  @Post('join')
+  @Post('join-by-invite-code')
   async joinGroup(@Body() body: { userId: number; inviteCode: string }) {
     const { inviteCode, userId } = body;
     const maybeInviteCode = await dbGetUserGroupByInviteCode(inviteCode);
@@ -93,22 +93,14 @@ export class UserGroupController {
 
   @Get('invite-code/:groupId')
   async generateInviteCode(@Param('groupId') groupId: number) {
-    // const group = (
-    //   await db
-    //     .select()
-    //     .from(groupTable)
-    //     .where(eq(groupTable.id, groupId))
-    //     .limit(1)
-    // )[0];
-
     const inviteCode = generateRandomAlphanumericalCode(6);
     await db.insert(userGroupInviteTable).values({ code: inviteCode, groupId });
 
     return { inviteCode };
   }
 
-  @Get(':userGroupId/users')
-  async getUsers(@Param('userGroupId') userGroupId: number) {
+  @Get('users')
+  async getUsers(@Query('userGroupId') userGroupId: number) {
     return await db
       .select({
         userId: userTable.id,

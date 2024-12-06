@@ -17,7 +17,6 @@ export async function dbGetUserGroupOfUser(userId: number) {
       eq(userGroupTable.id, userUserGroupTable.groupId),
     )
     .limit(1);
-  if (userGroups.length === 0) return undefined;
   return userGroups[0];
 }
 
