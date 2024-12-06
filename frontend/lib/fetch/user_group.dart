@@ -5,10 +5,10 @@ import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/utils/env.dart';
 
-Future<List<User>> fetchUsersInUserGroup({required int groupId}) async {
+Future<List<User>> fetchUsersInUserGroup({required int userGroupId}) async {
   final apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient
-      .get(Uri.parse("$apiBaseUrl/user-group/$groupId/users"));
+      .get(Uri.parse("$apiBaseUrl/user-group/users?userGroupId=$userGroupId"));
 
   if (response.statusCode != 200) {
     throw Exception(
@@ -41,7 +41,7 @@ Future<UserGroup> joinGroupByInviteCode(
     {required int userId, required String inviteCode}) async {
   final String apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient.post(
-      Uri.parse('$apiBaseUrl/user-group/join'),
+      Uri.parse('$apiBaseUrl/user-group/join-by-invite-code'),
       body: jsonEncode(
           <String, dynamic>{'userId': userId, 'inviteCode': inviteCode}));
 

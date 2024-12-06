@@ -71,6 +71,13 @@
       "when": 1732654709002,
       "tag": "0009_tough_darwin",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1733514132521,
+      "tag": "0010_nifty_dexter_bennett",
+      "breakpoints": true
     }
   ]
 }

@@ -71,7 +71,7 @@ export async function dbGetAssignmentsForUserGroupFromCurrentInterval(
   });
 }
 
-export async function dbChangeAssignmentState(
+export async function dbUpdateAssignmentState(
   assignmentId: number,
   state: AssignmentState,
 ) {
