@@ -26,6 +26,8 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
 
   late socket_io.Socket socket;
   var isConnected = false;
+
+  // TODO: should use provider instead.
   List<ShoppingListItem> shoppingListItems = [];
 
   @override
@@ -89,7 +91,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
       socket.on('shopping-list-item', (data) {
         var parsedItem = ShoppingListItem.fromJson(data);
         setState(() {
-          shoppingListItems.add(parsedItem);
+          shoppingListItems.insert(0, parsedItem);
         });
       });
 
@@ -261,6 +263,7 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
     // TODO: we should use emit with ack to show error message to the user if something failed
     socket.emit("shopping-list-item",
         {'text': controller.text, 'userGroupId': userGroupId});
+    controller.clear();
   }
 
   void updateShoppingListItem(
