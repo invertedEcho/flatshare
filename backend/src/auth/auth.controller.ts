@@ -94,7 +94,7 @@ export class AuthController {
         } else {
           await dbAddUserToUserGroup({
             userId: newUser.id,
-            groupId: maybeGroup.groupId,
+            userGroupId: maybeGroup.userGroupId,
           });
         }
       } catch (error) {

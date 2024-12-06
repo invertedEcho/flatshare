@@ -18,7 +18,7 @@ export const displayIntervalToPostgresInterval = {
   Monthly: '1 month',
 } satisfies Record<DefaultDisplayInterval, DefaultPostgresInterval>;
 
-export function getLongNameFromPostgresInterval(
+export function getDescriptiveNameFromPostgresInterval(
   interval: DefaultPostgresInterval,
 ) {
   switch (interval) {

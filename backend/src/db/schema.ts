@@ -58,7 +58,7 @@ export type InsertUserGroup = typeof userGroupTable.$inferInsert;
 export const userGroupInviteTable = pgTable('user_group_invite', {
   id: serial('id').primaryKey(),
   code: text('code').notNull(),
-  groupId: integer('group_id')
+  userGroupId: integer('user_group_id')
     .references(() => userGroupTable.id)
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -99,7 +99,7 @@ export const taskTable = pgTable('task', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description'),
-  // FIXME: This should not be here -> association table, so a task can be in multiple recurring task groups
+  // FIXME: This should not be here -> association table, so a task can be in multiple task groups
   taskGroupId: integer('task_group_id').references(() => taskGroupTable.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });

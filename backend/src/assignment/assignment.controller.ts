@@ -10,9 +10,9 @@ import { AssignmentResponse } from './types';
 export class AssignmentController {
   @Get()
   async getAllAssignments(
-    @Query('groupId') groupId: number,
+    @Query('userGroupId') userGroupId: number,
   ): Promise<AssignmentResponse[]> {
-    return await dbGetAssignmentsForUserGroupFromCurrentInterval(groupId);
+    return await dbGetAssignmentsForUserGroupFromCurrentInterval(userGroupId);
   }
 
   @Patch('/:id/:state')

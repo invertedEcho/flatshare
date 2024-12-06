@@ -1,6 +1,6 @@
 import { DefaultPostgresInterval } from './interval';
 
-// TODO: this will only work for UTC+2, overall we need to add a local time zone in the recurring task group and do all the stuff dynamic.
+// TODO: this will only work for UTC+2, overall we need to add a local time zone in the user group and do all the stuff dynamic.
 export function getStartOfInterval(interval: DefaultPostgresInterval): Date {
   // HOTFIX: This seems very hacky. We should think of something more elegant to handle this in the future, also consider the case when
   //  assignment scheduler runs during the changing days of DST.

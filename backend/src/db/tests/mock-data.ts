@@ -1,10 +1,10 @@
 import {
-  InsertRecurringTaskGroup,
-  InsertRecurringTaskGroupUser,
+  InsertTaskGroup,
+  InsertTaskGroupUserMapping,
   InsertTask,
   InsertUser,
   InsertUserGroup,
-  InsertUserUserGroup,
+  InsertUserUserGroupMapping,
 } from '../schema';
 
 export const userJulian = {
@@ -33,46 +33,46 @@ export const userGroupWG1 = {
   id: 1,
 } satisfies InsertUserGroup;
 
-export const recurringTaskGroupWeekly = {
+export const taskGroupWeekly = {
   id: 1,
   initialStartDate: new Date('2024-07-28 22:00:00Z'),
   interval: '1 week',
   title: 'Every week',
   userGroupId: 1,
-} satisfies InsertRecurringTaskGroup;
+} satisfies InsertTaskGroup;
 
 export const taskVacuuming = {
   id: 1,
   title: 'Staubsaugen',
   createdAt: new Date(),
   description: 'Boden saugen',
-  recurringTaskGroupId: recurringTaskGroupWeekly.id,
+  taskGroupId: taskGroupWeekly.id,
 } satisfies InsertTask;
 
 export const mockUserValues = [userJakob, userJulian, userMustermann];
 export const mockUserUserGroupValues = [
   {
-    groupId: userGroupWG1.id,
+    userGroupId: userGroupWG1.id,
     userId: userJulian.id,
   },
-  { groupId: userGroupWG1.id, userId: userJakob.id },
-  { groupId: userGroupWG1.id, userId: userMustermann.id },
-] satisfies InsertUserUserGroup[];
+  { userGroupId: userGroupWG1.id, userId: userJakob.id },
+  { userGroupId: userGroupWG1.id, userId: userMustermann.id },
+] satisfies InsertUserUserGroupMapping[];
 
-export const mockRecurringTaskGroupUserValues = [
+export const mockTaskGroupUserValues = [
   {
-    recurringTaskGroupId: recurringTaskGroupWeekly.id,
+    taskGroupId: taskGroupWeekly.id,
     userId: userJulian.id,
     assignmentOrdinal: 0,
   },
   {
-    recurringTaskGroupId: recurringTaskGroupWeekly.id,
+    taskGroupId: taskGroupWeekly.id,
     userId: userJakob.id,
     assignmentOrdinal: 1,
   },
   {
-    recurringTaskGroupId: recurringTaskGroupWeekly.id,
+    taskGroupId: taskGroupWeekly.id,
     userId: userMustermann.id,
     assignmentOrdinal: 2,
   },
-] satisfies InsertRecurringTaskGroupUser[];
+] satisfies InsertTaskGroupUserMapping[];

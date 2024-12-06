@@ -1,18 +1,18 @@
 import { sql } from 'drizzle-orm';
 import {
-  recurringTaskGroupTable,
-  recurringTaskGroupUserTable,
+  taskGroupTable,
+  taskGroupUserMappingTable,
   taskTable,
-  taskUserGroupTable,
+  taskUserGroupMappingTable,
   userGroupTable,
   userTable,
-  userUserGroupTable,
+  userUserGroupMappingTable,
 } from '../schema';
 import {
-  mockRecurringTaskGroupUserValues,
+  mockTaskGroupUserValues,
   mockUserUserGroupValues,
   mockUserValues,
-  recurringTaskGroupWeekly,
+  taskGroupWeekly,
   taskVacuuming,
   userGroupWG1,
 } from './mock-data';
@@ -46,18 +46,16 @@ export async function truncateAllTables(): Promise<void> {
 export async function seedDatabaseWithUserData() {
   await db.insert(userGroupTable).values(userGroupWG1);
   await db.insert(userTable).values(mockUserValues);
-  await db.insert(userUserGroupTable).values(mockUserUserGroupValues);
+  await db.insert(userUserGroupMappingTable).values(mockUserUserGroupValues);
 }
 
 export async function seedDatabaseWithTaskData() {
-  await db.insert(recurringTaskGroupTable).values(recurringTaskGroupWeekly);
+  await db.insert(taskGroupTable).values(taskGroupWeekly);
 
-  await db
-    .insert(recurringTaskGroupUserTable)
-    .values(mockRecurringTaskGroupUserValues);
+  await db.insert(taskGroupUserMappingTable).values(mockTaskGroupUserValues);
 
   await db.insert(taskTable).values(taskVacuuming);
   await db
-    .insert(taskUserGroupTable)
-    .values({ groupId: userGroupWG1.id, taskId: taskVacuuming.id });
+    .insert(taskUserGroupMappingTable)
+    .values({ userGroupId: userGroupWG1.id, taskId: taskVacuuming.id });
 }

@@ -2,15 +2,15 @@ import { client, db } from 'src/db';
 import {
   assignmentTable,
   InsertAssignment,
-  InsertRecurringTaskGroup,
+  InsertTaskGroup,
   InsertTask,
-  recurringTaskGroupTable,
-  recurringTaskGroupUserTable,
+  taskGroupTable,
+  taskGroupUserMappingTable,
   taskTable,
-  taskUserGroupTable,
+  taskUserGroupMappingTable,
 } from 'src/db/schema';
 import {
-  mockRecurringTaskGroupUserValues,
+  mockTaskGroupUserValues,
   taskVacuuming,
   userGroupWG1,
   userJulian,
@@ -40,18 +40,18 @@ describe('Assignment scheduler', () => {
   });
 
   it('sets assignment creation date to start of interval when task is created in middle of interval', async () => {
-    const recurringTaskGroupWeekly = {
+    const taskGroupWeekly = {
       id: 1,
       initialStartDate: new Date('2024-08-25 22:00:00Z'),
       interval: '1 week',
       title: 'Every week',
       userGroupId: 1,
-    } satisfies InsertRecurringTaskGroup;
+    } satisfies InsertTaskGroup;
 
     // Create task group with initialstartdate Monday in week 1
-    await db.insert(recurringTaskGroupTable).values(recurringTaskGroupWeekly);
-    await db.insert(recurringTaskGroupUserTable).values({
-      recurringTaskGroupId: recurringTaskGroupWeekly.id,
+    await db.insert(taskGroupTable).values(taskGroupWeekly);
+    await db.insert(taskGroupUserMappingTable).values({
+      taskGroupId: taskGroupWeekly.id,
       userId: userJulian.id,
       assignmentOrdinal: 2,
     });
@@ -59,8 +59,8 @@ describe('Assignment scheduler', () => {
     // Create new Task
     await db.insert(taskTable).values(taskVacuuming);
     await db
-      .insert(taskUserGroupTable)
-      .values({ groupId: userGroupWG1.id, taskId: taskVacuuming.id });
+      .insert(taskUserGroupMappingTable)
+      .values({ userGroupId: userGroupWG1.id, taskId: taskVacuuming.id });
 
     // Run scheduler function at Wednesday in week 2
     jest.setSystemTime(new Date('2024-09-03 22:00:00Z'));
@@ -77,24 +77,21 @@ describe('Assignment scheduler', () => {
   it('correctly inserts assignments to user in right order after after everyone was assigned once', async () => {
     jest.setSystemTime(new Date('2024-09-10 08:00:00Z'));
     const intervalStr = '7 days';
-    const mockRecurringTaskGroup = {
+    const mockTaskGroup = {
       title: 'Weekly Tasks',
       interval: intervalStr,
       userGroupId: userGroupWG1.id,
       initialStartDate: getStartOfInterval(intervalStr),
-    } satisfies InsertRecurringTaskGroup;
-    const insertedRecurringTaskGroup = (
-      await db
-        .insert(recurringTaskGroupTable)
-        .values(mockRecurringTaskGroup)
-        .returning()
+    } satisfies InsertTaskGroup;
+    const insertedTaskGroup = (
+      await db.insert(taskGroupTable).values(mockTaskGroup).returning()
     )[0];
-    if (insertedRecurringTaskGroup === undefined) {
-      throw new Error('Did not insert mock recurring task group');
+    if (insertedTaskGroup === undefined) {
+      throw new Error('Did not insert mock task group');
     }
     const mockTask = {
       title: 'Staubsaugen',
-      recurringTaskGroupId: insertedRecurringTaskGroup.id,
+      taskGroupId: insertedTaskGroup.id,
     } satisfies InsertTask;
     const insertedTask = (
       await db.insert(taskTable).values(mockTask).returning()
@@ -104,10 +101,10 @@ describe('Assignment scheduler', () => {
       throw new Error('Did not insert mock task');
     }
 
-    const firstUserId = mockRecurringTaskGroupUserValues[0]?.userId;
+    const firstUserId = mockTaskGroupUserValues[0]?.userId;
     if (firstUserId === undefined) {
       throw new Error(
-        'mock recurring task group user values did not contain expected data.',
+        'mock task group user values did not contain expected data.',
       );
     }
     const firstAssignment = {
@@ -117,10 +114,10 @@ describe('Assignment scheduler', () => {
       state: 'completed',
     } satisfies InsertAssignment;
 
-    const secondUserId = mockRecurringTaskGroupUserValues[1]?.userId;
+    const secondUserId = mockTaskGroupUserValues[1]?.userId;
     if (secondUserId === undefined) {
       throw new Error(
-        'mock recurring task group user values did not contain expected data.',
+        'mock task group user values did not contain expected data.',
       );
     }
     const secondAssignment = {
@@ -130,10 +127,10 @@ describe('Assignment scheduler', () => {
       state: 'completed',
     } satisfies InsertAssignment;
 
-    const thirdUserId = mockRecurringTaskGroupUserValues[2]?.userId;
+    const thirdUserId = mockTaskGroupUserValues[2]?.userId;
     if (thirdUserId === undefined) {
       throw new Error(
-        'mock recurring task group user values did not contain expected data.',
+        'mock task group user values did not contain expected data.',
       );
     }
     const thirdAssignment = {
@@ -143,19 +140,19 @@ describe('Assignment scheduler', () => {
       state: 'completed',
     } satisfies InsertAssignment;
 
-    await db.insert(recurringTaskGroupUserTable).values([
+    await db.insert(taskGroupUserMappingTable).values([
       {
-        recurringTaskGroupId: insertedRecurringTaskGroup.id,
+        taskGroupId: insertedTaskGroup.id,
         userId: firstUserId,
         assignmentOrdinal: 0,
       },
       {
-        recurringTaskGroupId: insertedRecurringTaskGroup.id,
+        taskGroupId: insertedTaskGroup.id,
         userId: secondUserId,
         assignmentOrdinal: 1,
       },
       {
-        recurringTaskGroupId: insertedRecurringTaskGroup.id,
+        taskGroupId: insertedTaskGroup.id,
         userId: thirdUserId,
         assignmentOrdinal: 2,
       },
