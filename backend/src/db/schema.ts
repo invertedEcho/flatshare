@@ -201,4 +201,5 @@ export const shoppingListItemTable = pgTable('shopping_list_item', {
     .references(() => userGroupTable.id)
     .notNull(),
   state: shoppingListItemStateEnum('state').notNull().default('pending'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
