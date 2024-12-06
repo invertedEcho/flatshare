@@ -38,7 +38,7 @@ class CreateTaskState extends State<CreateTask> {
     final userGroupId = userGroup?.id;
 
     if (userGroupId != null) {
-      fetchUsersInUserGroup(groupId: userGroupId).then((result) {
+      fetchUsersInUserGroup(userGroupId: userGroupId).then((result) {
         setState(() {
           userInUserGroup = result;
         });
@@ -181,6 +181,7 @@ class CreateTaskState extends State<CreateTask> {
                         ? CustomDropdown.multiSelect(
                             multiSelectController: multiSelectUserController,
                             decoration: const CustomDropdownDecoration(
+                                headerStyle: TextStyle(color: Colors.black),
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
                             hintText: "Select users",
@@ -200,12 +201,18 @@ class CreateTaskState extends State<CreateTask> {
                             },
                             listItemBuilder:
                                 (context, item, isSelected, onItemSelect) {
-                              return Text(item.name[0].toUpperCase() +
-                                  item.name.substring(1, item.name.length));
+                              return Text(
+                                item.name[0].toUpperCase() +
+                                    item.name.substring(1, item.name.length),
+                                style: const TextStyle(color: Colors.black),
+                              );
                             },
                             headerBuilder: (context, item, isSelected) {
-                              return Text(item.name[0].toUpperCase() +
-                                  item.name.substring(1, item.name.length));
+                              return Text(
+                                item.name[0].toUpperCase() +
+                                    item.name.substring(1, item.name.length),
+                                style: const TextStyle(color: Colors.black),
+                              );
                             },
                           ),
                     const SizedBox(height: 20),

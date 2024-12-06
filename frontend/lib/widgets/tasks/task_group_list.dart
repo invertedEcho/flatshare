@@ -44,8 +44,8 @@ class TaskGroupList extends StatelessWidget {
             return Dismissible(
                 key: Key(taskGroup.id.toString()),
                 direction: DismissDirection.endToStart,
-                onDismissed: (direction) {
-                  Provider.of<TaskGroupProvider>(context, listen: false)
+                onDismissed: (direction) async {
+                  await Provider.of<TaskGroupProvider>(context, listen: false)
                       .removeTaskGroup(taskGroup.id);
                 },
                 confirmDismiss: (DismissDirection direction) async {
