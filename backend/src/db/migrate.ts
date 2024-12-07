@@ -24,7 +24,6 @@ const main = async () => {
   process.exit(0);
 };
 
-/* eslint-disable @typescript-eslint/no-empty-function */
 main()
   .then(() => {})
   .catch(() => {});

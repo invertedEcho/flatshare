@@ -7,6 +7,8 @@ export function getStartOfInterval(interval: DefaultPostgresInterval): Date {
   // Determine target hour based on whether it's DST period
   const targetHour = getIsDSTPeroid(new Date()) ? 22 : 23; // 22:00 during DST, 23:00 afterward
 
+  const now = new Date();
+
   switch (interval) {
     // Go back to previous day at the calculated target hour
     case '1 day': {
@@ -21,7 +23,6 @@ export function getStartOfInterval(interval: DefaultPostgresInterval): Date {
 
     // Go back to previous Sunday at the calculated target hour
     case '7 days': {
-      const now = new Date();
       const todayTargetTime = new Date(now);
       todayTargetTime.setUTCHours(targetHour, 0, 0, 0); // Set to target hour (22 or 23 based on DST)
 
@@ -52,8 +53,7 @@ export function getStartOfInterval(interval: DefaultPostgresInterval): Date {
 
     // Go back to last day of previous month at the calculated target hour
     case '1 month':
-    case '1 mon':
-      const now = new Date();
+    case '1 mon': {
       const firstDayOfCurrentMonth = new Date(
         now.getUTCFullYear(),
         now.getUTCMonth(),
@@ -65,6 +65,7 @@ export function getStartOfInterval(interval: DefaultPostgresInterval): Date {
       );
       dayBeforeFirstDayOfCurrentMonth.setUTCHours(targetHour, 0, 0, 0); // Set to target hour (22 or 23 based on DST)
       return dayBeforeFirstDayOfCurrentMonth;
+    }
   }
 }
 
