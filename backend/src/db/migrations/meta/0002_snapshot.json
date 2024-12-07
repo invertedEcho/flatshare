@@ -1,7 +1,5 @@
 {
-  "id": "93495801-ce44-4776-9f8b-5558563a7169",
-  "prevId": "946ca430-0d12-4e02-9204-36cba066ed58",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "public.assignment": {
@@ -47,32 +45,35 @@
         "assignment_task_id_task_id_fk": {
           "name": "assignment_task_id_task_id_fk",
           "tableFrom": "assignment",
-          "tableTo": "task",
           "columnsFrom": [
             "task_id"
           ],
+          "tableTo": "task",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "assignment_user_id_user_id_fk": {
           "name": "assignment_user_id_user_id_fk",
           "tableFrom": "assignment",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.recurring_task_group": {
       "name": "recurring_task_group",
@@ -125,7 +126,10 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.recurring_task_group_user": {
       "name": "recurring_task_group_user",
@@ -162,32 +166,35 @@
         "recurring_task_group_user_recurring_task_group_id_recurring_task_group_id_fk": {
           "name": "recurring_task_group_user_recurring_task_group_id_recurring_task_group_id_fk",
           "tableFrom": "recurring_task_group_user",
-          "tableTo": "recurring_task_group",
           "columnsFrom": [
             "recurring_task_group_id"
           ],
+          "tableTo": "recurring_task_group",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "recurring_task_group_user_user_id_user_id_fk": {
           "name": "recurring_task_group_user_user_id_user_id_fk",
           "tableFrom": "recurring_task_group_user",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.task": {
       "name": "task",
@@ -230,19 +237,22 @@
         "task_recurring_task_group_id_recurring_task_group_id_fk": {
           "name": "task_recurring_task_group_id_recurring_task_group_id_fk",
           "tableFrom": "task",
-          "tableTo": "recurring_task_group",
           "columnsFrom": [
             "recurring_task_group_id"
           ],
+          "tableTo": "recurring_task_group",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.task_user_group": {
       "name": "task_user_group",
@@ -279,32 +289,35 @@
         "task_user_group_task_id_task_id_fk": {
           "name": "task_user_group_task_id_task_id_fk",
           "tableFrom": "task_user_group",
-          "tableTo": "task",
           "columnsFrom": [
             "task_id"
           ],
+          "tableTo": "task",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "task_user_group_groupId_user_group_id_fk": {
           "name": "task_user_group_groupId_user_group_id_fk",
           "tableFrom": "task_user_group",
-          "tableTo": "user_group",
           "columnsFrom": [
             "groupId"
           ],
+          "tableTo": "user_group",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.user_group_invite": {
       "name": "user_group_invite",
@@ -341,19 +354,22 @@
         "user_group_invite_group_id_user_group_id_fk": {
           "name": "user_group_invite_group_id_user_group_id_fk",
           "tableFrom": "user_group_invite",
-          "tableTo": "user_group",
           "columnsFrom": [
             "group_id"
           ],
+          "tableTo": "user_group",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.user_group": {
       "name": "user_group",
@@ -382,7 +398,10 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.user": {
       "name": "user",
@@ -426,12 +445,15 @@
       "uniqueConstraints": {
         "user_email_unique": {
           "name": "user_email_unique",
-          "nullsNotDistinct": false,
           "columns": [
             "email"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
-      }
+      },
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     },
     "public.user_user_group": {
       "name": "user_user_group",
@@ -461,32 +483,35 @@
         "user_user_group_user_id_user_id_fk": {
           "name": "user_user_group_user_id_user_id_fk",
           "tableFrom": "user_user_group",
-          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "user",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "user_user_group_group_id_user_group_id_fk": {
           "name": "user_user_group_group_id_user_group_id_fk",
           "tableFrom": "user_user_group",
-          "tableTo": "user_group",
           "columnsFrom": [
             "group_id"
           ],
+          "tableTo": "user_group",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     }
   },
   "enums": {
@@ -501,8 +526,14 @@
   },
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "93495801-ce44-4776-9f8b-5558563a7169",
+  "prevId": "946ca430-0d12-4e02-9204-36cba066ed58",
+  "sequences": {},
+  "policies": {},
+  "views": {},
+  "roles": {}
 }

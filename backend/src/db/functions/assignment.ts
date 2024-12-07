@@ -5,15 +5,15 @@ import {
   InsertAssignment,
   SelectAssignment,
   assignmentTable,
-  recurringTaskGroupTable,
+  taskGroupTable,
   taskTable,
   userTable,
-  userUserGroupTable,
+  userUserGroupMappingTable,
 } from '../schema';
 import { AssignmentResponse } from 'src/assignment/types';
 
 // FIXME: This function doesn't only return the assignments from the current interval, but just all assignments newer than `NOW()` minus
-// the interval, so let there be a weekly recurring taskgroup, let it be wednesday , it would also return all assignments that are newer
+// the interval, so let there be a weekly task group, let it be wednesday , it would also return all assignments that are newer
 // than last wednesday, but instead we just want assignment that have been created in the current period, so all assignments >= Monday 00:00.
 //
 // Alternatively, we need to make sure that the assignments `createdAt` date is only ever at the beginning of an interval, so for example always on Monday
@@ -30,33 +30,30 @@ export async function dbGetAssignmentsForUserGroupFromCurrentInterval(
       assigneeName: userTable.username,
       isCompleted: sql<boolean>`${assignmentTable.state} = 'completed'`,
       createdAt: assignmentTable.createdAt,
-      isOneOff: sql<boolean>`${taskTable.recurringTaskGroupId} IS NULL`,
+      isOneOff: sql<boolean>`${taskTable.taskGroupId} IS NULL`,
       // TODO: make timezone dynamic
-      dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
-      taskGroupId: recurringTaskGroupTable.id,
-      taskGroupTitle: recurringTaskGroupTable.title,
+      dueDate: sql<string>`(${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC' - interval '1 day'`,
+      taskGroupId: taskGroupTable.id,
+      taskGroupTitle: taskGroupTable.title,
     })
     .from(assignmentTable)
     .innerJoin(userTable, eq(assignmentTable.userId, userTable.id))
     .innerJoin(taskTable, eq(assignmentTable.taskId, taskTable.id))
     .innerJoin(
-      userUserGroupTable,
+      userUserGroupMappingTable,
       and(
-        eq(userUserGroupTable.groupId, userGroupId),
-        eq(userUserGroupTable.userId, userTable.id),
+        eq(userUserGroupMappingTable.userGroupId, userGroupId),
+        eq(userUserGroupMappingTable.userId, userTable.id),
       ),
     )
-    .leftJoin(
-      recurringTaskGroupTable,
-      eq(taskTable.recurringTaskGroupId, recurringTaskGroupTable.id),
-    )
+    .leftJoin(taskGroupTable, eq(taskTable.taskGroupId, taskGroupTable.id))
     // Only get assignments from the current interval
     .where(
       // TODO: make timezone dynamic
       and(
         or(
-          sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${recurringTaskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
-          isNull(recurringTaskGroupTable.id),
+          sql`now() < (${assignmentTable.createdAt} AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Berlin' + ${taskGroupTable.interval}) AT TIME ZONE 'Europe/Berlin' AT TIME ZONE 'UTC'`,
+          isNull(taskGroupTable.id),
         ),
       ),
     );
@@ -98,13 +95,10 @@ export async function dbGetAssignmentsForTaskGroup({
 }): Promise<SelectAssignment[]> {
   const result = db
     .select({ ...getTableColumns(assignmentTable) })
-    .from(recurringTaskGroupTable)
-    .innerJoin(
-      taskTable,
-      eq(recurringTaskGroupTable.id, taskTable.recurringTaskGroupId),
-    )
+    .from(taskGroupTable)
+    .innerJoin(taskTable, eq(taskGroupTable.id, taskTable.taskGroupId))
     .innerJoin(assignmentTable, eq(taskTable.id, assignmentTable.taskId))
-    .where(eq(recurringTaskGroupTable.id, taskGroupId))
+    .where(eq(taskGroupTable.id, taskGroupId))
     .orderBy(desc(assignmentTable.createdAt));
   if (limit === undefined) {
     return await result;

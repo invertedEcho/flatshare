@@ -1,10 +1,10 @@
 import { assignmentTable } from '../schema';
 import { client, db } from '..';
 import {
-  recurringTaskGroupWeekly,
+  taskGroupWeekly,
   userJulian,
   taskVacuuming,
-  mockRecurringTaskGroupUserValues,
+  mockTaskGroupUserValues,
 } from '../tests/mock-data';
 import {
   truncateAllTables,
@@ -12,14 +12,12 @@ import {
   seedDatabaseWithTaskData,
 } from '../tests/util';
 import {
-  RecurringTaskGroupToAssign,
-  dbGetRecurringTaskGroupsToAssignForCurrentInterval,
-} from './recurring-task-group';
+  TaskGroupToAssign,
+  dbGetTaskGroupsToAssignForCurrentInterval,
+} from './task-group';
 
-const userIdsOfRecurringTaskGroup = mockRecurringTaskGroupUserValues.map(
-  (value) => value.userId,
-);
-const assignmentOrdinals = mockRecurringTaskGroupUserValues.map(
+const userIdsOfTaskGroup = mockTaskGroupUserValues.map((value) => value.userId);
+const assignmentOrdinals = mockTaskGroupUserValues.map(
   (value) => value.assignmentOrdinal,
 );
 
@@ -38,29 +36,29 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
   it('does return tasks where initial start date is in the past', async () => {
     await seedDatabaseWithTaskData();
 
-    const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
+    const result = await dbGetTaskGroupsToAssignForCurrentInterval({
       overrideNow: new Date('2024-07-29T13:00:00Z'),
     });
 
-    const expectedRecurringTaskGroup = {
+    const expectedTaskGroup = {
       taskIds: [taskVacuuming.id],
-      recurringTaskGroupId: recurringTaskGroupWeekly.id,
+      taskGroupId: taskGroupWeekly.id,
       isInFirstInterval: true,
-      taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+      taskGroupInitialStartDate: taskGroupWeekly.initialStartDate,
       interval: '7 days',
-      userIdsOfRecurringTaskGroup,
+      userIdsOfTaskGroup,
       assignmentOrdinals,
-    } satisfies RecurringTaskGroupToAssign;
+    } satisfies TaskGroupToAssign;
 
     expect(result).toHaveLength(1);
-    const firstRecurringTaskGroup = result[0];
-    expect(firstRecurringTaskGroup).toStrictEqual(expectedRecurringTaskGroup);
+    const firstTaskGroup = result[0];
+    expect(firstTaskGroup).toStrictEqual(expectedTaskGroup);
   });
 
   it('does not return tasks where the initalStartDate is in the future', async () => {
     await seedDatabaseWithTaskData();
 
-    const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
+    const result = await dbGetTaskGroupsToAssignForCurrentInterval({
       overrideNow: new Date('2024-07-28 21:59:59Z'),
     });
 
@@ -72,15 +70,15 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
 
     const expectedTask = {
       taskIds: [taskVacuuming.id],
-      recurringTaskGroupId: recurringTaskGroupWeekly.id,
+      taskGroupId: taskGroupWeekly.id,
       isInFirstInterval: true,
-      taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+      taskGroupInitialStartDate: taskGroupWeekly.initialStartDate,
       interval: '7 days',
-      userIdsOfRecurringTaskGroup,
+      userIdsOfTaskGroup,
       assignmentOrdinals,
-    } satisfies RecurringTaskGroupToAssign;
+    } satisfies TaskGroupToAssign;
 
-    const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
+    const result = await dbGetTaskGroupsToAssignForCurrentInterval({
       overrideNow: new Date('2024-07-31 22:00:00Z'),
     });
     expect(result).toHaveLength(1);
@@ -94,7 +92,7 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
       userId: userJulian.id,
       createdAt: new Date('2024-07-28 22:00:00Z'),
     });
-    const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
+    const result = await dbGetTaskGroupsToAssignForCurrentInterval({
       overrideNow: new Date('2024-08-04 21:59:00Z'),
     });
     expect(result).toHaveLength(0);
@@ -104,20 +102,20 @@ describe('dbGetTasksToAssignForCurrentInterval', () => {
     await seedDatabaseWithTaskData();
     const expectedTask = {
       taskIds: [taskVacuuming.id],
-      recurringTaskGroupId: recurringTaskGroupWeekly.id,
+      taskGroupId: taskGroupWeekly.id,
       isInFirstInterval: false,
-      taskGroupInitialStartDate: recurringTaskGroupWeekly.initialStartDate,
+      taskGroupInitialStartDate: taskGroupWeekly.initialStartDate,
       interval: '7 days',
-      userIdsOfRecurringTaskGroup,
+      userIdsOfTaskGroup,
       assignmentOrdinals,
-    } satisfies RecurringTaskGroupToAssign;
+    } satisfies TaskGroupToAssign;
 
     await db.insert(assignmentTable).values({
       taskId: taskVacuuming.id,
       userId: userJulian.id,
       createdAt: new Date('2024-07-28 22:00:00Z'),
     });
-    const result = await dbGetRecurringTaskGroupsToAssignForCurrentInterval({
+    const result = await dbGetTaskGroupsToAssignForCurrentInterval({
       overrideNow: new Date('2024-08-04 22:00:00Z'),
     });
 

@@ -75,7 +75,7 @@ export class EventsGateway implements OnGatewayConnection {
       );
     }
 
-    if (userGroup.user_group.id !== parsedUserGroupId) {
+    if (userGroup.userGroup.id !== parsedUserGroupId) {
       console.info(
         'This client is not allowed to join a room by the user-group-id included in the header.',
       );

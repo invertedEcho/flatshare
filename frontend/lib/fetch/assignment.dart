@@ -4,10 +4,10 @@ import 'package:flatshare/main.dart';
 import 'package:flatshare/models/assignment.dart';
 import 'package:flatshare/utils/env.dart';
 
-Future<List<Assignment>> fetchAssignments({required int groupId}) async {
+Future<List<Assignment>> fetchAssignments({required int userGroupId}) async {
   var apiBaseUrl = getApiBaseUrl(withApiSuffix: true);
   final response = await authenticatedClient
-      .get(Uri.parse("$apiBaseUrl/assignments?groupId=$groupId"));
+      .get(Uri.parse("$apiBaseUrl/assignments?userGroupId=$userGroupId"));
 
   if (response.statusCode == 200) {
     List<dynamic> assignments = jsonDecode(response.body);

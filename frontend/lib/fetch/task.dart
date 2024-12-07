@@ -7,29 +7,29 @@ import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
 
 // TODO: https://github.com/invertedEcho/flatshare/issues/121
-class TaskWithMaybeRecurringTaskGroup extends Task {
+class TaskWithMaybeTaskGroup extends Task {
   TaskGroup? taskGroup;
 
-  TaskWithMaybeRecurringTaskGroup(
+  TaskWithMaybeTaskGroup(
       {required super.id,
       required super.title,
       super.description,
-      super.recurringTaskGroupId,
+      super.taskGroupId,
       this.taskGroup});
 
-  factory TaskWithMaybeRecurringTaskGroup.fromJson(Map<String, dynamic> json) {
+  factory TaskWithMaybeTaskGroup.fromJson(Map<String, dynamic> json) {
     try {
-      return TaskWithMaybeRecurringTaskGroup(
+      return TaskWithMaybeTaskGroup(
           id: json['id'] as int,
           title: json['title'] as String,
           description: json['description'] as String?,
-          recurringTaskGroupId: json['recurringTaskGroupId'] as int?,
-          taskGroup: json['maybeCreatedRecurringTaskGroup'] != null
-              ? TaskGroup.fromJson(json['maybeCreatedRecurringTaskGroup'])
+          taskGroupId: json['taskGroupId'] as int?,
+          taskGroup: json['maybeCreatedTaskGroup'] != null
+              ? TaskGroup.fromJson(json['maybeCreatedTaskGroup'])
               : null);
     } catch (e) {
       throw FormatException(
-          "Failed to parse task with maybe recurring task group: ${e.toString()}");
+          "Failed to parse task with maybe task group: ${e.toString()}");
     }
   }
 }
@@ -60,7 +60,7 @@ Future<Task> createOneOffTask(
             {
               'title': title,
               'description': description,
-              'groupId': userGroupId,
+              'userGroupId': userGroupId,
               'userIds': userIds
             },
           ));
@@ -71,7 +71,7 @@ Future<Task> createOneOffTask(
   return Task.fromJson(taskResponse);
 }
 
-Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
+Future<TaskWithMaybeTaskGroup> createRecurringTask(
     {required String title,
     required String? description,
     required int userGroupId,
@@ -92,7 +92,7 @@ Future<TaskWithMaybeRecurringTaskGroup> createRecurringTask(
     throw Exception("Failed to create task: ${response.statusCode}");
   }
   dynamic taskResponse = jsonDecode(response.body);
-  return TaskWithMaybeRecurringTaskGroup.fromJson(taskResponse);
+  return TaskWithMaybeTaskGroup.fromJson(taskResponse);
 }
 
 Future<void> updateTask({required Task task}) async {
@@ -103,7 +103,7 @@ Future<void> updateTask({required Task task}) async {
             {
               'title': task.title,
               'description': task.description,
-              'taskGroupId': task.recurringTaskGroupId
+              'taskGroupId': task.taskGroupId
             },
           ));
 

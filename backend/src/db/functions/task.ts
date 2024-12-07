@@ -3,17 +3,17 @@ import { db } from '..';
 import {
   SelectTask,
   assignmentTable,
-  taskUserGroupTable,
+  taskUserGroupMappingTable,
   taskTable,
-  recurringTaskGroupTable,
-  SelectRecurringTaskGroup,
+  taskGroupTable,
+  SelectTaskGroup,
 } from '../schema';
 import { OneOffTask, UpdateTask } from 'src/tasks/task.controller';
 import {
   DefaultPostgresInterval,
-  getLongNameFromPostgresInterval,
+  getDescriptiveNameFromPostgresInterval,
 } from 'src/utils/interval';
-import { dbCreateTaskGroup } from './recurring-task-group';
+import { dbCreateTaskGroup } from './task-group';
 import { dbGetUsersOfUserGroup } from './user-group';
 import { getStartOfInterval } from 'src/utils/date';
 
@@ -28,15 +28,18 @@ export async function dbGetAllTasks({
       title: taskTable.title,
       description: taskTable.description,
       createdAt: taskTable.createdAt,
-      recurringTaskGroupId: taskTable.recurringTaskGroupId,
+      taskGroupId: taskTable.taskGroupId,
     })
     .from(taskTable);
   if (userGroupId === undefined) {
     return await query;
   }
   return await query
-    .innerJoin(taskUserGroupTable, eq(taskUserGroupTable.taskId, taskTable.id))
-    .where(eq(taskUserGroupTable.groupId, userGroupId));
+    .innerJoin(
+      taskUserGroupMappingTable,
+      eq(taskUserGroupMappingTable.taskId, taskTable.id),
+    )
+    .where(eq(taskUserGroupMappingTable.userGroupId, userGroupId));
 }
 
 export async function dbGetTaskById(taskId: number) {
@@ -61,37 +64,37 @@ export async function dbCreateRecurringTask({
   userGroupId,
   interval,
 }: CreateRecurringTask): Promise<
-  SelectTask & { maybeCreatedRecurringTaskGroup: SelectRecurringTaskGroup }
+  SelectTask & { maybeCreatedTaskGroup: SelectTaskGroup }
 > {
-  const recurringTaskGroupTitle = getLongNameFromPostgresInterval(interval);
+  const taskGroupTitle = getDescriptiveNameFromPostgresInterval(interval);
 
   const usersOfUserGroup = await dbGetUsersOfUserGroup({ userGroupId });
 
-  const maybeExistingRecurringTaskGroup = (
+  const maybeExistingTaskGroup = (
     await db
       .select()
-      .from(recurringTaskGroupTable)
+      .from(taskGroupTable)
       .where(
         and(
-          eq(recurringTaskGroupTable.interval, interval),
-          eq(recurringTaskGroupTable.userGroupId, userGroupId),
+          eq(taskGroupTable.interval, interval),
+          eq(taskGroupTable.userGroupId, userGroupId),
         ),
       )
       .limit(1)
   )[0];
 
-  const recurringTaskGroup =
-    maybeExistingRecurringTaskGroup === undefined
+  const taskGroupId =
+    maybeExistingTaskGroup === undefined
       ? await dbCreateTaskGroup({
           interval,
-          title: recurringTaskGroupTitle,
+          title: taskGroupTitle,
           userIds: usersOfUserGroup.map(
             (userOfUserGroup) => userOfUserGroup.userId,
           ),
           initialStartDate: getStartOfInterval(interval),
           userGroupId,
         })
-      : maybeExistingRecurringTaskGroup;
+      : maybeExistingTaskGroup;
 
   const task = (
     await db
@@ -99,7 +102,7 @@ export async function dbCreateRecurringTask({
       .values({
         title,
         description,
-        recurringTaskGroupId: recurringTaskGroup.id,
+        taskGroupId: taskGroupId.id,
       })
       .returning()
   )[0];
@@ -109,22 +112,22 @@ export async function dbCreateRecurringTask({
   }
 
   await db
-    .insert(taskUserGroupTable)
-    .values({ taskId: task.id, groupId: userGroupId });
+    .insert(taskUserGroupMappingTable)
+    .values({ taskId: task.id, userGroupId });
   // TODO: this is really bad, this is an impure side effect.
-  // when the frontend creates a recurring task for an interval where no recurring task group exists yet,
-  // we manually create this recurring task group here, but the frontend needs to know about this change, so we will return here and include it in the response
+  // when the frontend creates a recurring task for an interval where no task group exists yet,
+  // we manually create this task group here, but the frontend needs to know about this change, so we will return here and include it in the response
   // we could alternatively just refetch after creating task, but that feels even worse
-  // we could perhaps always have a static list of recurring task groups that always exist, e.g. the default ones, and you cant delete those
+  // we could perhaps always have a static list of task groups that always exist, e.g. the default ones, and you cant delete those
   // yeah now where i think about that thats probably the best idea
-  return { ...task, maybeCreatedRecurringTaskGroup: recurringTaskGroup };
+  return { ...task, maybeCreatedTaskGroup: taskGroupId };
 }
 
 export async function dbDeleteTask({ taskId }: { taskId: number }) {
   await db.delete(assignmentTable).where(eq(assignmentTable.taskId, taskId));
   await db
-    .delete(taskUserGroupTable)
-    .where(eq(taskUserGroupTable.taskId, taskId));
+    .delete(taskUserGroupMappingTable)
+    .where(eq(taskUserGroupMappingTable.taskId, taskId));
   await db.delete(taskTable).where(eq(taskTable.id, taskId));
 }
 
@@ -136,7 +139,7 @@ export async function dbUpdateTask({
 }: UpdateTask & { id: number }) {
   await db
     .update(taskTable)
-    .set({ title, description, recurringTaskGroupId: taskGroupId })
+    .set({ title, description, taskGroupId })
     .where(eq(taskTable.id, id));
 }
 
@@ -144,8 +147,8 @@ export async function dbCreateOneOffTask({
   title,
   description,
   userIds,
-  groupId,
-}: OneOffTask & { groupId: number }) {
+  userGroupId,
+}: OneOffTask & { userGroupId: number }) {
   const tasks = await db
     .insert(taskTable)
     .values({ title, description })
@@ -161,7 +164,9 @@ export async function dbCreateOneOffTask({
       userId,
     };
   });
-  await db.insert(taskUserGroupTable).values({ taskId: task.id, groupId });
+  await db
+    .insert(taskUserGroupMappingTable)
+    .values({ taskId: task.id, userGroupId });
 
   await db.insert(assignmentTable).values(hydratedAssignments);
   return task;

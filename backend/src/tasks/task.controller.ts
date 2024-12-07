@@ -63,7 +63,9 @@ export class TasksController {
   }
 
   @Post('/one-off')
-  async createOneOffTask(@Body() oneOffTask: OneOffTask & { groupId: number }) {
+  async createOneOffTask(
+    @Body() oneOffTask: OneOffTask & { userGroupId: number },
+  ) {
     if (Object.keys(oneOffTask).length === 0) {
       throw new BadRequestException();
     }

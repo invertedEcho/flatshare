@@ -2,7 +2,7 @@ import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import {
   dbDeleteTaskGroup,
   dbGetTaskGroups,
-} from 'src/db/functions/recurring-task-group';
+} from 'src/db/functions/task-group';
 
 export type CreateTaskGroup = {
   title: string;

@@ -13,19 +13,21 @@ import { db } from './db';
 import {
   dbAddUserToUserGroup,
   dbCreateUserGroup,
-  dbGetRecurringTaskGroupsOfUserGroup,
   dbGetUserGroup,
   dbGetUserGroupByInviteCode,
   dbGetUserGroupOfUser,
 } from './db/functions/user-group';
 import {
-  recurringTaskGroupUserTable,
+  taskGroupUserMappingTable,
   userGroupInviteTable,
   userTable,
-  userUserGroupTable,
+  userUserGroupMappingTable,
 } from './db/schema';
 import { generateRandomAlphanumericalCode } from './utils/random';
-import { dbGetHighestAssignmentOrdinalForTaskGroup } from './db/functions/recurring-task-group';
+import {
+  dbGetHighestAssignmentOrdinalForTaskGroup,
+  dbGetTaskGroupsOfUserGroup,
+} from './db/functions/task-group';
 
 @Controller('user-group')
 export class UserGroupController {
@@ -33,8 +35,8 @@ export class UserGroupController {
   async getUserGroupOfUser(@Query('userId') userId: number) {
     const userGroup = await dbGetUserGroupOfUser(userId);
     return {
-      id: userGroup?.user_user_group.groupId ?? null,
-      name: userGroup?.user_group.name ?? null,
+      id: userGroup?.userUserGroupMapping.userGroupId ?? null,
+      name: userGroup?.userGroup.name ?? null,
     };
   }
 
@@ -50,39 +52,41 @@ export class UserGroupController {
       );
     }
 
-    await dbAddUserToUserGroup({ userId, groupId: maybeInviteCode.groupId });
+    await dbAddUserToUserGroup({
+      userId,
+      userGroupId: maybeInviteCode.userGroupId,
+    });
 
-    const recurringTaskGroupsOfUserGroup =
-      await dbGetRecurringTaskGroupsOfUserGroup({
-        userGroupId: maybeInviteCode.groupId,
-      });
+    const taskGroupsOfUserGroup = await dbGetTaskGroupsOfUserGroup({
+      userGroupId: maybeInviteCode.userGroupId,
+    });
 
     const values = await Promise.all(
-      recurringTaskGroupsOfUserGroup.map(async (recurringTaskGroup) => ({
-        recurringTaskGroupId: recurringTaskGroup.id,
-        userId: userId,
+      taskGroupsOfUserGroup.map(async (taskGroup) => ({
+        taskGroupId: taskGroup.id,
+        userId,
         assignmentOrdinal:
           ((await dbGetHighestAssignmentOrdinalForTaskGroup({
-            recurringTaskGroupId: recurringTaskGroup.id,
+            taskGroupId: taskGroup.id,
           })) ?? 0) + 1,
       })),
     );
 
     if (values.length > 0) {
-      await db.insert(recurringTaskGroupUserTable).values(values);
+      await db.insert(taskGroupUserMappingTable).values(values);
     }
 
     const userGroup = await dbGetUserGroup({
-      userGroupId: maybeInviteCode.groupId,
+      userGroupId: maybeInviteCode.userGroupId,
     });
     return userGroup;
   }
 
   @Post('join-by-id')
-  async joinGroupById(@Body() body: { userId: number; groupId: number }) {
-    const { groupId, userId } = body;
-    await dbAddUserToUserGroup({ userId, groupId });
-    return { success: true, groupId };
+  async joinGroupById(@Body() body: { userId: number; userGroupId: number }) {
+    const { userGroupId, userId } = body;
+    await dbAddUserToUserGroup({ userId, userGroupId });
+    return { success: true, userGroupId };
   }
 
   @Post('create')
@@ -91,10 +95,12 @@ export class UserGroupController {
     return (await dbCreateUserGroup({ groupName }))[0];
   }
 
-  @Get('invite-code/:groupId')
-  async generateInviteCode(@Param('groupId') groupId: number) {
+  @Get('invite-code/:userGroupId')
+  async generateInviteCode(@Param('userGroupId') userGroupId: number) {
     const inviteCode = generateRandomAlphanumericalCode(6);
-    await db.insert(userGroupInviteTable).values({ code: inviteCode, groupId });
+    await db
+      .insert(userGroupInviteTable)
+      .values({ code: inviteCode, userGroupId });
 
     return { inviteCode };
   }
@@ -110,9 +116,9 @@ export class UserGroupController {
       })
       .from(userTable)
       .innerJoin(
-        userUserGroupTable,
-        eq(userUserGroupTable.userId, userTable.id),
+        userUserGroupMappingTable,
+        eq(userUserGroupMappingTable.userId, userTable.id),
       )
-      .where(eq(userUserGroupTable.groupId, userGroupId));
+      .where(eq(userUserGroupMappingTable.userGroupId, userGroupId));
   }
 }

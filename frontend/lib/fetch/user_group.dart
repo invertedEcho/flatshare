@@ -88,12 +88,12 @@ Future<UserGroup> createUserGroup({required String userGroupName}) async {
 }
 
 Future<void> joinUserGroupById(
-    {required int userId, required int groupId}) async {
+    {required int userId, required int userGroupId}) async {
   final String apiBaseUrl = getApiBaseUrl();
   final response = await authenticatedClient.post(
       Uri.parse('$apiBaseUrl/user-group/join-by-id'),
-      body:
-          jsonEncode(<String, dynamic>{'userId': userId, 'groupId': groupId}));
+      body: jsonEncode(
+          <String, dynamic>{'userId': userId, 'userGroupId': userGroupId}));
   if (response.statusCode != 201) {
     throw Exception("Failed to join user group: ${response.statusCode}");
   }

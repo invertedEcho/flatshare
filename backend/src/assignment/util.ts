@@ -1,80 +1,76 @@
 import { dbGetAssignmentsForTaskGroup } from 'src/db/functions/assignment';
-import { RecurringTaskGroupToAssign } from 'src/db/functions/recurring-task-group';
+import { TaskGroupToAssign } from 'src/db/functions/task-group';
 import { InsertAssignment } from 'src/db/schema';
 import { getStartOfInterval } from 'src/utils/date';
 
 /**
- * Hydrates recurringTaskGroupsToAssign to "ready-to-insert" assignments.
+ * Hydrates taskGroupsToAssign to "ready-to-insert" assignments.
  *
- * This is done by finding the next responsible user id for each recurring task group.
+ * This is done by finding the next responsible user id for each task group.
  
- * Note that this function queries the database to retrieve the latest assignment for each `recurringTaskGroup`.
+ * Note that this function queries the database to retrieve the latest assignment for each `taskGroup`.
  *
- * @param recurringTaskGroupsToAssign The recurring task groups where assignments need to be created.
+ * @param taskGroupsToAssign The task groups where assignments need to be created.
  */
-export async function hydrateRecurringTaskGroupsToAssignToAssignments(
-  recurringTaskGroupsToAssign: RecurringTaskGroupToAssign[],
+export async function hydrateTaskGroupsToAssignToAssignments(
+  taskGroupsToAssign: TaskGroupToAssign[],
 ): Promise<InsertAssignment[]> {
-  const latestAssignmentUserIdForEachRecurringTaskGroup: {
-    recTaskGroupId: number;
+  const latestAssignmentUserIdForEachTaskGroup: {
+    taskGroupId: number;
     userId: number | undefined;
   }[] = await Promise.all(
-    recurringTaskGroupsToAssign.map(async (rec) => {
+    taskGroupsToAssign.map(async (taskGroupToAssign) => {
       const latestAssignment = (
         await dbGetAssignmentsForTaskGroup({
-          taskGroupId: rec.recurringTaskGroupId,
+          taskGroupId: taskGroupToAssign.taskGroupId,
           limit: 1,
         })
       )[0];
       return {
-        recTaskGroupId: rec.recurringTaskGroupId,
+        taskGroupId: taskGroupToAssign.taskGroupId,
         userId: latestAssignment?.userId,
       };
     }),
   );
 
   const assignmentsToCreate: InsertAssignment[] = [];
-  for (const recurringTaskGroup of recurringTaskGroupsToAssign) {
-    const { recurringTaskGroupId, userIdsOfRecurringTaskGroup } =
-      recurringTaskGroup;
+  for (const taskGroupToAssign of taskGroupsToAssign) {
+    const { taskGroupId, userIdsOfTaskGroup } = taskGroupToAssign;
 
-    const usersOfTaskGroup = userIdsOfRecurringTaskGroup.map(
-      (userId, index) => {
-        const assignmentOrdinal = recurringTaskGroup.assignmentOrdinals[index];
-        if (assignmentOrdinal === undefined) {
-          throw new Error('No assignment ordinal for userId');
-        }
-        return {
-          userId,
-          assignmentOrdinal,
-        };
-      },
-    );
+    const usersOfTaskGroup = userIdsOfTaskGroup.map((userId, index) => {
+      const assignmentOrdinal = taskGroupToAssign.assignmentOrdinals[index];
+      if (assignmentOrdinal === undefined) {
+        throw new Error('No assignment ordinal for userId');
+      }
+      return {
+        userId,
+        assignmentOrdinal,
+      };
+    });
 
     const userIdOfLatestAssignment =
-      latestAssignmentUserIdForEachRecurringTaskGroup.find(
-        (item) => item.recTaskGroupId === recurringTaskGroupId,
+      latestAssignmentUserIdForEachTaskGroup.find(
+        (item) => item.taskGroupId === taskGroupId,
       )?.userId;
 
-    const nextResponsibleUserId =
-      findNextResponsibleUserIdForRecurringTaskGroup(
-        userIdOfLatestAssignment,
-        usersOfTaskGroup,
-      );
+    const nextResponsibleUserId = findNextResponsibleUserIdForTaskGroup(
+      userIdOfLatestAssignment,
+      usersOfTaskGroup,
+    );
 
     if (nextResponsibleUserId === undefined) {
       throw new Error(
-        `Failed to find the next responsible user for the task group ${recurringTaskGroupId}`,
+        `Failed to find the next responsible user for the task group ${taskGroupId}`,
       );
     }
 
-    const taskIds = recurringTaskGroup.taskIds;
+    const taskIds = taskGroupToAssign.taskIds;
     const hydratedAssignments = taskIds.map((taskId) => ({
-      taskId: taskId,
+      taskId,
       userId: nextResponsibleUserId,
-      createdAt: recurringTaskGroup.isInFirstInterval
-        ? recurringTaskGroup.taskGroupInitialStartDate
-        : getStartOfInterval(recurringTaskGroup.interval),
+      createdAt: taskGroupToAssign.isInFirstInterval
+        ? taskGroupToAssign.taskGroupInitialStartDate
+        : getStartOfInterval(taskGroupToAssign.interval),
     }));
 
     assignmentsToCreate.push(...hydratedAssignments);
@@ -83,16 +79,16 @@ export async function hydrateRecurringTaskGroupsToAssignToAssignments(
 }
 
 /**
- * Finds the next responsible user id for a recurring task group.
+ * Finds the next responsible user id for a task group.
  *
- * @param userIdOfLatestAssignment The userId of the latest assignment from a recurring task group.
- * @param usersOfRecurringTaskGroup All users (with their `assignmentOrdinal`) belonging to the recurring task group.
+ * @param userIdOfLatestAssignment The userId of the latest assignment from a task group.
+ * @param usersOfTaskGroup All users (with their `assignmentOrdinal`) belonging to the task group.
  */
-export function findNextResponsibleUserIdForRecurringTaskGroup(
+export function findNextResponsibleUserIdForTaskGroup(
   userIdOfLatestAssignment: number | undefined,
-  usersOfRecurringTaskGroup: { userId: number; assignmentOrdinal: number }[],
+  usersOfTaskGroup: { userId: number; assignmentOrdinal: number }[],
 ) {
-  const usersSortedByAssignmentOrdinal = usersOfRecurringTaskGroup.sort(
+  const usersSortedByAssignmentOrdinal = usersOfTaskGroup.sort(
     (a, b) => a.assignmentOrdinal - b.assignmentOrdinal,
   );
 

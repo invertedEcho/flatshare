@@ -58,7 +58,7 @@ export type InsertUserGroup = typeof userGroupTable.$inferInsert;
 export const userGroupInviteTable = pgTable('user_group_invite', {
   id: serial('id').primaryKey(),
   code: text('code').notNull(),
-  groupId: integer('group_id')
+  userGroupId: integer('user_group_id')
     .references(() => userGroupTable.id)
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -70,38 +70,38 @@ export type InsertUserGroupInvite = typeof userGroupInviteTable.$inferInsert;
  * This association table stores information about which user belong into which groups,
  * in a N-N relation, e.g. a user may be in multiple groups.
  */
-export const userUserGroupTable = pgTable(
-  'user_user_group',
+export const userUserGroupMappingTable = pgTable(
+  'user_user_group_mapping',
   {
     userId: integer('user_id')
       .references(() => userTable.id)
       .notNull(),
-    groupId: integer('group_id')
+    userGroupId: integer('user_group_id')
       .references(() => userGroupTable.id)
       .notNull(),
   },
   (table) => {
     return {
-      pk: primaryKey({ columns: [table.userId, table.groupId] }),
+      pk: primaryKey({ columns: [table.userId, table.userGroupId] }),
     };
   },
 );
-export type SelectUserUserGroup = typeof userUserGroupTable.$inferSelect;
-export type InsertUserUserGroup = typeof userUserGroupTable.$inferInsert;
+export type SelectUserUserGroupMapping =
+  typeof userUserGroupMappingTable.$inferSelect;
+export type InsertUserUserGroupMapping =
+  typeof userUserGroupMappingTable.$inferInsert;
 
 /**
  * This table stores all tasks that exist in the application. Note that these are merely "blueprints"
- * that describe a task that needs to be completed, and are to be used with assignments
+ * that describe a task that needs to be completed, and are to be used with assignments.
  */
 export const taskTable = pgTable('task', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description'),
+  // FIXME: This should not be here -> association table, so a task can be in multiple task groups
+  taskGroupId: integer('task_group_id').references(() => taskGroupTable.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
-  // FIXME: This should not be here -> association table, so a task can be in multiple recurring task groups
-  recurringTaskGroupId: integer('recurring_task_group_id').references(
-    () => recurringTaskGroupTable.id,
-  ),
 });
 export type SelectTask = typeof taskTable.$inferSelect;
 export type InsertTask = typeof taskTable.$inferInsert;
@@ -109,7 +109,7 @@ export type InsertTask = typeof taskTable.$inferInsert;
 /**
  * This table stores information about a collection of tasks. Each interval, an algorithm determines which user's turn it is.
  */
-export const recurringTaskGroupTable = pgTable('recurring_task_group', {
+export const taskGroupTable = pgTable('task_group', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
   description: text('description'),
@@ -120,19 +120,17 @@ export const recurringTaskGroupTable = pgTable('recurring_task_group', {
   userGroupId: integer('user_group_id').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
-export type SelectRecurringTaskGroup =
-  typeof recurringTaskGroupTable.$inferSelect;
-export type InsertRecurringTaskGroup =
-  typeof recurringTaskGroupTable.$inferInsert;
+export type SelectTaskGroup = typeof taskGroupTable.$inferSelect;
+export type InsertTaskGroup = typeof taskGroupTable.$inferInsert;
 
 /**
- * This table stores information about the users that belong to a recurring task group
+ * This table stores information about the users that belong to a task group
  */
-export const recurringTaskGroupUserTable = pgTable(
-  'recurring_task_group_user',
+export const taskGroupUserMappingTable = pgTable(
+  'task_group_user_mapping',
   {
-    recurringTaskGroupId: integer('recurring_task_group_id')
-      .references(() => recurringTaskGroupTable.id)
+    taskGroupId: integer('task_group_id')
+      .references(() => taskGroupTable.id)
       .notNull(),
     userId: integer('user_id')
       .references(() => userTable.id)
@@ -144,19 +142,15 @@ export const recurringTaskGroupUserTable = pgTable(
   (table) => {
     return {
       pk: primaryKey({
-        columns: [
-          table.recurringTaskGroupId,
-          table.userId,
-          table.assignmentOrdinal,
-        ],
+        columns: [table.taskGroupId, table.userId, table.assignmentOrdinal],
       }),
     };
   },
 );
-export type SelectRecurringTaskGroupUser =
-  typeof recurringTaskGroupUserTable.$inferSelect;
-export type InsertRecurringTaskGroupUser =
-  typeof recurringTaskGroupUserTable.$inferInsert;
+export type SelectTaskGroupUserMapping =
+  typeof taskGroupUserMappingTable.$inferSelect;
+export type InsertTaskGroupUserMapping =
+  typeof taskGroupUserMappingTable.$inferInsert;
 
 /**
  * This table stores information about tasks that need to be completed by a specific user
@@ -178,18 +172,20 @@ export type InsertAssignment = typeof assignmentTable.$inferInsert;
 /**
  * This table stores information about which tasks belong to an user group.
  */
-export const taskUserGroupTable = pgTable('task_user_group', {
+export const taskUserGroupMappingTable = pgTable('task_user_group_mapping', {
   id: serial('id').primaryKey(),
   taskId: integer('task_id')
     .references(() => taskTable.id)
     .notNull(),
-  groupId: integer('groupId')
+  userGroupId: integer('user_group_id')
     .references(() => userGroupTable.id)
     .notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
-export type SelectTaskUserGroup = typeof taskUserGroupTable.$inferSelect;
-export type InsertTaskUserGroup = typeof taskUserGroupTable.$inferInsert;
+export type SelectTaskUserGroupMapping =
+  typeof taskUserGroupMappingTable.$inferSelect;
+export type InsertTaskUserGroupMapping =
+  typeof taskUserGroupMappingTable.$inferInsert;
 
 /**
  * This table stores information about shopping list items that belong to an user group.

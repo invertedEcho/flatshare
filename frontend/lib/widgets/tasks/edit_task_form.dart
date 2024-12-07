@@ -47,7 +47,7 @@ class EditTaskFormState extends State<EditTaskForm> {
         taskGroups = result;
         selectTaskGroupController = SingleSelectController<TaskGroup?>(
           result.firstWhereOrNull(
-            (taskGroup) => taskGroup.id == widget.task.recurringTaskGroupId,
+            (taskGroup) => taskGroup.id == widget.task.taskGroupId,
           ),
         );
       });
@@ -108,7 +108,7 @@ class EditTaskFormState extends State<EditTaskForm> {
                         id: task.id,
                         title: titleController.text,
                         description: descriptionController.text,
-                        recurringTaskGroupId: task.recurringTaskGroupId);
+                        taskGroupId: task.taskGroupId);
                     await onUpdateTask(updatedTask);
                     Navigator.pop(context);
                   }

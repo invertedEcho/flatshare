@@ -138,12 +138,12 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
               return [
                 PopupMenuItem(
                     onTap: handleLogout,
-                    child: const Row(children: [
-                      Icon(Icons.logout),
-                      SizedBox(
+                    child: Row(children: [
+                      const Icon(Icons.logout),
+                      const SizedBox(
                         width: 10,
                       ),
-                      Text("Logout"),
+                      Text("Logout (${userProvider.user?.email})"),
                     ])),
                 PopupMenuItem(
                     onTap: handleOpenGenerateInviteCode,

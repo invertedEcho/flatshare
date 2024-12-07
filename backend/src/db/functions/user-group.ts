@@ -1,20 +1,22 @@
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import { db } from '..';
 import {
-  recurringTaskGroupTable,
   userGroupInviteTable,
   userGroupTable,
-  userUserGroupTable,
+  userUserGroupMappingTable,
 } from '../schema';
 
 export async function dbGetUserGroupOfUser(userId: number) {
   const userGroups = await db
-    .select()
-    .from(userUserGroupTable)
-    .where(eq(userUserGroupTable.userId, userId))
+    .select({
+      userGroup: getTableColumns(userGroupTable),
+      userUserGroupMapping: getTableColumns(userUserGroupMappingTable),
+    })
+    .from(userUserGroupMappingTable)
+    .where(eq(userUserGroupMappingTable.userId, userId))
     .innerJoin(
       userGroupTable,
-      eq(userGroupTable.id, userUserGroupTable.groupId),
+      eq(userGroupTable.id, userUserGroupMappingTable.userGroupId),
     )
     .limit(1);
   return userGroups[0];
@@ -31,12 +33,12 @@ export async function dbGetUserGroupByInviteCode(inviteCode: string) {
 
 export async function dbAddUserToUserGroup({
   userId,
-  groupId,
+  userGroupId,
 }: {
   userId: number;
-  groupId: number;
+  userGroupId: number;
 }) {
-  await db.insert(userUserGroupTable).values({ userId, groupId });
+  await db.insert(userUserGroupMappingTable).values({ userId, userGroupId });
 }
 
 export async function dbCreateUserGroup({ groupName }: { groupName: string }) {
@@ -63,17 +65,6 @@ export async function dbGetUsersOfUserGroup({
 }) {
   return await db
     .select()
-    .from(userUserGroupTable)
-    .where(eq(userUserGroupTable.groupId, userGroupId));
-}
-
-export async function dbGetRecurringTaskGroupsOfUserGroup({
-  userGroupId,
-}: {
-  userGroupId: number;
-}) {
-  return await db
-    .select()
-    .from(recurringTaskGroupTable)
-    .where(eq(recurringTaskGroupTable.userGroupId, userGroupId));
+    .from(userUserGroupMappingTable)
+    .where(eq(userUserGroupMappingTable.userGroupId, userGroupId));
 }
