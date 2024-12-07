@@ -28,7 +28,7 @@ class CreateUserGroupState extends State<CreateUserGroup> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       UserGroup userGroup = await createUserGroup(userGroupName: userGroupName);
       await joinUserGroupById(
-          userId: userProvider.user!.userId, groupId: userGroup.id);
+          userId: userProvider.user!.userId, userGroupId: userGroup.id);
       userProvider.setUserGroup(userGroup);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Created group!')),

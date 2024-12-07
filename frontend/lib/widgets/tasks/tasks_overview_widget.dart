@@ -31,7 +31,7 @@ class TasksOverviewWidgetState extends State<TasksOverviewWidget> {
   Widget build(BuildContext context) {
     final tasks = Provider.of<TaskProvider>(context).tasks;
     final oneTimeTasks =
-        tasks.where((task) => task.recurringTaskGroupId == null).toList();
+        tasks.where((task) => task.taskGroupId == null).toList();
     final taskGroups = Provider.of<TaskGroupProvider>(context).taskGroups;
     return Padding(
       padding: const EdgeInsets.all(generalRootPadding),

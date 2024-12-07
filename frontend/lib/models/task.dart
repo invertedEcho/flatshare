@@ -2,13 +2,13 @@ class Task {
   final int id;
   final String title;
   final String? description;
-  final int? recurringTaskGroupId;
+  final int? taskGroupId;
 
   Task(
       {required this.id,
       required this.title,
       this.description,
-      this.recurringTaskGroupId});
+      this.taskGroupId});
 
   factory Task.fromJson(Map<String, dynamic> json) {
     try {
@@ -16,7 +16,7 @@ class Task {
           id: json['id'] as int,
           title: json['title'] as String,
           description: json['description'] as String?,
-          recurringTaskGroupId: json['recurringTaskGroupId'] as int?);
+          taskGroupId: json['taskGroupId'] as int?);
     } catch (e) {
       throw FormatException("Failed to parse task: ${e.toString()}");
     }

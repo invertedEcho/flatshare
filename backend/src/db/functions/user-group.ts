@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import { db } from '..';
 import {
   userGroupInviteTable,
@@ -8,7 +8,10 @@ import {
 
 export async function dbGetUserGroupOfUser(userId: number) {
   const userGroups = await db
-    .select()
+    .select({
+      userGroup: getTableColumns(userGroupTable),
+      userUserGroupMapping: getTableColumns(userUserGroupMappingTable),
+    })
     .from(userUserGroupMappingTable)
     .where(eq(userUserGroupMappingTable.userId, userId))
     .innerJoin(

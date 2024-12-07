@@ -21,9 +21,8 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
   @override
   Widget build(BuildContext context) {
     final tasks = Provider.of<TaskProvider>(context, listen: false).tasks;
-    final currentTaskGroupTasks = tasks
-        .where((task) => task.recurringTaskGroupId == widget.taskGroup.id)
-        .toList();
+    final currentTaskGroupTasks =
+        tasks.where((task) => task.taskGroupId == widget.taskGroup.id).toList();
 
     return Scaffold(
       appBar: AppBar(title: const Text("Tasks:")),

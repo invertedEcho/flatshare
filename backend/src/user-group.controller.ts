@@ -35,8 +35,8 @@ export class UserGroupController {
   async getUserGroupOfUser(@Query('userId') userId: number) {
     const userGroup = await dbGetUserGroupOfUser(userId);
     return {
-      id: userGroup?.user_user_group_mapping.userGroupId ?? null,
-      name: userGroup?.user_group.name ?? null,
+      id: userGroup?.userUserGroupMapping.userGroupId ?? null,
+      name: userGroup?.userGroup.name ?? null,
     };
   }
 

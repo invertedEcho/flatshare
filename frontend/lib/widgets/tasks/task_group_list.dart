@@ -38,8 +38,8 @@ class TaskGroupList extends StatelessWidget {
 
             // Feels stupid to get all tasks just to get the count of tasks in the current task group
             final tasks = Provider.of<TaskProvider>(context).tasks;
-            final tasksInTaskGroup = tasks
-                .where((task) => task.recurringTaskGroupId == taskGroup.id);
+            final tasksInTaskGroup =
+                tasks.where((task) => task.taskGroupId == taskGroup.id);
             final countOfTasksInTaskGroup = tasksInTaskGroup.length;
             return Dismissible(
                 key: Key(taskGroup.id.toString()),

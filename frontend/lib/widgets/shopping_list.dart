@@ -97,12 +97,14 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
 
       socket.on('update-shopping-list-item', (data) {
         var parsedItem = ShoppingListItem.fromJson(data);
-        if (parsedItem.state == 'deleted') return;
+        if (parsedItem.state == 'deleted') {
+          return;
+        }
         var itemsExceptUpdated = shoppingListItems
             .where((item) => item.id != parsedItem.id)
             .toList();
         itemsExceptUpdated.add(parsedItem);
-        itemsExceptUpdated.sort((a, b) => a.id.compareTo(b.id));
+        itemsExceptUpdated.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         setState(() {
           shoppingListItems = itemsExceptUpdated;
         });
