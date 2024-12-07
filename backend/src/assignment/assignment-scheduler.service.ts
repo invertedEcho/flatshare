@@ -16,13 +16,18 @@ export class AssignmentSchedulerService {
       return;
     }
 
-    const assignmentsToCreate =
-      await hydrateTaskGroupsToAssignToAssignments(taskGroupsToAssign);
+    const assignmentsToCreate = await hydrateTaskGroupsToAssignToAssignments(
+      taskGroupsToAssign,
+    );
 
     if (assignmentsToCreate.length > 0) {
       await dbInsertAssignments({ assignments: assignmentsToCreate });
       console.info(
-        `Created new assignments: ${JSON.stringify(assignmentsToCreate, null, 2)}`,
+        `Created new assignments: ${JSON.stringify(
+          assignmentsToCreate,
+          null,
+          2,
+        )}`,
       );
     }
   }
