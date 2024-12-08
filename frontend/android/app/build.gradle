@@ -31,7 +31,10 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.invertedecho.flatshare"
-    compileSdk = flutter.compileSdkVersion
+
+    // we override these values to ensure compatiblity with the nix flake
+    // not optimal to do it this way, because not everyone uses the nix flake
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -41,12 +44,18 @@ android {
 
     defaultConfig {
         applicationId = "com.invertedecho.flatshare"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
+
+	// we override these values to ensure compatiblity with the nix flake
+	// not optimal to do it this way, because not everyone uses the nix flake
+        minSdk = 34
+        targetSdk = 34
+
+	// TODO: this seems to do nothing right now :(
+	// so we still install build tools version 30.0.3 in our nix flake
+	// also dont want to spend too much time for this
+	buildToolsVersion = 34
     }
 
     signingConfigs {
