@@ -1,18 +1,50 @@
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatshare/authenticated_navigation.dart';
 import 'package:flatshare/fetch/authenticated_client.dart';
+import 'package:flatshare/notifications/android.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/unauthenticated_navigation.dart';
 import 'package:flatshare/widgets/screens/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'firebase_options.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
+  if (Platform.isAndroid || Platform.isIOS) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    // TODO: do something if user denied notifications.
+    // TODO: also, allow for disabling notifications in app. not everyone knows about
+    // internal notification settings in android itself.
+    print(settings.authorizationStatus);
+
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    print(await messaging.getToken());
+  }
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),

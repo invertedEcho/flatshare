@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "engines": {
-    "pnpm": "~9"
+    "pnpm": "9.9.0"
   },
   "scripts": {
     "build": "nest build",
@@ -34,6 +34,7 @@
     "@nestjs/serve-static": "4.0.2",
     "bcrypt": "5.1.1",
     "drizzle-orm": "0.37.0",
+    "firebase": "11.0.2",
     "pg": "8.11.5",
     "postgres": "3.4.4",
     "reflect-metadata": "0.2.0",

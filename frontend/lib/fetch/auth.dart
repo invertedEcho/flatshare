@@ -19,6 +19,7 @@ Future<String> login(String email, String password) async {
       'password': password,
     }),
   );
+  print(apiBaseUrl);
 
   switch (response.statusCode) {
     case 200:

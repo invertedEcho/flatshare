@@ -6,6 +6,7 @@ import { dbGetTaskGroupsToAssignForCurrentInterval } from 'src/db/functions/task
 
 @Injectable()
 export class AssignmentSchedulerService {
+  // TODO: optimally, this is not run this often, but just once in a day, and on task creation we immediately create assignments as needed.
   @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCreateAssignmentsCron() {
     const taskGroupsToAssign = await dbGetTaskGroupsToAssignForCurrentInterval({
