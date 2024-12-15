@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatshare/const.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
@@ -83,6 +84,36 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
     context.go('/login');
   }
 
+  void handleSubscribeToNotifications() async {
+    if (userGroupId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'It does not seem like you are in a group, cant subscribe to notifications')));
+      return;
+    }
+
+    final topicName = 'assignments-$userGroupId';
+
+    await FirebaseMessaging.instance.subscribeToTopic(topicName);
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Succesfully subscribed to topic: $topicName')));
+  }
+
+  void handleUnsubscribeToNotifications() async {
+    if (userGroupId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'It does not seem like you are in a group, cant subscribe to notifications')));
+      return;
+    }
+
+    final topicName = 'assignments-$userGroupId';
+
+    await FirebaseMessaging.instance.unsubscribeFromTopic(topicName);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Succesfully unsubscribed to topic: $topicName')));
+  }
+
   void handleOpenGenerateInviteCode() async {
     if (userGroupId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -154,6 +185,20 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                           width: 10,
                         ),
                         Text("Invite new user to your group")
+                      ],
+                    )),
+                PopupMenuItem(
+                    onTap: handleSubscribeToNotifications,
+                    child: const Row(
+                      children: [
+                        Text("Subscribe to notifications for your user group")
+                      ],
+                    )),
+                PopupMenuItem(
+                    onTap: handleUnsubscribeToNotifications,
+                    child: const Row(
+                      children: [
+                        Text("Unsubscribe to notifications for your user group")
                       ],
                     ))
               ];

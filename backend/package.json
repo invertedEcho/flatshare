@@ -34,7 +34,7 @@
     "@nestjs/serve-static": "4.0.2",
     "bcrypt": "5.1.1",
     "drizzle-orm": "0.37.0",
-    "firebase": "11.0.2",
+    "firebase-admin": "^13.0.1",
     "pg": "8.11.5",
     "postgres": "3.4.4",
     "reflect-metadata": "0.2.0",
