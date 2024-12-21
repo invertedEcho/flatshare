@@ -34,6 +34,10 @@ export class AssignmentSchedulerService {
         )}`,
       );
 
+      if (process.env.CI === 'true') {
+        return;
+      }
+
       const userIds = assignmentsToCreate.map(
         (assignment) => assignment.userId,
       );
