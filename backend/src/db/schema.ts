@@ -199,3 +199,24 @@ export const shoppingListItemTable = pgTable('shopping_list_item', {
   state: shoppingListItemStateEnum('state').notNull().default('pending'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
+
+// 1. on app startup, send token to server
+// 2. if token/userid combination already exists, timestamp needs to be updated
+// 3. cleanup job -> if token (created_at) older than 270 days (following firebase best-practice docs) we should delete it
+
+/**
+ * This table stores FCM (Firebase Cloud Messaging) registration tokens for users.
+ * Note that we allow multiple fcm registration tokens to exist per user,
+ * as they may be logged in on multiple devices, and we still would want to
+ */
+export const userFcmRegistrationTokenMappingTable = pgTable(
+  'user_fcm_registration_token_mapping',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .references(() => userTable.id)
+      .notNull(),
+    fcmRegistrationToken: text('fcm_registration_token').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+);
