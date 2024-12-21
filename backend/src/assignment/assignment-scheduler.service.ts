@@ -3,6 +3,9 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { dbInsertAssignments } from 'src/db/functions/assignment';
 import { hydrateTaskGroupsToAssignToAssignments } from './util';
 import { dbGetTaskGroupsToAssignForCurrentInterval } from 'src/db/functions/task-group';
+import { dbGetFCMRegistrationTokensByUserIds } from 'src/db/functions/notification';
+import { sendFirebaseMessages } from 'src/notifications/notification';
+import { Message } from 'firebase-admin/messaging';
 
 @Injectable()
 export class AssignmentSchedulerService {
@@ -30,6 +33,22 @@ export class AssignmentSchedulerService {
           2,
         )}`,
       );
+
+      const userIds = assignmentsToCreate.map(
+        (assignment) => assignment.userId,
+      );
+      const tokens = await dbGetFCMRegistrationTokensByUserIds(userIds);
+      const messages = tokens.map((token) => {
+        return {
+          token,
+          notification: {
+            title: '🚀 New Task Assigned!',
+            body: "You have a new assignment waiting for you! Click to learn more. Let's get it done!",
+          },
+        } satisfies Message;
+      });
+      await sendFirebaseMessages({ messages });
+      console.log({ loc: 'Sent firebase messages', messages });
     }
   }
 }
