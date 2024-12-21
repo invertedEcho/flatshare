@@ -5,6 +5,9 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixpkgs.url = "github:NixOS/nixpkgs";
 
+    # pnpm 9.15.1
+    nixpkgs-pnpm.url = "github:NixOS/nixpkgs/3f5c1fc2affdb6c70b44ca624b4710843b7e3059";
+
     # gradle v7.6.3
     nixpkgs-gradle.url = "github:NixOS/nixpkgs/68bb040a9617ec704cb453cc921f7516d5b36cae";
     # jdk19
@@ -14,6 +17,7 @@
   outputs = {
     self,
     nixpkgs,
+    nixpkgs-pnpm,
     nixpkgs-gradle,
     nixpkgs-jdk,
     flake-utils,
@@ -29,6 +33,7 @@
         };
         pkgs-gradle = import nixpkgs-gradle {inherit system;};
         pkgs-jdk = import nixpkgs-jdk {inherit system;};
+        pkgs-pnpm = import nixpkgs-pnpm {inherit system;};
 
         androidEnv = pkgs.androidenv.override {licenseAccepted = true;};
 
@@ -61,6 +66,7 @@
               pcre2
               pkg-config
               firebase-tools
+              pkgs-pnpm.pnpm
             ];
             CMAKE_PREFIX_PATH = "${pkgs.lib.makeLibraryPath [libsecret.dev gtk3.dev]}";
 
