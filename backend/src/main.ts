@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 import firebaseAdmin from 'firebase-admin';
-import { applicationDefault } from 'firebase-admin/app';
-import { getMessaging } from 'firebase-admin/messaging';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,8 +9,20 @@ async function bootstrap() {
   app.enableCors();
   await app.listen(3000, '0.0.0.0');
 
-  const firebaseApp = firebaseAdmin.initializeApp({
-    credential: applicationDefault(),
+  const firebaseServiceAccountJsonContent =
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON_CONTENT;
+
+  // TODO: should probably do the same for all other environment variables too.
+  if (firebaseServiceAccountJsonContent === undefined) {
+    throw new Error(
+      'FIREBASE_SERVICE_ACCOUNT_JSON_CONTENT environment variable must be set.',
+    );
+  }
+
+  firebaseAdmin.initializeApp({
+    credential: firebaseAdmin.credential.cert(
+      JSON.parse(firebaseServiceAccountJsonContent),
+    ),
   });
 
   const appUrl = await app.getUrl();

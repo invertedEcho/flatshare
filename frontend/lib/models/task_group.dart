@@ -11,23 +11,12 @@ class TaskGroup {
     required this.interval,
   });
 
-  factory TaskGroup.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'title': String title,
-        'description': String? description,
-        'interval': String interval,
-      } =>
-        TaskGroup(
-          id: id,
-          title: title,
-          description: description,
-          interval: interval,
-        ),
-      _ => throw const FormatException("Failed to parse task groups.")
-    };
-  }
+  TaskGroup.fromJson(Map<String, dynamic> json)
+      : id = json['id'] as int,
+        title = json['title'] as String,
+        description = json['description'] as String?,
+        interval = json['interval'] as String;
+
   @override
   String toString() {
     return title;

@@ -27,7 +27,7 @@ Future main() async {
     );
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    NotificationSettings settings = await messaging.requestPermission(
+    await messaging.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -37,13 +37,7 @@ Future main() async {
       sound: true,
     );
 
-    // TODO: do something if user denied notifications.
-    // TODO: also, allow for disabling notifications in app. not everyone knows about
-    // internal notification settings in android itself.
-    print(settings.authorizationStatus);
-
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-    print(await messaging.getToken());
   }
   runApp(MultiProvider(
     providers: [

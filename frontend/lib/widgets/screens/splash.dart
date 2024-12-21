@@ -22,7 +22,7 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    userInfoFuture = getUserInfo();
+    userInfoFuture = fetchProfileAndUserGroup();
   }
 
   @override

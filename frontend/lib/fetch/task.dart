@@ -2,37 +2,9 @@ import 'dart:convert';
 
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/task.dart';
-import 'package:flatshare/models/task_group.dart';
+import 'package:flatshare/models/task_with_maybe_task_group.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
-
-// TODO: https://github.com/invertedEcho/flatshare/issues/121
-class TaskWithMaybeTaskGroup extends Task {
-  TaskGroup? taskGroup;
-
-  TaskWithMaybeTaskGroup(
-      {required super.id,
-      required super.title,
-      super.description,
-      super.taskGroupId,
-      this.taskGroup});
-
-  factory TaskWithMaybeTaskGroup.fromJson(Map<String, dynamic> json) {
-    try {
-      return TaskWithMaybeTaskGroup(
-          id: json['id'] as int,
-          title: json['title'] as String,
-          description: json['description'] as String?,
-          taskGroupId: json['taskGroupId'] as int?,
-          taskGroup: json['maybeCreatedTaskGroup'] != null
-              ? TaskGroup.fromJson(json['maybeCreatedTaskGroup'])
-              : null);
-    } catch (e) {
-      throw FormatException(
-          "Failed to parse task with maybe task group: ${e.toString()}");
-    }
-  }
-}
 
 Future<List<Task>> fetchTasks({required int userGroupId}) async {
   var apiBaseUrl = getApiBaseUrl();

@@ -1,5 +1,4 @@
 import 'package:flatshare/fetch/auth.dart';
-import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
@@ -38,21 +37,34 @@ class LoginFormState extends State<LoginForm> {
     try {
       String email = emailController.text;
       String password = passwordController.text;
+      print("calling login fetch");
       var accessToken = await login(
         email,
         password,
       );
+      print("called login fetch");
+      print("Writing into storage");
       await storage.write(key: 'jwt-token', value: accessToken);
+      print("Wrote into storage");
 
       if (!mounted) return;
 
-      User user = await getProfile();
+      print("Getting user info");
+      (User?, UserGroup?) userInfo = await fetchProfileAndUserGroup();
+      User? user = userInfo.$1;
+      print("Got user info.");
 
-      UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Failed to get user information directly after logging in. Very weird...')));
+        return;
+      }
 
       var userProvider = Provider.of<UserProvider>(context, listen: false);
 
       userProvider.setUser(user);
+      UserGroup? userGroup = userInfo.$2;
 
       if (userGroup != null) {
         userProvider.setUserGroup(userGroup);

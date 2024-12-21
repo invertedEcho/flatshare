@@ -212,11 +212,18 @@ export const shoppingListItemTable = pgTable('shopping_list_item', {
 export const userFcmRegistrationTokenMappingTable = pgTable(
   'user_fcm_registration_token_mapping',
   {
-    id: serial('id').primaryKey(),
     userId: integer('user_id')
       .references(() => userTable.id)
       .notNull(),
     fcmRegistrationToken: text('fcm_registration_token').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({
+        columns: [table.userId, table.fcmRegistrationToken],
+      }),
+    };
   },
 );

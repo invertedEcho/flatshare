@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flatshare/fetch/notification.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
@@ -19,7 +21,6 @@ Future<String> login(String email, String password) async {
       'password': password,
     }),
   );
-  print(apiBaseUrl);
 
   switch (response.statusCode) {
     case 200:
@@ -56,19 +57,28 @@ Future<void> register(
   }
 }
 
-Future<User> getProfile() async {
+Future<User?> fetchProfile() async {
   var apiBaseUrl = getApiBaseUrl();
   var profileRes =
       await authenticatedClient.get(Uri.parse('$apiBaseUrl/auth/profile'));
+  if (profileRes.statusCode == 401) {
+    return null;
+  }
   return User.fromJson(jsonDecode(profileRes.body));
 }
 
-Future<(User?, UserGroup?)> getUserInfo() async {
+Future<(User?, UserGroup?)> fetchProfileAndUserGroup() async {
   try {
-    User userProfile = await getProfile();
-    UserGroup? userGroup =
-        await fetchUserGroupForUser(userId: userProfile.userId);
-    return (userProfile, userGroup);
+    User? user = await fetchProfile();
+    if (user == null) {
+      return (null, null);
+    }
+    UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
+    String? registrationToken = await FirebaseMessaging.instance.getToken();
+    if (registrationToken != null) {
+      await sendFCMToken(user.userId, registrationToken);
+    } else {}
+    return (user, userGroup);
   } catch (err) {
     return (null, null);
   }

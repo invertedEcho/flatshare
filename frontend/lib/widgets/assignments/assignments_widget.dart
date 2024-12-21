@@ -30,13 +30,13 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     currentUserId = userProvider.user?.userId;
     UserGroup? userGroup = userProvider.userGroup;
-    final userGroupId = userGroup?.id;
+    final groupId = userGroup?.id;
 
-    if (userGroupId == null) {
+    if (groupId == null) {
       throw Exception("userGroupId is null.");
     }
 
-    _assignmentsFuture = fetchAssignments(userGroupId: userGroupId);
+    _assignmentsFuture = fetchAssignments(userGroupId: groupId);
   }
 
   Future<void> updateAssignment(Assignment assignment) async {
