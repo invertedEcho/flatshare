@@ -70,6 +70,6 @@ jobs:
 
       - name: Run tests
         run: |
-          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.test
+          echo DATABASE_URL=${{ secrets.DATABASE_URL }} >> .env.test && echo FIREBASE_SERVICE_ACCOUNT_JSON_CONTENT=${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON_CONTENT }} >> .env.test
           pnpm test
         working-directory: ./backend
