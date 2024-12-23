@@ -1,3 +1,18 @@
+## frontend setup
+
+- setup environment variables
+
+```bash
+# adjust the values as needed.
+cp .env.example .env
+```
+
+- run it
+
+```bash
+flutter run
+```
+
 ## Signing the android app
 
 Create `key.properties` inside the `android/` folder.

@@ -1,69 +1,75 @@
-# Flatshare
+# 🏠 Flatshare
 
-This mobile app allows you to easily track all what you need in your shared apartment with ease and no useless features.
+Simplify living in a shared apartment!
+**Flatshare** helps you manage tasks, shopping lists, and more—effortlessly and without clutter.
 
-## Installing
+It's **completely free**, **open source**, with **no ads** and **non-intrusive to your privacy**.
 
-- IOS: https://testflight.apple.com/join/evmP9jag
-- Android: Install the latest apk from the [release](https://github.com/invertedEcho/flatshare/releases) tab
+<p align="center">
+  <img src="screenshots/assignments_tab.jpeg" alt="Assignments Tab" width="30%">
+  <img src="screenshots/tasks_tab.jpeg" alt="Tasks Tab" width="30%">
+  <img src="screenshots/shopping_list_tab.jpeg" alt="Shopping List Tab" width="30%">
+</p>
 
-## dev setup
+---
 
-- Install all dependencies for backend
+## 🌟 Key Features
 
-```bash
-cd backend && pnpm i
-```
+✔️ **Recurring & One-Off Tasks**
+- Set recurring tasks that auto-assign to group members daily, weekly, or monthly.
+- Manage one-time assignments effortlessly.
 
-- setup environment variables
+✔️ **Real-Time Shopping List**
+- A shared shopping list updated instantly for everyone in your group.
 
-```bash
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-# adjust the values as needed.
-```
+✔️ **User Group Management**
+- Create or join groups.
+- Invite others via an easy-to-share invite code or link.
 
-- setup database
+✔️ **Task Notifications**
+- Get notified when you are assigned a new task.
 
-```bash
-# you will of course have to install docker beforehand
-docker compose up -d
-```
+---
 
-- start the apps
+## 📥 Installation
 
-```bash
-cd backend && pnpm dev
-cd frontend && flutter run
-```
+> [!NOTE]
+> Flatshare will soon be published on the App Store and the Google Play store
 
-## tests
+### iOS
+Download via [TestFlight](https://testflight.apple.com/join/evmP9jag).
 
-the tests are currently mainly focused around the database functions used in the assignment scheduler.
+### Android
+Get the latest APK from the [Releases](https://github.com/invertedEcho/flatshare/releases) tab.
 
-as you probably dont want to run the tests against your main database, the tests are setup to run via a different .env file, e.g. `.env.test`
+---
 
-- setup .env.test:
+## 🚀 Coming Soon
 
-  ```bash
-  touch .env.test
+💡 **Multiple User Groups**
+- Seamlessly manage multiple shared apartments or groups.
 
-  # content 
-  DB_PASSWORD=postgres://***
-  ```
+💡 **Vacation Mode**
+- Mark users as "on vacation" to adjust task assignments accordingly.
 
-- run the tests:
+💡 **Expense Tracker**
+- Keep tabs on shared expenses with an integrated shopping list tracker.
 
-  ```bash
-  pnpm test
-  # or pnpm test:watch for "hot-reloaded" tests
-  ```
+---
 
-## The Stack:
+## 🛠️ Tech Stack
 
-- Backend:
-  - NestJS
-  - drizzle (ORM)
+**Backend:**
+- 🚀 [pnpm](https://pnpm.io/)
+- 🌐 [NestJS](https://nestjs.com/)
+- ⚡ [drizzle](https://orm.drizzle.team/)
 
-- Frontend:
-  - flutter
+**Frontend:**
+- 📱 [Flutter](https://flutter.dev/)
+
+---
+
+## 📝 Development Setup
+
+- **Backend Setup:** Check the [backend/README.md](backend/README.md) for detailed setup instructions for the backend.
+- **Frontend Setup:** Check the [frontend/README.md](frontend/README.md) for detailed setup instructions for the frontend.
