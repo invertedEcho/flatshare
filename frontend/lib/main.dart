@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatshare/authenticated_navigation.dart';
 import 'package:flatshare/fetch/authenticated_client.dart';
 import 'package:flatshare/notifications/android.dart';
+import 'package:flatshare/notifications/util.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/providers/user.dart';
@@ -20,7 +21,7 @@ import 'firebase_options.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
-  if (Platform.isAndroid || Platform.isIOS) {
+  if (getIsSupportedPlatformFirebase()) {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

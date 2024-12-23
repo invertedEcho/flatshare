@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatshare/fetch/notification.dart';
@@ -6,6 +7,7 @@ import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
+import 'package:flatshare/notifications/util.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:http/http.dart' as http;
 
@@ -74,12 +76,16 @@ Future<(User?, UserGroup?)> fetchProfileAndUserGroup() async {
       return (null, null);
     }
     UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
-    String? registrationToken = await FirebaseMessaging.instance.getToken();
-    if (registrationToken != null) {
-      await sendFCMToken(user.userId, registrationToken);
-    } else {}
+
+    if (getIsSupportedPlatformFirebase()) {
+      String? registrationToken = await FirebaseMessaging.instance.getToken();
+      if (registrationToken != null) {
+        await sendFCMToken(user.userId, registrationToken);
+      }
+    }
     return (user, userGroup);
   } catch (err) {
+    print(err);
     return (null, null);
   }
 }

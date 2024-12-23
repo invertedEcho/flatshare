@@ -37,22 +37,16 @@ class LoginFormState extends State<LoginForm> {
     try {
       String email = emailController.text;
       String password = passwordController.text;
-      print("calling login fetch");
       var accessToken = await login(
         email,
         password,
       );
-      print("called login fetch");
-      print("Writing into storage");
       await storage.write(key: 'jwt-token', value: accessToken);
-      print("Wrote into storage");
 
       if (!mounted) return;
 
-      print("Getting user info");
       (User?, UserGroup?) userInfo = await fetchProfileAndUserGroup();
       User? user = userInfo.$1;
-      print("Got user info.");
 
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
