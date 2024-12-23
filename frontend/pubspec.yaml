@@ -1,9 +1,9 @@
 name: flatshare
-description: "Track everything you need in your shared apartment with ease"
+description: "Flatshare: A free, open-source mobile app to manage tasks, shopping lists, and more for shared living spaces—no ads, no privacy invasions."
 
 publish_to: 'none'
 
-version: 1.2.0
+version: 2.0.0
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
