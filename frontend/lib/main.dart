@@ -1,18 +1,43 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatshare/authenticated_navigation.dart';
 import 'package:flatshare/fetch/authenticated_client.dart';
+import 'package:flatshare/notifications/handler.dart';
+import 'package:flatshare/notifications/util.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/unauthenticated_navigation.dart';
 import 'package:flatshare/widgets/screens/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'firebase_options.dart';
 
 Future main() async {
   await dotenv.load(fileName: '.env');
+  if (getIsSupportedPlatformFirebase()) {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  }
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => UserProvider()),

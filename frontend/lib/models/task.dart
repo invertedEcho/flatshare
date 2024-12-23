@@ -10,17 +10,11 @@ class Task {
       this.description,
       this.taskGroupId});
 
-  factory Task.fromJson(Map<String, dynamic> json) {
-    try {
-      return Task(
-          id: json['id'] as int,
-          title: json['title'] as String,
-          description: json['description'] as String?,
-          taskGroupId: json['taskGroupId'] as int?);
-    } catch (e) {
-      throw FormatException("Failed to parse task: ${e.toString()}");
-    }
-  }
+  Task.fromJson(Map<String, dynamic> json)
+      : id = json['id'] as int,
+        title = json['title'] as String,
+        description = json['description'] as String?,
+        taskGroupId = json['taskGroupId'] as int?;
 }
 
 enum TaskType { oneOff, recurring }

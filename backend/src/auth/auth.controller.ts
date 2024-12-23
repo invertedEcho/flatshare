@@ -15,7 +15,6 @@ import { userTable } from 'src/db/schema';
 import { AuthService } from './auth.service';
 import {
   dbAddUserToUserGroup,
-  dbGetUserGroupOfUser,
   dbGetUserGroupByInviteCode,
 } from 'src/db/functions/user-group';
 import { eq } from 'drizzle-orm';
@@ -115,13 +114,8 @@ export class AuthController {
         'The access token seemed valid, but the user id included in the jwt token could not be found in the database.',
       );
     }
-    const userGroup = await dbGetUserGroupOfUser(req.user.sub);
     return {
       userId: req.user.sub,
-      userGroup: {
-        id: userGroup?.userGroup.name,
-        name: userGroup?.userGroup.name,
-      },
       email: user.email,
       username: user.username,
     };

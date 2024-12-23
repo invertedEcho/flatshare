@@ -1,5 +1,4 @@
 import 'package:flatshare/fetch/auth.dart';
-import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/main.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
@@ -46,13 +45,20 @@ class LoginFormState extends State<LoginForm> {
 
       if (!mounted) return;
 
-      User user = await getProfile();
+      (User?, UserGroup?) userInfo = await fetchProfileAndUserGroup();
+      User? user = userInfo.$1;
 
-      UserGroup? userGroup = await fetchUserGroupForUser(userId: user.userId);
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                'Failed to get user information directly after logging in. Very weird...')));
+        return;
+      }
 
       var userProvider = Provider.of<UserProvider>(context, listen: false);
 
       userProvider.setUser(user);
+      UserGroup? userGroup = userInfo.$2;
 
       if (userGroup != null) {
         userProvider.setUserGroup(userGroup);

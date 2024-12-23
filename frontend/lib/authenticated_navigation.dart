@@ -155,7 +155,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                         ),
                         Text("Invite new user to your group")
                       ],
-                    ))
+                    )),
               ];
             })
           ],

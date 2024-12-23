@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "66431485841",
+    "project_id": "flatshare-223fd",
+    "storage_bucket": "flatshare-223fd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:66431485841:android:f9a7a5dd12273c2f0fbc30",
+        "android_client_info": {
+          "package_name": "com.invertedecho.flatshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBak-z8ENI9BDldZAwlcvNTSMpn5AGJuL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,10 +3,14 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { dbInsertAssignments } from 'src/db/functions/assignment';
 import { hydrateTaskGroupsToAssignToAssignments } from './util';
 import { dbGetTaskGroupsToAssignForCurrentInterval } from 'src/db/functions/task-group';
+import { dbGetFCMRegistrationTokensByUserIds } from 'src/db/functions/notification';
+import { sendFirebaseMessages } from 'src/notifications/notification';
+import { Message } from 'firebase-admin/messaging';
 
 @Injectable()
 export class AssignmentSchedulerService {
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  // TODO: optimally, this is not run this often, but just once in a day, and on task creation we immediately create assignments as needed.
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCreateAssignmentsCron() {
     const taskGroupsToAssign = await dbGetTaskGroupsToAssignForCurrentInterval({
       overrideNow: undefined,
@@ -29,6 +33,25 @@ export class AssignmentSchedulerService {
           2,
         )}`,
       );
+
+      if (process.env.CI === 'true') {
+        return;
+      }
+
+      const userIds = assignmentsToCreate.map(
+        (assignment) => assignment.userId,
+      );
+      const tokens = await dbGetFCMRegistrationTokensByUserIds(userIds);
+      const messages = tokens.map((token) => {
+        return {
+          token,
+          notification: {
+            title: '🚀 New Assignments Waiting!',
+            body: "You have new assignments waiting for you! Click to learn more. Let's get them done!",
+          },
+        } satisfies Message;
+      });
+      await sendFirebaseMessages({ messages });
     }
   }
 }

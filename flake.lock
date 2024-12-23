@@ -20,11 +20,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1733588544,
-        "narHash": "sha256-FCE/q0JA3VYtrtKy+fFxwxu1EB6HektN8LLewsDm5yg=",
+        "lastModified": 1734797770,
+        "narHash": "sha256-a5imzZoh5h3Dhnum9+zSQb2QUWdSPO1+qwxBNuO6YPg=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "b5879c104e9e424af2c6153870c84ef22a9804e2",
+        "rev": "48b8a5d743cb569ddd71b2ad31eef12b7139d0d0",
         "type": "github"
       },
       "original": {
@@ -65,12 +65,29 @@
         "type": "github"
       }
     },
+    "nixpkgs-pnpm": {
+      "locked": {
+        "lastModified": 1734795326,
+        "narHash": "sha256-hY5UNECd6xXimwZoamTyP0hb1Jq21tc2xk2I8k7z9U4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3f5c1fc2affdb6c70b44ca624b4710843b7e3059",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3f5c1fc2affdb6c70b44ca624b4710843b7e3059",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "nixpkgs-gradle": "nixpkgs-gradle",
-        "nixpkgs-jdk": "nixpkgs-jdk"
+        "nixpkgs-jdk": "nixpkgs-jdk",
+        "nixpkgs-pnpm": "nixpkgs-pnpm"
       }
     },
     "systems": {

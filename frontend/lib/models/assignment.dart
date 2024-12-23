@@ -1,3 +1,6 @@
+// TODO: this model seems to have way too many properties...
+// for example, the task group title really doesnt have to be in here, we also store task groups.
+
 class Assignment {
   final int id;
   final String title;
@@ -25,23 +28,20 @@ class Assignment {
     this.dueDate,
   });
 
-  factory Assignment.fromJson(Map<String, dynamic> json) {
-    return Assignment(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      isCompleted: json['isCompleted'] as bool,
-      assigneeId: json['assigneeId'] as int,
-      assigneeName: json['assigneeName'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      isOneOff: json['isOneOff'] as bool,
-      description: json['description'] as String?,
-      dueDate: json['dueDate'] != null
-          ? DateTime.parse(json['dueDate'] as String)
-          : null,
-      taskGroupId: json['taskGroupId'] as int?,
-      taskGroupTitle: json['taskGroupTitle'] as String?,
-    );
-  }
+  Assignment.fromJson(Map<String, dynamic> json)
+      : id = json['id'] as int,
+        title = json['title'] as String,
+        isCompleted = json['isCompleted'] as bool,
+        assigneeId = json['assigneeId'] as int,
+        assigneeName = json['assigneeName'] as String,
+        createdAt = DateTime.parse(json['createdAt'] as String),
+        isOneOff = json['isOneOff'] as bool,
+        description = json['description'] as String?,
+        dueDate = json['dueDate'] != null
+            ? DateTime.parse(json['dueDate'] as String)
+            : null,
+        taskGroupId = json['taskGroupId'] as int?,
+        taskGroupTitle = json['taskGroupTitle'] as String?;
 
   @override
   String toString() {
