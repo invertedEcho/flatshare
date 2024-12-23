@@ -52,7 +52,6 @@ export class AssignmentSchedulerService {
         } satisfies Message;
       });
       await sendFirebaseMessages({ messages });
-      console.log({ loc: 'Sent firebase messages', messages });
     }
   }
 }

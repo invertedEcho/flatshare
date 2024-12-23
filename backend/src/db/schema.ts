@@ -200,10 +200,6 @@ export const shoppingListItemTable = pgTable('shopping_list_item', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-// 1. on app startup, send token to server
-// 2. if token/userid combination already exists, timestamp needs to be updated
-// 3. cleanup job -> if token (created_at) older than 270 days (following firebase best-practice docs) we should delete it
-
 /**
  * This table stores FCM (Firebase Cloud Messaging) registration tokens for users.
  * Note that we allow multiple fcm registration tokens to exist per user,

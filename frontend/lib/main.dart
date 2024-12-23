@@ -1,10 +1,8 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flatshare/authenticated_navigation.dart';
 import 'package:flatshare/fetch/authenticated_client.dart';
-import 'package:flatshare/notifications/android.dart';
+import 'package:flatshare/notifications/handler.dart';
 import 'package:flatshare/notifications/util.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';

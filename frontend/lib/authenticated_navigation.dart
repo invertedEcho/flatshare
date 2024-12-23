@@ -156,20 +156,6 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                         Text("Invite new user to your group")
                       ],
                     )),
-                // PopupMenuItem(
-                //     onTap: handleSubscribeToNotifications,
-                //     child: const Row(
-                //       children: [
-                //         Text("Subscribe to notifications for your user group")
-                //       ],
-                //     )),
-                // PopupMenuItem(
-                //     onTap: handleUnsubscribeToNotifications,
-                //     child: const Row(
-                //       children: [
-                //         Text("Unsubscribe to notifications for your user group")
-                //       ],
-                //     ))
               ];
             })
           ],
