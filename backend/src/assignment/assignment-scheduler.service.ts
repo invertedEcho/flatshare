@@ -46,8 +46,8 @@ export class AssignmentSchedulerService {
         return {
           token,
           notification: {
-            title: '🚀 New Task Assigned!',
-            body: "You have a new assignment waiting for you! Click to learn more. Let's get it done!",
+            title: '🚀 New Assignments Waiting!',
+            body: "You have new assignments waiting for you! Click to learn more. Let's get them done!",
           },
         } satisfies Message;
       });

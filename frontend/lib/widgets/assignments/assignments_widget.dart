@@ -102,7 +102,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                         return const Padding(
                           padding: EdgeInsets.all(16.0),
                           child: Text(
-                              "Currently, there are no assignments. To get started, use the + Action Button on the bottom right."),
+                              "Currently, there are no assignments. To get started, use the + Action Button in the Tasks Page, on the bottom right."),
                         );
                       }
                       List<List<Assignment>> sortedAssignmentGroups = [];
