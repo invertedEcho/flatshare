@@ -26,6 +26,22 @@ cp .env.example .env
 pnpm dev
 ```
 
+## production setup
+
+- setup environment variables
+
+```bash
+# adjust the values as needed.
+cp .env.example .env
+```
+
+- ensure docker is installed
+
+```bash
+docker build . -t flatshare-backend
+docker run -d --publish 3000:3000 --restart always flatshare-backend
+```
+
 ## tests
 
 the tests are currently mainly focused around the database functions used in the assignment scheduler.
