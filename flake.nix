@@ -53,7 +53,7 @@
             QT_QPA_PLATFORM = "wayland;xcb"; # emulator related: try using wayland, otherwise fall back to X
             buildInputs = [
               androidSdk
-              flutter
+              flutter327
               pkgs-gradle.gradle_7
               pkgs-jdk.jdk19
               protobuf
