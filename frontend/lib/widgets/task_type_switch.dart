@@ -26,24 +26,22 @@ class TaskTypeSwitchState extends State<TaskTypeSwitch> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Container(
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-            color: Colors.grey[300]),
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
           child: Row(
             children: [
               Expanded(
                   child: ElevatedButton(
                       style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(
-                              widget.selectedTaskType == TaskType.recurring
-                                  ? Colors.white
-                                  : Colors.black),
                           backgroundColor: WidgetStateProperty.all<Color>(
                               widget.selectedTaskType == TaskType.recurring
                                   ? Colors.blueAccent
-                                  : Colors.grey.shade300),
+                                  : Colors.grey[850]!),
+                          foregroundColor:
+                              WidgetStateProperty.all(Colors.white),
                           textStyle: WidgetStateProperty.all<TextStyle>(
                             TextStyle(
                               fontWeight:
@@ -69,11 +67,9 @@ class TaskTypeSwitchState extends State<TaskTypeSwitch> {
                           backgroundColor: WidgetStateProperty.all(
                               widget.selectedTaskType == TaskType.oneOff
                                   ? Colors.blueAccent
-                                  : Colors.grey.shade300),
-                          foregroundColor: WidgetStateProperty.all(
-                              widget.selectedTaskType == TaskType.oneOff
-                                  ? Colors.white
-                                  : Colors.black),
+                                  : Colors.grey[850]!),
+                          foregroundColor:
+                              WidgetStateProperty.all(Colors.white),
                           textStyle: WidgetStateProperty.all<TextStyle>(
                             TextStyle(
                               fontWeight:
