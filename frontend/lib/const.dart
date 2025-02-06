@@ -8,3 +8,4 @@ const generalRootPadding = 10.0;
 const assignmentPageIndex = 0;
 const taskPageIndex = 1;
 const shoppingListPageIndex = 2;
+const expenseTrackerPageIndex = 3;

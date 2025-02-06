@@ -223,3 +223,40 @@ export const userFcmRegistrationTokenMappingTable = pgTable(
     };
   },
 );
+
+export const expenseItemTable = pgTable('expense_item', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  amount: integer('amount').notNull(),
+  userGroupId: integer('user_group_id')
+    .references(() => userGroupTable.id)
+    .notNull(),
+});
+export type InsertExpenseItem = typeof expenseItemTable.$inferInsert;
+
+export const expensePayerMappingTable = pgTable('expense_payer_mapping', {
+  id: serial('id').primaryKey(),
+  expenseItemId: integer('expense_item_id')
+    .references(() => expenseItemTable.id)
+    .notNull(),
+  userId: integer('user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  percentagePaid: integer('percentage_paid').notNull(),
+});
+export type InsertExpensePayerMapping =
+  typeof expensePayerMappingTable.$inferInsert;
+
+export const expenseBeneficiaryMappingTable = pgTable('expense_beneficiary', {
+  id: serial('id').primaryKey(),
+  expenseItemId: integer('expense_item_id')
+    .references(() => expenseItemTable.id)
+    .notNull(),
+  userId: integer('user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  percentageShare: integer('percentage_share').notNull(),
+});
+export type InsertExpenseBeneficiaryMapping =
+  typeof expenseBeneficiaryMappingTable.$inferInsert;

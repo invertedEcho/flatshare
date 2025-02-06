@@ -5,6 +5,8 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_user_group.dart';
+import 'package:flatshare/widgets/expense-tracker/add_expense_item.dart';
+import 'package:flatshare/widgets/expense-tracker/expense_tracker.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/shopping_list.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
@@ -22,6 +24,7 @@ List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
       const AssignmentsWidget(),
       const TasksOverviewWidget(),
       ShoppingListWidget(userGroupId: userGroupId),
+      const ExpenseTrackerWidget(),
     ];
   }
   return [
@@ -45,7 +48,9 @@ List<NavigationDestination> getNavigationDestinations(int? userGroupId) {
         label: 'Tasks',
       ),
       const NavigationDestination(
-          icon: Icon(Icons.shopping_cart), label: "Shopping List")
+          icon: Icon(Icons.shopping_cart), label: "Shopping List"),
+      const NavigationDestination(
+          icon: Icon(Icons.paid), label: "Expense Tracker")
     ];
   }
   return [
@@ -119,6 +124,21 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         });
   }
 
+  void onFloatingActionButtonPress(
+      {required bool isCurrentlyTaskPage,
+      required bool isCurrentlyExpenseTrackerPage}) {
+    print("hello?");
+    if (isCurrentlyTaskPage) {
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const CreateTask()));
+    } else if (isCurrentlyExpenseTrackerPage) {
+      print("hello2");
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const AddExpenseItem()));
+    }
+    print("hello3");
+  }
+
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context);
@@ -127,6 +147,10 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         userGroupId = userProvider.userGroup!.id;
       });
     }
+    final isCurrentlyTaskPage = currentPageIndex == taskPageIndex;
+    final isCurrentlyExpenseTrackerPage =
+        currentPageIndex == expenseTrackerPageIndex;
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -161,11 +185,12 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
           ],
         ),
         floatingActionButton: userProvider.userGroup?.id != null &&
-                currentPageIndex != shoppingListPageIndex &&
-                currentPageIndex != assignmentPageIndex
+                (isCurrentlyTaskPage || isCurrentlyExpenseTrackerPage)
             ? FloatingActionButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const CreateTask())),
+                onPressed: () => onFloatingActionButtonPress(
+                    isCurrentlyTaskPage: isCurrentlyTaskPage,
+                    isCurrentlyExpenseTrackerPage:
+                        isCurrentlyExpenseTrackerPage),
                 child: const Icon(Icons.add),
               )
             : null,

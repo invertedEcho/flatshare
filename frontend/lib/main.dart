@@ -4,6 +4,7 @@ import 'package:flatshare/authenticated_navigation.dart';
 import 'package:flatshare/fetch/authenticated_client.dart';
 import 'package:flatshare/notifications/handler.dart';
 import 'package:flatshare/notifications/util.dart';
+import 'package:flatshare/providers/expense_item.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/task_group.dart';
 import 'package:flatshare/providers/user.dart';
@@ -43,6 +44,7 @@ Future main() async {
       ChangeNotifierProvider(create: (_) => UserProvider()),
       ChangeNotifierProvider(create: (_) => TaskProvider()),
       ChangeNotifierProvider(create: (_) => TaskGroupProvider()),
+      ChangeNotifierProvider(create: (_) => ExpenseItemProvider())
     ],
     child: const App(),
   ));
