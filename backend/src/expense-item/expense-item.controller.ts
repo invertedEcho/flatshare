@@ -63,5 +63,6 @@ export class ExpenseItemController {
 
     await dbAddExpensePayers(hydratedExpensePayers);
     await dbAddExpenseBeneficiares(hydratedExpenseBeneficiares);
+    return expenseItemDb;
   }
 }

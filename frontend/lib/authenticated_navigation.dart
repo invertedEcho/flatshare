@@ -127,16 +127,13 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
   void onFloatingActionButtonPress(
       {required bool isCurrentlyTaskPage,
       required bool isCurrentlyExpenseTrackerPage}) {
-    print("hello?");
     if (isCurrentlyTaskPage) {
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => const CreateTask()));
     } else if (isCurrentlyExpenseTrackerPage) {
-      print("hello2");
       Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => const AddExpenseItem()));
     }
-    print("hello3");
   }
 
   @override

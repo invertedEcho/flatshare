@@ -91,6 +91,7 @@ class AddExpenseItemState extends State<AddExpenseItem> {
         expenseItem: expenseItem,
         expenseBeneficiaries: expenseBeneficiares,
         expensePayers: expensePayers);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -121,7 +122,8 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                           labelText: "Description (optional)"),
                     ),
                     TextFormField(
-                      decoration: const InputDecoration(labelText: "Amount"),
+                      decoration: const InputDecoration(
+                          labelText: "Amount", suffixText: "€"),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter an amount';
@@ -131,7 +133,6 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                       controller: amountController,
                       keyboardType: const TextInputType.numberWithOptions(
                           signed: false, decimal: true),
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     ),
                     const SizedBox(
                       height: 20,
@@ -169,6 +170,13 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                   width: 70,
                                   child: TextFormField(
                                     key: Key(equalDistributed.toString()),
+                                    onChanged: (value) {
+                                      double newValue = double.parse(value);
+                                      selectedPayers.update(user.userId,
+                                          (oldValue) {
+                                        return newValue;
+                                      });
+                                    },
                                     initialValue: isUserSelected
                                         ? equalDistributed.toString()
                                         : null,
@@ -219,6 +227,16 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                   width: 70,
                                   child: TextFormField(
                                     key: Key(equalDistributed.toString()),
+                                    onChanged: (value) {
+                                      if (value.isEmpty) {
+                                        return;
+                                      }
+                                      double newValue = double.parse(value);
+                                      selectedBeneficiares.update(user.userId,
+                                          (oldValue) {
+                                        return newValue;
+                                      });
+                                    },
                                     initialValue: isUserSelected
                                         ? equalDistributed.toString()
                                         : null,
