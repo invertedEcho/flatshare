@@ -15,6 +15,11 @@ class Task {
         title = json['title'] as String,
         description = json['description'] as String?,
         taskGroupId = json['taskGroupId'] as int?;
+
+  @override
+  String toString() {
+    return title;
+  }
 }
 
 enum TaskType { oneOff, recurring }
