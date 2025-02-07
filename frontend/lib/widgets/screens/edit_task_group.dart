@@ -20,7 +20,7 @@ class EditTaskGroupScreenState extends State<EditTaskGroupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tasks = Provider.of<TaskProvider>(context, listen: false).tasks;
+    final tasks = Provider.of<TaskProvider>(context, listen: true).tasks;
     final currentTaskGroupTasks =
         tasks.where((task) => task.taskGroupId == widget.taskGroup.id).toList();
 
