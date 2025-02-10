@@ -11,12 +11,17 @@ import {
   dbAddExpenseBeneficiares,
   dbAddExpenseItem,
   dbAddExpensePayers,
+  dbGetAllExpenseBeneficiaresByUserGroupId,
   dbGetAllExpenseItemsByUserGroupId,
+  dbGetAllExpensePayersByUserGroupId,
 } from 'src/db/functions/expense-item';
 import {
   InsertExpenseBeneficiaryMapping,
   InsertExpenseItem,
   InsertExpensePayerMapping,
+  SelectExpenseBeneficiaryMapping,
+  SelectExpenseItem,
+  SelectExpensePayerMapping,
 } from 'src/db/schema';
 
 type CreateExpenseItemBody = {
@@ -28,8 +33,24 @@ type CreateExpenseItemBody = {
 @Controller('expense-item')
 export class ExpenseItemController {
   @Get()
-  async getAllExpenseItems(@Query('userGroupId') userGroupId: number) {
+  async getAllExpenseItems(
+    @Query('userGroupId') userGroupId: number,
+  ): Promise<SelectExpenseItem[]> {
     return await dbGetAllExpenseItemsByUserGroupId(userGroupId);
+  }
+
+  @Get('expense-payer')
+  async getAllExpensePayers(
+    @Query('userGroupId') userGroupId: number,
+  ): Promise<SelectExpensePayerMapping[]> {
+    return await dbGetAllExpensePayersByUserGroupId(userGroupId);
+  }
+
+  @Get('expense-beneficiary')
+  async getAllExpenseBeneficiares(
+    @Query('userGroupId') userGroupId: number,
+  ): Promise<SelectExpenseBeneficiaryMapping[]> {
+    return await dbGetAllExpenseBeneficiaresByUserGroupId(userGroupId);
   }
 
   @Post()

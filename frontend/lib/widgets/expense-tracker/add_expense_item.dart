@@ -8,7 +8,6 @@ import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/expense_item.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class AddExpenseItem extends StatefulWidget {
@@ -70,7 +69,8 @@ class AddExpenseItemState extends State<AddExpenseItem> {
         userGroupId: userGroup.id,
         title: titleController.text,
         description: descriptionController.text,
-        amount: int.parse(amountController.text));
+        // we show euro in frontend, but we store it as cent in database
+        amount: int.parse(amountController.text) * 100);
 
     List<ExpenseBeneficiary> expenseBeneficiares = [];
 
@@ -115,11 +115,6 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                       decoration: const InputDecoration(
                         labelText: "Title",
                       ),
-                    ),
-                    TextFormField(
-                      controller: descriptionController,
-                      decoration: const InputDecoration(
-                          labelText: "Description (optional)"),
                     ),
                     TextFormField(
                       decoration: const InputDecoration(

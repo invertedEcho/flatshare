@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flatshare/fetch/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
 import 'package:flatshare/models/expense-tracker/expense_item.dart';
@@ -12,12 +10,17 @@ class ExpenseItemProvider extends ChangeNotifier {
   List<ExpenseItem> _expenseItems = [];
   List<ExpenseItem> get expenseItems => _expenseItems;
 
+  List<ExpensePayer> _expensePayers = [];
+  List<ExpensePayer> get expensePayers => _expensePayers;
+
+  List<ExpenseBeneficiary> _expenseBeneficiares = [];
+  List<ExpenseBeneficiary> get expenseBeneficiares => _expenseBeneficiares;
+
   void addExpenseItem(
       {required BuildContext context,
       required ExpenseItem expenseItem,
       required List<ExpenseBeneficiary> expenseBeneficiaries,
       required List<ExpensePayer> expensePayers}) async {
-    print(jsonEncode(expenseItem));
     final createdExpenseItem = await postExpenseItem(
         expenseItem: expenseItem,
         expensePayers: expensePayers,
@@ -37,6 +40,11 @@ class ExpenseItemProvider extends ChangeNotifier {
 
     final expenseItems = await fetchAllExpenseItems(userGroup.id);
     _expenseItems = expenseItems;
+    final expensePayers = await fetchAllExpensePayers(userGroup.id);
+    _expensePayers = expensePayers;
+    final expenseBeneficiaries =
+        await fetchAllExpenseBeneficiares(userGroup.id);
+    _expenseBeneficiares = expenseBeneficiaries;
     notifyListeners();
   }
 }

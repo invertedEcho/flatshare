@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, getTableColumns } from 'drizzle-orm';
 import { db } from '..';
 import {
   InsertExpenseBeneficiaryMapping,
@@ -30,4 +30,28 @@ export async function dbAddExpenseBeneficiares(
   expenseBeneficiares: InsertExpenseBeneficiaryMapping[],
 ) {
   await db.insert(expenseBeneficiaryMappingTable).values(expenseBeneficiares);
+}
+
+export async function dbGetAllExpensePayersByUserGroupId(userGroupId: number) {
+  return await db
+    .select(getTableColumns(expensePayerMappingTable))
+    .from(expensePayerMappingTable)
+    .innerJoin(
+      expenseItemTable,
+      eq(expenseItemTable.id, expensePayerMappingTable.expenseItemId),
+    )
+    .where(eq(expenseItemTable.userGroupId, userGroupId));
+}
+
+export async function dbGetAllExpenseBeneficiaresByUserGroupId(
+  userGroupId: number,
+) {
+  return await db
+    .select(getTableColumns(expenseBeneficiaryMappingTable))
+    .from(expenseBeneficiaryMappingTable)
+    .innerJoin(
+      expenseItemTable,
+      eq(expenseItemTable.id, expenseBeneficiaryMappingTable.expenseItemId),
+    )
+    .where(eq(expenseItemTable.userGroupId, userGroupId));
 }

@@ -234,6 +234,7 @@ export const expenseItemTable = pgTable('expense_item', {
     .notNull(),
 });
 export type InsertExpenseItem = typeof expenseItemTable.$inferInsert;
+export type SelectExpenseItem = typeof expenseItemTable.$inferSelect;
 
 export const expensePayerMappingTable = pgTable('expense_payer_mapping', {
   id: serial('id').primaryKey(),
@@ -247,16 +248,23 @@ export const expensePayerMappingTable = pgTable('expense_payer_mapping', {
 });
 export type InsertExpensePayerMapping =
   typeof expensePayerMappingTable.$inferInsert;
+export type SelectExpensePayerMapping =
+  typeof expensePayerMappingTable.$inferSelect;
 
-export const expenseBeneficiaryMappingTable = pgTable('expense_beneficiary', {
-  id: serial('id').primaryKey(),
-  expenseItemId: integer('expense_item_id')
-    .references(() => expenseItemTable.id)
-    .notNull(),
-  userId: integer('user_id')
-    .references(() => userTable.id)
-    .notNull(),
-  percentageShare: integer('percentage_share').notNull(),
-});
+export const expenseBeneficiaryMappingTable = pgTable(
+  'expense_beneficiary_mapping',
+  {
+    id: serial('id').primaryKey(),
+    expenseItemId: integer('expense_item_id')
+      .references(() => expenseItemTable.id)
+      .notNull(),
+    userId: integer('user_id')
+      .references(() => userTable.id)
+      .notNull(),
+    percentageShare: integer('percentage_share').notNull(),
+  },
+);
 export type InsertExpenseBeneficiaryMapping =
   typeof expenseBeneficiaryMappingTable.$inferInsert;
+export type SelectExpenseBeneficiaryMapping =
+  typeof expenseBeneficiaryMappingTable.$inferSelect;

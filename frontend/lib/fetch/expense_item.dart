@@ -11,8 +11,6 @@ Future<ExpenseItem> postExpenseItem(
     required List<ExpenseBeneficiary> expenseBeneficiaries,
     required List<ExpensePayer> expensePayers}) async {
   var apiBaseUrl = getApiBaseUrl();
-  print(jsonEncode(expenseBeneficiaries));
-  print(jsonEncode(expensePayers));
   final response =
       await authenticatedClient.post(Uri.parse('$apiBaseUrl/expense-item'),
           body: jsonEncode({
@@ -30,15 +28,48 @@ Future<ExpenseItem> postExpenseItem(
 
 Future<List<ExpenseItem>> fetchAllExpenseItems(int userGroupId) async {
   var apiBaseUrl = getApiBaseUrl();
-  final response = await authenticatedClient
-      .get(Uri.parse('$apiBaseUrl/expense-item?userGroupId=$userGroupId'));
+  var requestUrl =
+      Uri.parse('$apiBaseUrl/expense-item?userGroupId=$userGroupId');
+  final response = await authenticatedClient.get(requestUrl);
   if (response.statusCode != 200) {
     throw Exception("Failed to get expense items: ${response.statusCode}]");
   }
 
   List<dynamic> decodedResponseBody = jsonDecode(response.body);
-  print(decodedResponseBody);
   return decodedResponseBody
       .map<ExpenseItem>((expenseItem) => ExpenseItem.fromJson(expenseItem))
+      .toList();
+}
+
+Future<List<ExpensePayer>> fetchAllExpensePayers(int userGroupId) async {
+  var apiBaseUrl = getApiBaseUrl();
+  var requestUrl = Uri.parse(
+      '$apiBaseUrl/expense-item/expense-payer?userGroupId=$userGroupId');
+  final response = await authenticatedClient.get(requestUrl);
+  if (response.statusCode != 200) {
+    throw Exception("Failed to get expense payers: ${response.statusCode}]");
+  }
+
+  List<dynamic> decodedResponseBody = jsonDecode(response.body);
+  return decodedResponseBody
+      .map<ExpensePayer>((expenseItem) => ExpensePayer.fromJson(expenseItem))
+      .toList();
+}
+
+Future<List<ExpenseBeneficiary>> fetchAllExpenseBeneficiares(
+    int userGroupId) async {
+  var apiBaseUrl = getApiBaseUrl();
+  var requestUrl = Uri.parse(
+      '$apiBaseUrl/expense-item/expense-beneficiary?userGroupId=$userGroupId');
+  final response = await authenticatedClient.get(requestUrl);
+  if (response.statusCode != 200) {
+    throw Exception(
+        "Failed to get expense beneficiares: ${response.statusCode}]");
+  }
+
+  List<dynamic> decodedResponseBody = jsonDecode(response.body);
+  return decodedResponseBody
+      .map<ExpenseBeneficiary>(
+          (expenseItem) => ExpenseBeneficiary.fromJson(expenseItem))
       .toList();
 }
