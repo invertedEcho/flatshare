@@ -21,8 +21,35 @@ class TaskTypeSwitchState extends State<TaskTypeSwitch> {
     super.initState();
   }
 
+  Color getBackgroundColor(bool isSelected, bool isDarkMode) {
+    if (isSelected) {
+      return Colors.blueAccent;
+    } else {
+      if (isDarkMode) {
+        return Colors.grey[850]!;
+      } else {
+        return Colors.white;
+      }
+    }
+  }
+
+  Color getForegroundColor(bool isSelected, bool isDarkMode) {
+    if (isDarkMode) {
+      return Colors.white;
+    } else {
+      if (isSelected) {
+        return Colors.white;
+      } else {
+        return Colors.black;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: Container(
@@ -37,11 +64,13 @@ class TaskTypeSwitchState extends State<TaskTypeSwitch> {
                   child: ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(
-                              widget.selectedTaskType == TaskType.recurring
-                                  ? Colors.blueAccent
-                                  : Colors.grey[850]!),
-                          foregroundColor:
-                              WidgetStateProperty.all(Colors.white),
+                              getBackgroundColor(
+                                  widget.selectedTaskType == TaskType.recurring,
+                                  isDarkMode)),
+                          foregroundColor: WidgetStateProperty.all(
+                              getForegroundColor(
+                                  widget.selectedTaskType == TaskType.recurring,
+                                  isDarkMode)),
                           textStyle: WidgetStateProperty.all<TextStyle>(
                             TextStyle(
                               fontWeight:
@@ -60,16 +89,18 @@ class TaskTypeSwitchState extends State<TaskTypeSwitch> {
                         widget.onTaskTypeSelect(TaskType.recurring);
                       },
                       child: const Text("Recurring Tasks"))),
-              const SizedBox(width: 4),
+              const SizedBox(width: 8),
               Expanded(
                   child: ElevatedButton(
                       style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all(
-                              widget.selectedTaskType == TaskType.oneOff
-                                  ? Colors.blueAccent
-                                  : Colors.grey[850]!),
-                          foregroundColor:
-                              WidgetStateProperty.all(Colors.white),
+                              getBackgroundColor(
+                                  widget.selectedTaskType == TaskType.oneOff,
+                                  isDarkMode)),
+                          foregroundColor: WidgetStateProperty.all(
+                              getForegroundColor(
+                                  widget.selectedTaskType == TaskType.oneOff,
+                                  isDarkMode)),
                           textStyle: WidgetStateProperty.all<TextStyle>(
                             TextStyle(
                               fontWeight:
