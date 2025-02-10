@@ -54,7 +54,7 @@ class ExpenseItemList extends StatelessWidget {
                   .toList();
 
               String trailingText =
-                  "${stringifyCentAmount(expenseItem.amount)}\nPaid by: ${expensePayerNames.join(", ")}";
+                  "${stringifyCentAmount(double.parse(expenseItem.amount.toString()))}\nPaid by: ${expensePayerNames.join(", ")}";
 
               return Card(
                   child: ListTile(

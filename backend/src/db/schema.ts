@@ -1,6 +1,8 @@
 import {
+  doublePrecision,
   integer,
   interval,
+  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -244,7 +246,7 @@ export const expensePayerMappingTable = pgTable('expense_payer_mapping', {
   userId: integer('user_id')
     .references(() => userTable.id)
     .notNull(),
-  percentagePaid: integer('percentage_paid').notNull(),
+  percentagePaid: numeric('percentage_paid').notNull(),
 });
 export type InsertExpensePayerMapping =
   typeof expensePayerMappingTable.$inferInsert;
@@ -261,7 +263,7 @@ export const expenseBeneficiaryMappingTable = pgTable(
     userId: integer('user_id')
       .references(() => userTable.id)
       .notNull(),
-    percentageShare: integer('percentage_share').notNull(),
+    percentageShare: numeric('percentage_share').notNull(),
   },
 );
 export type InsertExpenseBeneficiaryMapping =

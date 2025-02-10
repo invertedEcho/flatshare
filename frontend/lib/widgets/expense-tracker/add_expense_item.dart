@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
@@ -150,8 +152,13 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                       if (value == null) return;
                                       setState(() {
                                         if (value) {
+                                          // we have to recalculate equalDistributed as its missing the newly added payer (yet)
+                                          equalDistributed =
+                                              100 / (selectedPayers.length + 1);
                                           selectedPayers.addAll(
                                               {user.userId: equalDistributed});
+                                          selectedPayers.updateAll(
+                                              (key, value) => equalDistributed);
                                         } else {
                                           selectedPayers.removeWhere(
                                               (userId, percentagePaid) =>
@@ -207,8 +214,13 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                       if (value == null) return;
                                       setState(() {
                                         if (value) {
+                                          // we have to recalculate equalDistributed as its missing the newly added beneficiary (yet)
+                                          equalDistributed = 100 /
+                                              (selectedBeneficiares.length + 1);
                                           selectedBeneficiares.addAll(
                                               {user.userId: equalDistributed});
+                                          selectedBeneficiares.updateAll(
+                                              (key, value) => equalDistributed);
                                         } else {
                                           selectedBeneficiares.removeWhere(
                                               (userId, percentageShare) =>

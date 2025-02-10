@@ -81,6 +81,8 @@ export class ExpenseItemController {
         };
       },
     );
+    console.log({ hydratedExpensePayers });
+    console.log({ hydratedExpenseBeneficiares });
 
     await dbAddExpensePayers(hydratedExpensePayers);
     await dbAddExpenseBeneficiares(hydratedExpenseBeneficiares);

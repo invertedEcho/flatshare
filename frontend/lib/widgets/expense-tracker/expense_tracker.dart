@@ -8,6 +8,7 @@ import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/expense_item.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/widgets/expense-tracker/expense_item_list.dart';
+import 'package:flatshare/widgets/expense-tracker/expense_tracker_overview.dart';
 import 'package:flatshare/widgets/expense-tracker/page_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -52,11 +53,12 @@ class ExpenseTrackerWidgetState extends State<ExpenseTrackerWidget> {
   @override
   Widget build(BuildContext context) {
     List<ExpenseItem> expenseItems =
-        Provider.of<ExpenseItemProvider>(context).expenseItems;
+        Provider.of<ExpenseItemProvider>(context, listen: true).expenseItems;
     List<ExpensePayer> expensePayers =
-        Provider.of<ExpenseItemProvider>(context).expensePayers;
+        Provider.of<ExpenseItemProvider>(context, listen: true).expensePayers;
     List<ExpenseBeneficiary> expenseBeneficiares =
-        Provider.of<ExpenseItemProvider>(context).expenseBeneficiares;
+        Provider.of<ExpenseItemProvider>(context, listen: true)
+            .expenseBeneficiares;
 
     return Padding(
       padding: const EdgeInsets.all(generalRootPadding),
@@ -71,7 +73,12 @@ class ExpenseTrackerWidgetState extends State<ExpenseTrackerWidget> {
             },
           ),
           selectedPage == PageType.overview
-              ? const Text("overview")
+              ? ExpenseTrackerOverview(
+                  expenseItems: expenseItems,
+                  expensePayers: expensePayers,
+                  expenseBeneficiaries: expenseBeneficiares,
+                  usersInUserGroup: usersInUserGroup,
+                )
               : ExpenseItemList(
                   expenseItems: expenseItems,
                   expensePayers: expensePayers,
