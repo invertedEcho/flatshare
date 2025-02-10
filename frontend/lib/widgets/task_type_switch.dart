@@ -21,81 +21,92 @@ class TaskTypeSwitchState extends State<TaskTypeSwitch> {
     super.initState();
   }
 
+  Color getBackgroundColor(bool isSelected, bool isDarkMode) {
+    if (isSelected) {
+      return Colors.blueAccent;
+    } else {
+      if (isDarkMode) {
+        return Colors.grey[850]!;
+      } else {
+        return Colors.white;
+      }
+    }
+  }
+
+  Color getForegroundColor(bool isSelected, bool isDarkMode) {
+    if (isDarkMode) {
+      return Colors.white;
+    } else {
+      if (isSelected) {
+        return Colors.white;
+      } else {
+        return Colors.black;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-            color: Colors.grey[300]),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            children: [
-              Expanded(
-                  child: ElevatedButton(
-                      style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.all(
-                              widget.selectedTaskType == TaskType.recurring
-                                  ? Colors.white
-                                  : Colors.black),
-                          backgroundColor: WidgetStateProperty.all<Color>(
-                              widget.selectedTaskType == TaskType.recurring
-                                  ? Colors.blueAccent
-                                  : Colors.grey.shade300),
-                          textStyle: WidgetStateProperty.all<TextStyle>(
-                            TextStyle(
-                              fontWeight:
-                                  widget.selectedTaskType == TaskType.recurring
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                            ),
-                          ),
-                          shape: WidgetStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          elevation: WidgetStateProperty.all(generalElevation)),
-                      onPressed: () {
-                        widget.onTaskTypeSelect(TaskType.recurring);
-                      },
-                      child: const Text("Recurring Tasks"))),
-              const SizedBox(width: 4),
-              Expanded(
-                  child: ElevatedButton(
-                      style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(
-                              widget.selectedTaskType == TaskType.oneOff
-                                  ? Colors.blueAccent
-                                  : Colors.grey.shade300),
-                          foregroundColor: WidgetStateProperty.all(
-                              widget.selectedTaskType == TaskType.oneOff
-                                  ? Colors.white
-                                  : Colors.black),
-                          textStyle: WidgetStateProperty.all<TextStyle>(
-                            TextStyle(
-                              fontWeight:
-                                  widget.selectedTaskType == TaskType.oneOff
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                            ),
-                          ),
-                          shape:
-                              WidgetStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          )),
-                      onPressed: () {
-                        widget.onTaskTypeSelect(TaskType.oneOff);
-                      },
-                      child: const Text("One-Time Tasks"))),
-            ],
-          ),
-        ),
-      ),
+    var brightness = MediaQuery.of(context).platformBrightness;
+    bool isDarkMode = brightness == Brightness.dark;
+
+    return Row(
+      children: [
+        Expanded(
+            child: ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all<Color>(
+                        getBackgroundColor(
+                            widget.selectedTaskType == TaskType.recurring,
+                            isDarkMode)),
+                    foregroundColor: WidgetStateProperty.all(getForegroundColor(
+                        widget.selectedTaskType == TaskType.recurring,
+                        isDarkMode)),
+                    textStyle: WidgetStateProperty.all<TextStyle>(
+                      TextStyle(
+                        fontWeight:
+                            widget.selectedTaskType == TaskType.recurring
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                      ),
+                    ),
+                    shape: WidgetStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    elevation: WidgetStateProperty.all(generalElevation)),
+                onPressed: () {
+                  widget.onTaskTypeSelect(TaskType.recurring);
+                },
+                child: const Text("Recurring Tasks"))),
+        const SizedBox(width: 8),
+        Expanded(
+            child: ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all(getBackgroundColor(
+                        widget.selectedTaskType == TaskType.oneOff,
+                        isDarkMode)),
+                    foregroundColor: WidgetStateProperty.all(getForegroundColor(
+                        widget.selectedTaskType == TaskType.oneOff,
+                        isDarkMode)),
+                    textStyle: WidgetStateProperty.all<TextStyle>(
+                      TextStyle(
+                        fontWeight: widget.selectedTaskType == TaskType.oneOff
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    )),
+                onPressed: () {
+                  widget.onTaskTypeSelect(TaskType.oneOff);
+                },
+                child: const Text("One-Time Tasks"))),
+      ],
     );
   }
 }
