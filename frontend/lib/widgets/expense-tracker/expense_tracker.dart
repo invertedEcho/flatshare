@@ -7,10 +7,12 @@ import 'package:flatshare/models/user.dart';
 import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/expense_item.dart';
 import 'package:flatshare/providers/user.dart';
-import 'package:flatshare/utils/money.dart';
+import 'package:flatshare/widgets/expense-tracker/expense_item_list.dart';
+import 'package:flatshare/widgets/expense-tracker/page_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
+
+enum PageType { overview, list }
 
 class ExpenseTrackerWidget extends StatefulWidget {
   const ExpenseTrackerWidget({super.key});
@@ -22,6 +24,7 @@ class ExpenseTrackerWidget extends StatefulWidget {
 class ExpenseTrackerWidgetState extends State<ExpenseTrackerWidget> {
   // TODO: get rid of this by storing them in a provider too
   List<User> usersInUserGroup = [];
+  PageType selectedPage = PageType.overview;
 
   @override
   void initState() {
@@ -59,50 +62,21 @@ class ExpenseTrackerWidgetState extends State<ExpenseTrackerWidget> {
       padding: const EdgeInsets.all(generalRootPadding),
       child: Column(
         children: [
-          Expanded(
-              child: ListView.builder(
-                  itemCount: expenseItems.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    var expenseItem = expenseItems[index];
-                    if (expenseItems.isEmpty) {
-                      return const Text("No expense items found!");
-                    }
-
-                    final expensePayersOfExpenseItem = expensePayers
-                        .where((expensePayer) =>
-                            expensePayer.expenseItemId == expenseItem.id)
-                        .toList();
-                    final expenseBeneficiaresOfExpenseItem = expenseBeneficiares
-                        .where((expenseBeneficiary) =>
-                            expenseBeneficiary.expenseItemId == expenseItem.id)
-                        .toList();
-
-                    final expensePayerNames = expensePayersOfExpenseItem
-                        .map((expensePayer) => usersInUserGroup
-                            .firstWhereOrNull(
-                                (user) => user.userId == expensePayer.userId)
-                            ?.username)
-                        .toList();
-
-                    final expenseBeneficiaryNames =
-                        expenseBeneficiaresOfExpenseItem
-                            .map((expenseBeneficiary) => usersInUserGroup
-                                .firstWhereOrNull((user) =>
-                                    user.userId == expenseBeneficiary.userId)
-                                ?.username)
-                            .toList();
-
-                    String trailingText =
-                        "${stringifyCentAmount(expenseItem.amount)}\nPaid by: ${expensePayerNames.join(", ")}";
-
-                    return Card(
-                        child: ListTile(
-                      title: Text(expenseItem.title),
-                      subtitle:
-                          Text("For: ${expenseBeneficiaryNames.join(", ")}"),
-                      trailing: Text(trailingText),
-                    ));
-                  }))
+          PageSwitch(
+            selectedPage: selectedPage,
+            onPageSelect: (PageType pageType) {
+              setState(() {
+                selectedPage = pageType;
+              });
+            },
+          ),
+          selectedPage == PageType.overview
+              ? const Text("overview")
+              : ExpenseItemList(
+                  expenseItems: expenseItems,
+                  expensePayers: expensePayers,
+                  expenseBeneficiaries: expenseBeneficiares,
+                  usersInUserGroup: usersInUserGroup)
         ],
       ),
     );
