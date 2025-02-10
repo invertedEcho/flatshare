@@ -143,7 +143,7 @@ class AssignmentsWidgetState extends State<AssignmentsWidget> {
                               sectionAssignments[0].dueDate;
                           final maybeParsedDueDate =
                               firstAssignmentDueDate != null
-                                  ? parseToDueDate(firstAssignmentDueDate)
+                                  ? stringifyDueDate(firstAssignmentDueDate)
                                   : "";
 
                           final isRecurringAssignments = sectionAssignments
