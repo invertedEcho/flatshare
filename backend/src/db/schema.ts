@@ -1,5 +1,4 @@
 import {
-  doublePrecision,
   integer,
   interval,
   numeric,
