@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
 import 'package:flatshare/models/expense-tracker/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_payer.dart';
@@ -21,6 +23,8 @@ class ExpenseItemList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print("Current expensepayers: ${jsonEncode(expensePayers)}");
+    print("Current expense beneficiares: ${jsonEncode(expenseBeneficiaries)}");
     return Expanded(
         child: ListView.builder(
             itemCount: expenseItems.length,

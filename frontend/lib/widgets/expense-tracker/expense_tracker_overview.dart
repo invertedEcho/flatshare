@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
 import 'package:flatshare/models/expense-tracker/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_payer.dart';
@@ -43,8 +42,8 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
 
       for (ExpensePayer expensePayer in expensePayers) {
         double calculatedAmount =
-            expenseItem.amount * expensePayer.percentagePaid / 100;
-        print("expensepayer: calculatedamount: $calculatedAmount");
+            (expenseItem.amount * expensePayer.percentagePaid / 100);
+        print(calculatedAmount);
         moneyInCentPerUser.update(expensePayer.userId,
             (existingValue) => existingValue + calculatedAmount,
             ifAbsent: () => calculatedAmount);
@@ -52,13 +51,26 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
 
       for (ExpenseBeneficiary expenseBeneficiary in expenseBeneficiaries) {
         double calculatedAmount =
-            expenseItem.amount * expenseBeneficiary.percentageShare / 100;
-        print("expensebeneficiary: calculatedAmount: $calculatedAmount");
+            (expenseItem.amount * expenseBeneficiary.percentageShare / 100);
+        print(calculatedAmount);
         moneyInCentPerUser.update(expenseBeneficiary.userId,
             (existingValue) => existingValue - calculatedAmount,
             ifAbsent: () => -calculatedAmount);
       }
     }
+  }
+
+  Color getColorForMoneyOfUserInCent(double amountInCent) {
+    double inEur = (amountInCent / 100).roundToDouble();
+
+    if (inEur == -0.0) {
+      return Colors.white;
+    }
+
+    if (amountInCent > 0) {
+      return Colors.green;
+    }
+    return Colors.red;
   }
 
   @override
@@ -72,17 +84,16 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
                 return user.userId == userId;
               });
 
-              final double moneyOfUserCent =
+              final double moneyOfUserInCent =
                   moneyInCentPerUser.values.toList()[index];
-              print(moneyOfUserCent);
+              Color color = getColorForMoneyOfUserInCent(moneyOfUserInCent);
 
               return Card(
                 child: ListTile(
                   title: Text(user.username),
                   subtitle: Text(
-                    stringifyCentAmount(moneyOfUserCent),
-                    style: TextStyle(
-                        color: moneyOfUserCent < 0 ? Colors.red : Colors.green),
+                    stringifyCentAmount(moneyOfUserInCent),
+                    style: TextStyle(color: color),
                   ),
                 ),
               );

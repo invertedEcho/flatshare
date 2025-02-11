@@ -30,6 +30,16 @@ class AddExpenseItemState extends State<AddExpenseItem> {
 
   final multiSelectUserController = MultiSelectController<User>([]);
 
+  int convertAmountTextInputToCent(String input) {
+    if (input.contains(",")) {
+      return int.parse(input.replaceAll(",", ""));
+    }
+    if (input.contains(".")) {
+      return int.parse(input.replaceAll(".", ""));
+    }
+    return int.parse(input) * 100;
+  }
+
   void handleAddExpenseItem() {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -46,12 +56,15 @@ class AddExpenseItemState extends State<AddExpenseItem> {
           "userGroup was null while trying to add a new expense item");
     }
 
+    // we show euro in frontend, but we store it as cent in database
+    int actualAmountInCent =
+        convertAmountTextInputToCent(amountController.text);
+
     ExpenseItem expenseItem = ExpenseItem(
         userGroupId: userGroup.id,
         title: titleController.text,
         description: descriptionController.text,
-        // we show euro in frontend, but we store it as cent in database
-        amount: int.parse(amountController.text) * 100);
+        amount: actualAmountInCent);
 
     List<ExpenseBeneficiary> expenseBeneficiares = [];
 

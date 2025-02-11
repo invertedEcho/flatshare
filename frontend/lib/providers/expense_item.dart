@@ -26,6 +26,24 @@ class ExpenseItemProvider extends ChangeNotifier {
         expensePayers: expensePayers,
         expenseBeneficiaries: expenseBeneficiaries);
     _expenseItems.add(createdExpenseItem);
+
+    // originally, we dont have the expenseItemId in our beneficiares and payers list.
+    // we can now add them as we now have the id.
+    expensePayers = expensePayers
+        .map((expensePayer) => ExpensePayer(
+            userId: expensePayer.userId,
+            percentagePaid: expensePayer.percentagePaid,
+            expenseItemId: createdExpenseItem.id))
+        .toList();
+    _expensePayers.addAll(expensePayers);
+
+    expenseBeneficiaries = expenseBeneficiaries
+        .map((expenseBeneficiary) => ExpenseBeneficiary(
+            userId: expenseBeneficiary.userId,
+            percentageShare: expenseBeneficiary.percentageShare,
+            expenseItemId: createdExpenseItem.id))
+        .toList();
+    _expenseBeneficiares.addAll(expenseBeneficiaries);
     notifyListeners();
   }
 
