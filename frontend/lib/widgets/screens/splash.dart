@@ -17,19 +17,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-  late Future<(User?, UserGroup?)> userInfoFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    userInfoFuture = fetchProfileAndUserGroup();
-  }
-
   @override
   Widget build(BuildContext context) {
     final userGroupInviteCode = widget.userGroupInviteCode;
     return FutureBuilder<(User?, UserGroup?)>(
-        future: userInfoFuture,
+        future: fetchProfileAndUserGroup(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -43,6 +35,7 @@ class SplashScreenState extends State<SplashScreen> {
                   Provider.of<UserProvider>(context, listen: false);
               if (maybeUserGroup != null) {
                 userProvider.setUserGroup(maybeUserGroup);
+                userProvider.initUsersInUserGroup(maybeUserGroup.id);
               }
               if (maybeUser != null) {
                 userProvider.setUser(maybeUser);

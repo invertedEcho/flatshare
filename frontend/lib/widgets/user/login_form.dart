@@ -62,6 +62,7 @@ class LoginFormState extends State<LoginForm> {
 
       if (userGroup != null) {
         userProvider.setUserGroup(userGroup);
+        userProvider.initUsersInUserGroup(userGroup.id);
       }
 
       context.go("/home");
