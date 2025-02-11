@@ -27,39 +27,6 @@ class ExpenseTrackerOverview extends StatefulWidget {
 class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
   final Map<int, double> moneyInCentPerUser = {};
 
-  @override
-  void initState() {
-    super.initState();
-    for (ExpenseItem expenseItem in widget.expenseItems) {
-      List<ExpensePayer> expensePayers = widget.expensePayers
-          .where((expensePayer) => expensePayer.expenseItemId == expenseItem.id)
-          .toList();
-      List<ExpenseBeneficiary> expenseBeneficiaries = widget
-          .expenseBeneficiaries
-          .where((expenseBeneficiary) =>
-              expenseBeneficiary.expenseItemId == expenseItem.id)
-          .toList();
-
-      for (ExpensePayer expensePayer in expensePayers) {
-        double calculatedAmount =
-            (expenseItem.amount * expensePayer.percentagePaid / 100);
-        print(calculatedAmount);
-        moneyInCentPerUser.update(expensePayer.userId,
-            (existingValue) => existingValue + calculatedAmount,
-            ifAbsent: () => calculatedAmount);
-      }
-
-      for (ExpenseBeneficiary expenseBeneficiary in expenseBeneficiaries) {
-        double calculatedAmount =
-            (expenseItem.amount * expenseBeneficiary.percentageShare / 100);
-        print(calculatedAmount);
-        moneyInCentPerUser.update(expenseBeneficiary.userId,
-            (existingValue) => existingValue - calculatedAmount,
-            ifAbsent: () => -calculatedAmount);
-      }
-    }
-  }
-
   Color getColorForMoneyOfUserInCent(double amountInCent) {
     double inEur = (amountInCent / 100).roundToDouble();
 
@@ -75,6 +42,34 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
 
   @override
   Widget build(BuildContext context) {
+    moneyInCentPerUser.clear();
+    for (ExpenseItem expenseItem in widget.expenseItems) {
+      List<ExpensePayer> expensePayers = widget.expensePayers
+          .where((expensePayer) => expensePayer.expenseItemId == expenseItem.id)
+          .toList();
+      List<ExpenseBeneficiary> expenseBeneficiaries = widget
+          .expenseBeneficiaries
+          .where((expenseBeneficiary) =>
+              expenseBeneficiary.expenseItemId == expenseItem.id)
+          .toList();
+
+      for (ExpensePayer expensePayer in expensePayers) {
+        double calculatedAmount =
+            (expenseItem.amount * expensePayer.percentagePaid / 100);
+        moneyInCentPerUser.update(expensePayer.userId,
+            (existingValue) => existingValue + calculatedAmount,
+            ifAbsent: () => calculatedAmount);
+      }
+
+      for (ExpenseBeneficiary expenseBeneficiary in expenseBeneficiaries) {
+        double calculatedAmount =
+            (expenseItem.amount * expenseBeneficiary.percentageShare / 100);
+        moneyInCentPerUser.update(expenseBeneficiary.userId,
+            (existingValue) => existingValue - calculatedAmount,
+            ifAbsent: () => -calculatedAmount);
+      }
+    }
+
     return Expanded(
         child: ListView.builder(
             itemCount: moneyInCentPerUser.length,

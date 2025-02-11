@@ -23,8 +23,6 @@ class ExpenseItemList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Current expensepayers: ${jsonEncode(expensePayers)}");
-    print("Current expense beneficiares: ${jsonEncode(expenseBeneficiaries)}");
     return Expanded(
         child: ListView.builder(
             itemCount: expenseItems.length,

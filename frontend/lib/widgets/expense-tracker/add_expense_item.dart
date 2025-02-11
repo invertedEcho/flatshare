@@ -1,5 +1,4 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
 import 'package:flatshare/models/expense-tracker/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_payer.dart';
@@ -80,6 +79,22 @@ class AddExpenseItemState extends State<AddExpenseItem> {
       expensePayers.add(ExpensePayer(
           userId: selectedPayer.key, percentagePaid: selectedPayer.value));
     }
+
+    if (expensePayers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('At least one payer must be selected!')),
+      );
+      return;
+    }
+
+    if (expenseBeneficiares.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('At least one beneficiary must be selected!')),
+      );
+      return;
+    }
+
     expenseItemProvider.addExpenseItem(
         context: context,
         expenseItem: expenseItem,

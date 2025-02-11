@@ -27,4 +27,9 @@ class ExpenseItem {
       'userGroupId': userGroupId
     };
   }
+
+  @override
+  String toString() {
+    return title;
+  }
 }
