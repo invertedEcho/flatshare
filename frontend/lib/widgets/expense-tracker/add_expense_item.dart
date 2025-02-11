@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
@@ -31,25 +29,6 @@ class AddExpenseItemState extends State<AddExpenseItem> {
   Map<int, double> selectedBeneficiares = {};
 
   final multiSelectUserController = MultiSelectController<User>([]);
-
-  // TODO: get rid of this by storing them in a provider too
-  List<User> usersInUserGroup = [];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    UserGroup? userGroup = userProvider.userGroup;
-    final userGroupId = userGroup?.id;
-
-    if (userGroupId != null) {
-      fetchUsersInUserGroup(userGroupId: userGroupId).then((result) {
-        setState(() {
-          usersInUserGroup = result;
-        });
-      });
-    }
-  }
 
   void handleAddExpenseItem() {
     if (!_formKey.currentState!.validate()) {
@@ -98,6 +77,9 @@ class AddExpenseItemState extends State<AddExpenseItem> {
 
   @override
   Widget build(BuildContext context) {
+    List<User> usersInUserGroup =
+        Provider.of<UserProvider>(context, listen: true).usersInUserGroup;
+
     return Scaffold(
         appBar: AppBar(title: const Text("Add Expense")),
         body: Form(

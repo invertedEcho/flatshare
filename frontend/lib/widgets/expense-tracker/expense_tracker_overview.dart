@@ -68,18 +68,9 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
             itemCount: moneyInCentPerUser.length,
             itemBuilder: (BuildContext context, int index) {
               final int userId = moneyInCentPerUser.keys.toList()[index];
-              final User? user =
-                  widget.usersInUserGroup.firstWhereOrNull((user) {
+              final User user = widget.usersInUserGroup.firstWhere((user) {
                 return user.userId == userId;
               });
-
-              // TODO: this should not be possible happen
-              if (user == null) {
-                print(
-                    "COULD NOT FIND userId: $userId in usersInUserGroup: ${widget.usersInUserGroup}");
-                return Text(
-                    "COULD NOT FIND userId: $userId in usersInUserGroup: ${widget.usersInUserGroup}");
-              }
 
               final double moneyOfUserCent =
                   moneyInCentPerUser.values.toList()[index];
