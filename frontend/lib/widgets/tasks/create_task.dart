@@ -1,8 +1,6 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
-import 'package:flatshare/fetch/user_group.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/user.dart';
-import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/task.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
@@ -27,25 +25,6 @@ class CreateTaskState extends State<CreateTask> {
 
   TaskType selectedTaskType = TaskType.recurring;
   IntervalType? selectedInterval;
-
-  // TODO: get rid of this by storing them in a provider too
-  List<User> userInUserGroup = [];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    UserGroup? userGroup = userProvider.userGroup;
-    final userGroupId = userGroup?.id;
-
-    if (userGroupId != null) {
-      fetchUsersInUserGroup(userGroupId: userGroupId).then((result) {
-        setState(() {
-          userInUserGroup = result;
-        });
-      });
-    }
-  }
 
   ButtonStyle getSelectTaskTypeButtonStyle(
       TaskType taskTypeOfButton, TaskType selectedTaskType) {
@@ -124,6 +103,9 @@ class CreateTaskState extends State<CreateTask> {
 
   @override
   Widget build(BuildContext context) {
+    List<User> usersInUserGroup =
+        Provider.of<UserProvider>(context, listen: true).usersInUserGroup;
+
     return Scaffold(
         appBar: AppBar(title: const Text("Create a new Task")),
         body: Form(
@@ -187,7 +169,7 @@ class CreateTaskState extends State<CreateTask> {
                                 listItemStyle: TextStyle(color: Colors.black),
                                 hintStyle: TextStyle(color: Colors.black)),
                             hintText: "Select users",
-                            items: userInUserGroup,
+                            items: usersInUserGroup,
                             onListChanged: (value) {})
                         : CustomDropdown(
                             decoration: const CustomDropdownDecoration(
