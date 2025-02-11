@@ -32,11 +32,6 @@ class ExpenseTrackerWidgetState extends State<ExpenseTrackerWidget> {
     super.initState();
     Provider.of<ExpenseItemProvider>(context, listen: false)
         .initExpenseItems(context);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     UserGroup? userGroup = userProvider.userGroup;
     final userGroupId = userGroup?.id;
@@ -47,6 +42,8 @@ class ExpenseTrackerWidgetState extends State<ExpenseTrackerWidget> {
           usersInUserGroup = result;
         });
       });
+    } else {
+      print("WARNING: userGroupId was null, not fetching users in usergroup");
     }
   }
 

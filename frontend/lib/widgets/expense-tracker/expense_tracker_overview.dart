@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:collection/collection.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
 import 'package:flatshare/models/expense-tracker/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_payer.dart';
@@ -27,7 +26,7 @@ class ExpenseTrackerOverview extends StatefulWidget {
 }
 
 class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
-  final Map<int, double> moneyPerUser = {};
+  final Map<int, double> moneyInCentPerUser = {};
 
   @override
   void initState() {
@@ -45,7 +44,8 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
       for (ExpensePayer expensePayer in expensePayers) {
         double calculatedAmount =
             expenseItem.amount * expensePayer.percentagePaid / 100;
-        moneyPerUser.update(expensePayer.userId,
+        print("expensepayer: calculatedamount: $calculatedAmount");
+        moneyInCentPerUser.update(expensePayer.userId,
             (existingValue) => existingValue + calculatedAmount,
             ifAbsent: () => calculatedAmount);
       }
@@ -53,7 +53,8 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
       for (ExpenseBeneficiary expenseBeneficiary in expenseBeneficiaries) {
         double calculatedAmount =
             expenseItem.amount * expenseBeneficiary.percentageShare / 100;
-        moneyPerUser.update(expenseBeneficiary.userId,
+        print("expensebeneficiary: calculatedAmount: $calculatedAmount");
+        moneyInCentPerUser.update(expenseBeneficiary.userId,
             (existingValue) => existingValue - calculatedAmount,
             ifAbsent: () => -calculatedAmount);
       }
@@ -64,20 +65,33 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
   Widget build(BuildContext context) {
     return Expanded(
         child: ListView.builder(
-            itemCount: moneyPerUser.length,
+            itemCount: moneyInCentPerUser.length,
             itemBuilder: (BuildContext context, int index) {
-              final int userId = moneyPerUser.keys.toList()[index];
-              final User user = widget.usersInUserGroup
-                  .firstWhere((user) => user.userId == userId);
-              final double moneyOfUser = moneyPerUser.values.toList()[index];
+              final int userId = moneyInCentPerUser.keys.toList()[index];
+              final User? user =
+                  widget.usersInUserGroup.firstWhereOrNull((user) {
+                return user.userId == userId;
+              });
+
+              // TODO: this should not be possible happen
+              if (user == null) {
+                print(
+                    "COULD NOT FIND userId: $userId in usersInUserGroup: ${widget.usersInUserGroup}");
+                return Text(
+                    "COULD NOT FIND userId: $userId in usersInUserGroup: ${widget.usersInUserGroup}");
+              }
+
+              final double moneyOfUserCent =
+                  moneyInCentPerUser.values.toList()[index];
+              print(moneyOfUserCent);
 
               return Card(
                 child: ListTile(
                   title: Text(user.username),
                   subtitle: Text(
-                    stringifyCentAmount(moneyOfUser),
+                    stringifyCentAmount(moneyOfUserCent),
                     style: TextStyle(
-                        color: moneyOfUser < 0 ? Colors.red : Colors.green),
+                        color: moneyOfUserCent < 0 ? Colors.red : Colors.green),
                   ),
                 ),
               );
