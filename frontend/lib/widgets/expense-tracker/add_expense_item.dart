@@ -7,6 +7,7 @@ import 'package:flatshare/models/user_group.dart';
 import 'package:flatshare/providers/expense_item.dart';
 import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class AddExpenseItem extends StatefulWidget {
@@ -164,6 +165,10 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                         }
                         return null;
                       },
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^[0-9.,]*$')),
+                      ],
                       controller: amountController,
                       keyboardType: const TextInputType.numberWithOptions(
                           signed: false, decimal: true),
