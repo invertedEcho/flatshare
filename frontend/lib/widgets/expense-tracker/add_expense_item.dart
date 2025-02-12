@@ -103,10 +103,27 @@ class AddExpenseItemState extends State<AddExpenseItem> {
     Navigator.of(context).pop();
   }
 
+  double calculateEqualDistributedPercentage(int countOfPeople) {
+    // 1. we have 100 to distribute
+    return 100 / countOfPeople;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    if (userProvider.user != null) {
+      selectedPayers.addAll({userProvider.user!.userId: 100});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<User> usersInUserGroup =
-        Provider.of<UserProvider>(context, listen: true).usersInUserGroup;
+    UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: true);
+    List<User> usersInUserGroup = userProvider.usersInUserGroup;
 
     return Scaffold(
         appBar: AppBar(title: const Text("Add Expense")),
@@ -162,9 +179,9 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                       if (value == null) return;
                                       setState(() {
                                         if (value) {
-                                          // we have to recalculate equalDistributed as its missing the newly added payer (yet)
-                                          equalDistributed =
-                                              100 / (selectedPayers.length + 1);
+                                          double equalDistributed =
+                                              calculateEqualDistributedPercentage(
+                                                  selectedPayers.length + 1);
                                           selectedPayers.addAll(
                                               {user.userId: equalDistributed});
                                           selectedPayers.updateAll(
@@ -173,15 +190,23 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                           selectedPayers.removeWhere(
                                               (userId, percentagePaid) =>
                                                   userId == user.userId);
+                                          double equalDistributed =
+                                              calculateEqualDistributedPercentage(
+                                                  selectedPayers.length);
+                                          selectedPayers.updateAll(
+                                              (key, value) => equalDistributed);
                                         }
                                       });
                                     }),
                                 Text(user.username),
                                 const Spacer(),
                                 SizedBox(
-                                  width: 70,
+                                  width: 80,
                                   child: TextFormField(
                                     key: Key(equalDistributed.toString()),
+                                    initialValue: isUserSelected
+                                        ? equalDistributed.toStringAsFixed(2)
+                                        : null,
                                     onChanged: (value) {
                                       double newValue = double.parse(value);
                                       selectedPayers.update(user.userId,
@@ -189,9 +214,6 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                         return newValue;
                                       });
                                     },
-                                    initialValue: isUserSelected
-                                        ? equalDistributed.toString()
-                                        : null,
                                     decoration:
                                         const InputDecoration(suffixText: "%"),
                                     readOnly: !isUserSelected,
@@ -216,7 +238,8 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                               double equalDistributed =
                                   selectedBeneficiares.isEmpty
                                       ? 0
-                                      : 100 / selectedBeneficiares.length;
+                                      : calculateEqualDistributedPercentage(
+                                          selectedBeneficiares.length);
                               return Row(children: [
                                 Checkbox(
                                     value: isUserSelected,
@@ -224,26 +247,35 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                       if (value == null) return;
                                       setState(() {
                                         if (value) {
-                                          // we have to recalculate equalDistributed as its missing the newly added beneficiary (yet)
-                                          equalDistributed = 100 /
-                                              (selectedBeneficiares.length + 1);
+                                          double equalDistributed =
+                                              calculateEqualDistributedPercentage(
+                                                  selectedBeneficiares.length +
+                                                      1);
                                           selectedBeneficiares.addAll(
                                               {user.userId: equalDistributed});
                                           selectedBeneficiares.updateAll(
                                               (key, value) => equalDistributed);
                                         } else {
+                                          double equalDistributed =
+                                              calculateEqualDistributedPercentage(
+                                                  selectedBeneficiares.length);
                                           selectedBeneficiares.removeWhere(
                                               (userId, percentageShare) =>
                                                   userId == user.userId);
+                                          selectedBeneficiares.updateAll(
+                                              (key, value) => equalDistributed);
                                         }
                                       });
                                     }),
                                 Text(user.username),
                                 const Spacer(),
                                 SizedBox(
-                                  width: 70,
+                                  width: 80,
                                   child: TextFormField(
                                     key: Key(equalDistributed.toString()),
+                                    initialValue: isUserSelected
+                                        ? equalDistributed.toStringAsFixed(2)
+                                        : null,
                                     onChanged: (value) {
                                       if (value.isEmpty) {
                                         return;
@@ -254,9 +286,6 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                         return newValue;
                                       });
                                     },
-                                    initialValue: isUserSelected
-                                        ? equalDistributed.toString()
-                                        : null,
                                     decoration:
                                         const InputDecoration(suffixText: "%"),
                                     readOnly: !isUserSelected,
