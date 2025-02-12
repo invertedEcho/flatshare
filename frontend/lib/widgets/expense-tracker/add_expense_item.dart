@@ -117,6 +117,16 @@ class AddExpenseItemState extends State<AddExpenseItem> {
     if (userProvider.user != null) {
       selectedPayers.addAll({userProvider.user!.userId: 100});
     }
+
+    List<User> usersInUserGroup = userProvider.usersInUserGroup;
+    double equalDistributed =
+        calculateEqualDistributedPercentage(usersInUserGroup.length);
+    Map<int, double> initialBeneficiares = {};
+    for (User user in usersInUserGroup) {
+      initialBeneficiares.update(user.userId, (_) => equalDistributed,
+          ifAbsent: () => equalDistributed);
+    }
+    selectedBeneficiares.addAll(initialBeneficiares);
   }
 
   @override
@@ -256,12 +266,12 @@ class AddExpenseItemState extends State<AddExpenseItem> {
                                           selectedBeneficiares.updateAll(
                                               (key, value) => equalDistributed);
                                         } else {
-                                          double equalDistributed =
-                                              calculateEqualDistributedPercentage(
-                                                  selectedBeneficiares.length);
                                           selectedBeneficiares.removeWhere(
                                               (userId, percentageShare) =>
                                                   userId == user.userId);
+                                          double equalDistributed =
+                                              calculateEqualDistributedPercentage(
+                                                  selectedBeneficiares.length);
                                           selectedBeneficiares.updateAll(
                                               (key, value) => equalDistributed);
                                         }
