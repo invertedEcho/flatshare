@@ -40,63 +40,64 @@ class CreateTaskState extends State<CreateTask> {
   }
 
   void handleSubmit() async {
-    if (_formKey.currentState!.validate()) {
-      String title = titleController.text;
-      String description = descriptionController.text;
-      List<int> selectedUserIds = multiSelectUserController.value
-          .map((selectUser) => selectUser.userId)
-          .toList();
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-      if (selectedTaskType == TaskType.oneOff && selectedUserIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('At least one user must be selected')),
-        );
-        return;
-      }
+    String title = titleController.text;
+    String description = descriptionController.text;
+    List<int> selectedUserIds = multiSelectUserController.value
+        .map((selectUser) => selectUser.userId)
+        .toList();
 
-      if (selectedTaskType == TaskType.recurring && selectedInterval == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an interval first')),
-        );
-        return;
-      }
+    if (selectedTaskType == TaskType.oneOff && selectedUserIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('At least one user must be selected')),
+      );
+      return;
+    }
 
-      final int? currentUserGroupId =
-          Provider.of<UserProvider>(context, listen: false).userGroup?.id;
+    if (selectedTaskType == TaskType.recurring && selectedInterval == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select an interval first')),
+      );
+      return;
+    }
 
-      if (currentUserGroupId == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Unexpected error: userGroupId was null')),
-        );
-        return;
-      }
+    final int? currentUserGroupId =
+        Provider.of<UserProvider>(context, listen: false).userGroup?.id;
 
-      final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-      try {
-        selectedTaskType == TaskType.oneOff
-            ? taskProvider.addOneOffTask(
-                title: title,
-                description: description,
-                userGroupId: currentUserGroupId,
-                userIds: selectedUserIds)
-            : await taskProvider.addRecurringTask(
-                title: title,
-                description: description,
-                userGroupId: currentUserGroupId,
-                interval: selectedInterval!,
-                context: context);
+    if (currentUserGroupId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unexpected error: userGroupId was null')),
+      );
+      return;
+    }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Created new task!')),
-        );
-        Navigator.of(context).pop();
-      } catch (e) {
-        print(e);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    try {
+      selectedTaskType == TaskType.oneOff
+          ? taskProvider.addOneOffTask(
+              title: title,
+              description: description,
+              userGroupId: currentUserGroupId,
+              userIds: selectedUserIds)
+          : await taskProvider.addRecurringTask(
+              title: title,
+              description: description,
+              userGroupId: currentUserGroupId,
+              interval: selectedInterval!,
+              context: context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Created new task!')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
     }
   }
 
