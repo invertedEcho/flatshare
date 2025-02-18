@@ -87,6 +87,7 @@ class _AppState extends State<App> {
         routerConfig: goRouter,
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          cardTheme: const CardTheme(margin: EdgeInsets.all(0)),
           useMaterial3: true,
           brightness: Brightness.light,
           colorScheme: const ColorScheme(
@@ -101,6 +102,7 @@ class _AppState extends State<App> {
               onSurface: Colors.black),
         ),
         darkTheme: ThemeData(
+          cardTheme: const CardTheme(margin: EdgeInsets.all(0)),
           useMaterial3: true,
           brightness: Brightness.dark,
           colorScheme: ColorScheme(

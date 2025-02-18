@@ -3,6 +3,7 @@ import 'package:flatshare/models/expense-tracker/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_payer.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/utils/money.dart';
+import 'package:flatshare/widgets/expense-tracker/utils.dart';
 import 'package:flutter/material.dart';
 
 class ExpenseTrackerOverview extends StatefulWidget {
@@ -25,7 +26,7 @@ class ExpenseTrackerOverview extends StatefulWidget {
 }
 
 class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
-  final Map<int, double> moneyInCentPerUser = {};
+  Map<int, double> balanceInCentPerUser = {};
 
   Color getColorForMoneyOfUserInCent(double amountInCent) {
     double inEur = (amountInCent / 100).roundToDouble();
@@ -42,45 +43,32 @@ class ExpenseTrackerOverviewState extends State<ExpenseTrackerOverview> {
 
   @override
   Widget build(BuildContext context) {
-    moneyInCentPerUser.clear();
-    for (ExpenseItem expenseItem in widget.expenseItems) {
-      List<ExpensePayer> expensePayers = widget.expensePayers
-          .where((expensePayer) => expensePayer.expenseItemId == expenseItem.id)
-          .toList();
-      List<ExpenseBeneficiary> expenseBeneficiaries = widget
-          .expenseBeneficiaries
-          .where((expenseBeneficiary) =>
-              expenseBeneficiary.expenseItemId == expenseItem.id)
-          .toList();
+    setState(() {
+      balanceInCentPerUser.clear();
+      balanceInCentPerUser = calculateBalancePerUser(
+          expenseItems: widget.expenseItems,
+          expensePayers: widget.expensePayers,
+          expenseBeneficiares: widget.expenseBeneficiaries);
+      getSettlePayment(balanceInCentPerUser);
+    });
 
-      for (ExpensePayer expensePayer in expensePayers) {
-        double calculatedAmount =
-            (expenseItem.amount * expensePayer.percentagePaid / 100);
-        moneyInCentPerUser.update(expensePayer.userId,
-            (existingValue) => existingValue + calculatedAmount,
-            ifAbsent: () => calculatedAmount);
-      }
-
-      for (ExpenseBeneficiary expenseBeneficiary in expenseBeneficiaries) {
-        double calculatedAmount =
-            (expenseItem.amount * expenseBeneficiary.percentageShare / 100);
-        moneyInCentPerUser.update(expenseBeneficiary.userId,
-            (existingValue) => existingValue - calculatedAmount,
-            ifAbsent: () => -calculatedAmount);
-      }
+    if (widget.expenseItems.isEmpty) {
+      return const Expanded(
+        child: Center(child: Text("No expenses found.")),
+      );
     }
 
     return Expanded(
         child: ListView.builder(
-            itemCount: moneyInCentPerUser.length,
+            itemCount: balanceInCentPerUser.length,
             itemBuilder: (BuildContext context, int index) {
-              final int userId = moneyInCentPerUser.keys.toList()[index];
+              final int userId = balanceInCentPerUser.keys.toList()[index];
               final User user = widget.usersInUserGroup.firstWhere((user) {
                 return user.userId == userId;
               });
 
               final double moneyOfUserInCent =
-                  moneyInCentPerUser.values.toList()[index];
+                  balanceInCentPerUser.values.toList()[index];
               Color color = getColorForMoneyOfUserInCent(moneyOfUserInCent);
 
               return Card(

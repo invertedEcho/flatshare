@@ -75,7 +75,7 @@ class PageSwitchState extends State<PageSwitch> {
                 onPressed: () {
                   widget.onPageSelect(PageType.overview);
                 },
-                child: const Text("Overview"))),
+                child: const Text("Group Balances"))),
         const SizedBox(width: 8),
         Expanded(
             child: ElevatedButton(
@@ -99,7 +99,7 @@ class PageSwitchState extends State<PageSwitch> {
                 onPressed: () {
                   widget.onPageSelect(PageType.list);
                 },
-                child: const Text("List"))),
+                child: const Text("Expense History"))),
       ],
     );
   }

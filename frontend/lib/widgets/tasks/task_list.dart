@@ -41,6 +41,9 @@ class TaskList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (tasks.isEmpty) {
+      return const Center(child: Text("No one-time tasks found."));
+    }
     return ListView.builder(
       itemCount: tasks.length,
       itemBuilder: (context, index) {

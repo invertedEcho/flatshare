@@ -36,6 +36,7 @@ class JoinGroupState extends State<JoinGroup> {
       final UserGroup userGroup = await joinGroupByInviteCode(
           userId: user.userId, inviteCode: inviteCode);
       userProvider.setUserGroup(userGroup);
+      userProvider.initUsersInUserGroup(userGroup.id);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Joined group!')),
       );

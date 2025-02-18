@@ -3,8 +3,8 @@ String stringifyCentAmount(double amount) {
 
   // ignore rounding issues
   if (inEur == "-0.00") {
-    return "0.00€";
+    return "0,00€";
   }
 
-  return "$inEur€";
+  return "${inEur.replaceAll(".", ",")}€";
 }

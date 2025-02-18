@@ -1,4 +1,5 @@
 import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:flatshare/const.dart';
 import 'package:flatshare/models/task.dart';
 import 'package:flatshare/models/user.dart';
 import 'package:flatshare/providers/task.dart';
@@ -111,7 +112,7 @@ class CreateTaskState extends State<CreateTask> {
         body: Form(
             key: _formKey,
             child: Padding(
-                padding: const EdgeInsets.all(30),
+                padding: const EdgeInsets.all(generalSubPagePadding),
                 child: Column(
                   children: [
                     TextFormField(

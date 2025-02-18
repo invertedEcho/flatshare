@@ -35,9 +35,10 @@ Future<String> login(String email, String password) async {
 
 Future<void> register(
     String username, String password, String email, String? inviteCode) async {
-  var apiBaseUrl = getApiBaseUrl();
+  final String apiBaseUrl = getApiBaseUrl();
+  final Uri requestUrl = Uri.parse('$apiBaseUrl/auth/register');
   final response = await http.post(
-    Uri.parse('$apiBaseUrl/auth/register'),
+    requestUrl,
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     },
@@ -54,7 +55,7 @@ Future<void> register(
   }
 
   if (response.statusCode != 201) {
-    throw Exception("Failed to register");
+    throw Exception("Failed to register: ${response.statusCode}");
   }
 }
 

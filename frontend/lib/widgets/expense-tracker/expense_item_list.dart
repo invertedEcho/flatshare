@@ -23,6 +23,12 @@ class ExpenseItemList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (expenseItems.isEmpty) {
+      return const Expanded(
+        child: Center(child: Text("No expenses found.")),
+      );
+    }
+
     return Expanded(
         child: ListView.builder(
             itemCount: expenseItems.length,
@@ -57,11 +63,13 @@ class ExpenseItemList extends StatelessWidget {
 
               String trailingText =
                   "${stringifyCentAmount(double.parse(expenseItem.amount.toString()))}\nPaid by: ${expensePayerNames.join(", ")}";
+              String subtitleText =
+                  "For: ${expenseBeneficiaryNames.join(", ")}";
 
               return Card(
                   child: ListTile(
                 title: Text(expenseItem.title),
-                subtitle: Text("For: ${expenseBeneficiaryNames.join(", ")}"),
+                subtitle: Text(subtitleText),
                 trailing: Text(trailingText),
               ));
             }));

@@ -5,8 +5,10 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_user_group.dart';
+import 'package:flatshare/widgets/expandable_fab.dart';
 import 'package:flatshare/widgets/expense-tracker/add_expense_item.dart';
 import 'package:flatshare/widgets/expense-tracker/expense_tracker.dart';
+import 'package:flatshare/widgets/expense-tracker/settle_payment.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/shopping_list.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
@@ -78,7 +80,6 @@ class AuthenticatedNavigation extends StatefulWidget {
 class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
   final PageController _pageController = PageController(initialPage: 0);
   int currentPageIndex = 0;
-  int? userGroupId;
 
   void handleLogout() async {
     await storage.delete(key: 'jwt-token');
@@ -88,7 +89,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
     context.go('/login');
   }
 
-  void handleOpenGenerateInviteCode() async {
+  void handleOpenGenerateInviteCode(int? userGroupId) async {
     if (userGroupId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -98,7 +99,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
       return;
     }
     String inviteCode =
-        await generateInviteCodeForUserGroup(userGroupId: userGroupId!);
+        await generateInviteCodeForUserGroup(userGroupId: userGroupId);
     String inviteCodeUrl = getInviteCodeUrl(inviteCode: inviteCode);
     showModalBottomSheet<void>(
         context: context,
@@ -124,29 +125,30 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         });
   }
 
-  void onFloatingActionButtonPress(
-      {required bool isCurrentlyTaskPage,
-      required bool isCurrentlyExpenseTrackerPage}) {
-    if (isCurrentlyTaskPage) {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const CreateTask()));
-    } else if (isCurrentlyExpenseTrackerPage) {
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const AddExpenseItem()));
+  Widget? getFloatingActionButtonWidget() {
+    if (currentPageIndex == taskPageIndex) {
+      return FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const CreateTask()));
+          });
+    } else if (currentPageIndex == expenseTrackerPageIndex) {
+      return FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const AddExpenseItem()));
+          });
+    } else {
+      return null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context);
-    if (userProvider.userGroup != null) {
-      setState(() {
-        userGroupId = userProvider.userGroup!.id;
-      });
-    }
-    final isCurrentlyTaskPage = currentPageIndex == taskPageIndex;
-    final isCurrentlyExpenseTrackerPage =
-        currentPageIndex == expenseTrackerPageIndex;
+    int? userGroupId = userProvider.userGroup?.id;
 
     return Scaffold(
         appBar: AppBar(
@@ -167,7 +169,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                       Text("Logout (${userProvider.user?.email})"),
                     ])),
                 PopupMenuItem(
-                    onTap: handleOpenGenerateInviteCode,
+                    onTap: () => handleOpenGenerateInviteCode(userGroupId),
                     child: const Row(
                       children: [
                         Icon(Icons.password),
@@ -181,16 +183,10 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             })
           ],
         ),
-        floatingActionButton: userProvider.userGroup?.id != null &&
-                (isCurrentlyTaskPage || isCurrentlyExpenseTrackerPage)
-            ? FloatingActionButton(
-                onPressed: () => onFloatingActionButtonPress(
-                    isCurrentlyTaskPage: isCurrentlyTaskPage,
-                    isCurrentlyExpenseTrackerPage:
-                        isCurrentlyExpenseTrackerPage),
-                child: const Icon(Icons.add),
-              )
-            : null,
+        floatingActionButton: userProvider.userGroup?.id == null
+            ? null
+            : getFloatingActionButtonWidget(),
+        floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {
             _pageController.animateToPage(index,

@@ -190,59 +190,65 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
                 ],
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                  itemCount: shoppingListItems.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    var shoppingListItem = shoppingListItems[index];
-                    return Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(13),
-                        ),
-                        elevation: generalElevation,
-                        shadowColor: Colors.black,
-                        child: Dismissible(
-                            onDismissed: (_) {
-                              updateShoppingListItem(
-                                  shoppingListItem, 'deleted');
-                              setState(() {
-                                shoppingListItems.remove(shoppingListItem);
-                              });
-                            },
-                            key: Key(shoppingListItem.id.toString()),
-                            child: ListTile(
-                              title: Row(
-                                children: [
-                                  Text(shoppingListItem.text),
-                                  const SizedBox(width: 8),
-                                ],
+            shoppingListItems.isEmpty
+                ? const Center(child: Text("No shopping items found."))
+                : Expanded(
+                    child: ListView.builder(
+                        itemCount: shoppingListItems.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          var shoppingListItem = shoppingListItems[index];
+                          return Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(13),
                               ),
-                              subtitle: const Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[],
-                              ),
-                              onTap: () {
-                                final newState =
-                                    shoppingListItem.state == 'purchased'
-                                        ? 'pending'
-                                        : 'purchased';
-                                updateShoppingListItem(
-                                    shoppingListItem, newState);
-                              },
-                              trailing: Checkbox(
-                                onChanged: (bool? value) {
-                                  final newState =
-                                      shoppingListItem.state == 'purchased'
-                                          ? 'pending'
-                                          : 'purchased';
-                                  updateShoppingListItem(
-                                      shoppingListItem, newState);
-                                },
-                                value: shoppingListItem.state == 'purchased',
-                              ),
-                            )));
-                  }),
-            )
+                              elevation: generalElevation,
+                              shadowColor: Colors.black,
+                              child: Dismissible(
+                                  onDismissed: (_) {
+                                    updateShoppingListItem(
+                                        shoppingListItem, 'deleted');
+                                    setState(() {
+                                      shoppingListItems
+                                          .remove(shoppingListItem);
+                                    });
+                                  },
+                                  key: Key(shoppingListItem.id.toString()),
+                                  child: ListTile(
+                                    title: Row(
+                                      children: [
+                                        Text(shoppingListItem.text),
+                                        const SizedBox(width: 8),
+                                      ],
+                                    ),
+                                    subtitle: const Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[],
+                                    ),
+                                    onTap: () {
+                                      final newState =
+                                          shoppingListItem.state == 'purchased'
+                                              ? 'pending'
+                                              : 'purchased';
+                                      updateShoppingListItem(
+                                          shoppingListItem, newState);
+                                    },
+                                    trailing: Checkbox(
+                                      onChanged: (bool? value) {
+                                        final newState =
+                                            shoppingListItem.state ==
+                                                    'purchased'
+                                                ? 'pending'
+                                                : 'purchased';
+                                        updateShoppingListItem(
+                                            shoppingListItem, newState);
+                                      },
+                                      value:
+                                          shoppingListItem.state == 'purchased',
+                                    ),
+                                  )));
+                        }),
+                  ),
           ],
         ));
   }
