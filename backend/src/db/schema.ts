@@ -233,6 +233,7 @@ export const expenseItemTable = pgTable('expense_item', {
   userGroupId: integer('user_group_id')
     .references(() => userGroupTable.id)
     .notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 export type InsertExpenseItem = typeof expenseItemTable.$inferInsert;
 export type SelectExpenseItem = typeof expenseItemTable.$inferSelect;
@@ -246,6 +247,7 @@ export const expensePayerMappingTable = pgTable('expense_payer_mapping', {
     .references(() => userTable.id)
     .notNull(),
   percentagePaid: numeric('percentage_paid').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 export type InsertExpensePayerMapping =
   typeof expensePayerMappingTable.$inferInsert;
@@ -263,9 +265,11 @@ export const expenseBeneficiaryMappingTable = pgTable(
       .references(() => userTable.id)
       .notNull(),
     percentageShare: numeric('percentage_share').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
   },
 );
 export type InsertExpenseBeneficiaryMapping =
   typeof expenseBeneficiaryMappingTable.$inferInsert;
 export type SelectExpenseBeneficiaryMapping =
   typeof expenseBeneficiaryMappingTable.$inferSelect;
+
