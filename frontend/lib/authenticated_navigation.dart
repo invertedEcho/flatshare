@@ -5,6 +5,8 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flatshare/utils/env.dart';
 import 'package:flatshare/widgets/assignments/assignments_widget.dart';
 import 'package:flatshare/widgets/create_user_group.dart';
+import 'package:flatshare/widgets/expense-tracker/add_expense_item.dart';
+import 'package:flatshare/widgets/expense-tracker/expense_tracker.dart';
 import 'package:flatshare/widgets/join_group.dart';
 import 'package:flatshare/widgets/shopping_list.dart';
 import 'package:flatshare/widgets/tasks/create_task.dart';
@@ -22,6 +24,7 @@ List<Widget> getWidgets(int? userGroupId, String? inviteCode) {
       const AssignmentsWidget(),
       const TasksOverviewWidget(),
       ShoppingListWidget(userGroupId: userGroupId),
+      const ExpenseTrackerWidget(),
     ];
   }
   return [
@@ -45,7 +48,9 @@ List<NavigationDestination> getNavigationDestinations(int? userGroupId) {
         label: 'Tasks',
       ),
       const NavigationDestination(
-          icon: Icon(Icons.shopping_cart), label: "Shopping List")
+          icon: Icon(Icons.shopping_cart), label: "Shopping List"),
+      const NavigationDestination(
+          icon: Icon(Icons.paid), label: "Expense Tracker")
     ];
   }
   return [
@@ -73,7 +78,6 @@ class AuthenticatedNavigation extends StatefulWidget {
 class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
   final PageController _pageController = PageController(initialPage: 0);
   int currentPageIndex = 0;
-  int? userGroupId;
 
   void handleLogout() async {
     await storage.delete(key: 'jwt-token');
@@ -83,7 +87,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
     context.go('/login');
   }
 
-  void handleOpenGenerateInviteCode() async {
+  void handleOpenGenerateInviteCode(int? userGroupId) async {
     if (userGroupId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -93,7 +97,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
       return;
     }
     String inviteCode =
-        await generateInviteCodeForUserGroup(userGroupId: userGroupId!);
+        await generateInviteCodeForUserGroup(userGroupId: userGroupId);
     String inviteCodeUrl = getInviteCodeUrl(inviteCode: inviteCode);
     showModalBottomSheet<void>(
         context: context,
@@ -119,14 +123,31 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
         });
   }
 
+  Widget? getFloatingActionButtonWidget() {
+    if (currentPageIndex == taskPageIndex) {
+      return FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const CreateTask()));
+          });
+    } else if (currentPageIndex == expenseTrackerPageIndex) {
+      return FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => const AddExpenseItem()));
+          });
+    } else {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var userProvider = Provider.of<UserProvider>(context);
-    if (userProvider.userGroup != null) {
-      setState(() {
-        userGroupId = userProvider.userGroup!.id;
-      });
-    }
+    int? userGroupId = userProvider.userGroup?.id;
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -146,7 +167,7 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
                       Text("Logout (${userProvider.user?.email})"),
                     ])),
                 PopupMenuItem(
-                    onTap: handleOpenGenerateInviteCode,
+                    onTap: () => handleOpenGenerateInviteCode(userGroupId),
                     child: const Row(
                       children: [
                         Icon(Icons.password),
@@ -160,15 +181,10 @@ class _AuthenticatedNavigationState extends State<AuthenticatedNavigation> {
             })
           ],
         ),
-        floatingActionButton: userProvider.userGroup?.id != null &&
-                currentPageIndex != shoppingListPageIndex &&
-                currentPageIndex != assignmentPageIndex
-            ? FloatingActionButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const CreateTask())),
-                child: const Icon(Icons.add),
-              )
-            : null,
+        floatingActionButton: userProvider.userGroup?.id == null
+            ? null
+            : getFloatingActionButtonWidget(),
+        floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
         bottomNavigationBar: NavigationBar(
           onDestinationSelected: (int index) {
             _pageController.animateToPage(index,

@@ -13,6 +13,7 @@ class UserProvider with ChangeNotifier {
   List<User> get usersInUserGroup => _usersInUserGroup;
 
   Future<void> initUsersInUserGroup(int userGroupId) async {
+    print("init users in usergroup");
     List<User> usersInUserGroup =
         await fetchUsersInUserGroup(userGroupId: userGroupId);
     _usersInUserGroup = usersInUserGroup;

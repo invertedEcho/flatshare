@@ -29,7 +29,7 @@ class TaskGroupList extends StatelessWidget {
     return Consumer<TaskGroupProvider>(
         builder: (context, taskGroupProvider, child) {
       if (taskGroupProvider.taskGroups.isEmpty) {
-        return const Center(child: Text("No task groups found."));
+        return const Center(child: Text("No recurring tasks found."));
       }
       return ListView.builder(
           itemCount: taskGroupProvider.taskGroups.length,

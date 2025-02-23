@@ -1,6 +1,7 @@
 import {
   integer,
   interval,
+  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -223,3 +224,63 @@ export const userFcmRegistrationTokenMappingTable = pgTable(
     };
   },
 );
+
+export const expenseItemTable = pgTable('expense_item', {
+  id: serial('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  amount: integer('amount').notNull(),
+  userGroupId: integer('user_group_id')
+    .references(() => userGroupTable.id)
+    .notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+export type InsertExpenseItem = typeof expenseItemTable.$inferInsert;
+export type SelectExpenseItem = typeof expenseItemTable.$inferSelect;
+
+export const expensePayerMappingTable = pgTable('expense_payer_mapping', {
+  id: serial('id').primaryKey(),
+  expenseItemId: integer('expense_item_id')
+    .references(() => expenseItemTable.id)
+    .notNull(),
+  userId: integer('user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  percentagePaid: numeric('percentage_paid').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+export type InsertExpensePayerMapping =
+  typeof expensePayerMappingTable.$inferInsert;
+export type SelectExpensePayerMapping =
+  typeof expensePayerMappingTable.$inferSelect;
+
+export const expenseBeneficiaryMappingTable = pgTable(
+  'expense_beneficiary_mapping',
+  {
+    id: serial('id').primaryKey(),
+    expenseItemId: integer('expense_item_id')
+      .references(() => expenseItemTable.id)
+      .notNull(),
+    userId: integer('user_id')
+      .references(() => userTable.id)
+      .notNull(),
+    percentageShare: numeric('percentage_share').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+);
+export type InsertExpenseBeneficiaryMapping =
+  typeof expenseBeneficiaryMappingTable.$inferInsert;
+export type SelectExpenseBeneficiaryMapping =
+  typeof expenseBeneficiaryMappingTable.$inferSelect;
+
+export const expenseSettlementTable = pgTable('expense_settlement', {
+  id: serial('id').primaryKey(),
+  payerUserId: integer('payer_user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  payeeUserId: integer('payee_user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  amount: integer('amount').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});

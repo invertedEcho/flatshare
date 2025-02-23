@@ -1,0 +1,2 @@
+ALTER TABLE "expense_beneficiary_mapping" ALTER COLUMN "percentage_share" SET DATA TYPE numeric;--> statement-breakpoint
+ALTER TABLE "expense_payer_mapping" ALTER COLUMN "percentage_paid" SET DATA TYPE numeric;

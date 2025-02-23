@@ -39,8 +39,8 @@ Future<Task> createOneOffTask(
   if (response.statusCode != 201) {
     throw Exception("Failed to create task: ${response.statusCode}");
   }
-  dynamic taskResponse = jsonDecode(response.body);
-  return Task.fromJson(taskResponse);
+  dynamic decodedResponseBody = jsonDecode(response.body);
+  return Task.fromJson(decodedResponseBody);
 }
 
 Future<TaskWithMaybeTaskGroup> createRecurringTask(

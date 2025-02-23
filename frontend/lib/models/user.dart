@@ -1,4 +1,5 @@
 class User {
+  // TODO: why is this called userId instead of id?
   final int userId;
   final String email;
   final String username;
