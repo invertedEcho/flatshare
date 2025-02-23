@@ -13,7 +13,7 @@ import { EventsGateway } from './shopping-list/events.gateway';
 import { ShoppingListController } from './shopping-list/shopping-list.controller';
 import { NotificationController } from './notifications/notification.controller';
 import { NotificationModule } from './notifications/notification.module';
-import { ExpenseItemController } from './expense-item/expense-item.controller';
+import { ExpenseTrackerController } from './expense-item/expense-item.controller';
 
 const rootPathStatic = join(__dirname, '../../src/client/public/');
 
@@ -37,7 +37,7 @@ const rootPathStatic = join(__dirname, '../../src/client/public/');
     UserGroupController,
     ShoppingListController,
     NotificationController,
-    ExpenseItemController,
+    ExpenseTrackerController,
   ],
   providers: [EventsGateway],
 })

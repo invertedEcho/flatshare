@@ -130,9 +130,11 @@ class ShoppingListWidgetState extends State<ShoppingListWidget> {
     fetchShoppingList(userGroupId: userGroupId!).then((items) {
       var nonDeletedItems =
           items.where((item) => item.state != 'deleted').toList();
-      setState(() {
-        shoppingListItems = nonDeletedItems;
-      });
+      if (mounted) {
+        setState(() {
+          shoppingListItems = nonDeletedItems;
+        });
+      }
     });
   }
 

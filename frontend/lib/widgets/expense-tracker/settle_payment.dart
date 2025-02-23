@@ -23,16 +23,17 @@ class SettlePayment extends StatefulWidget {
 class SettlePaymentState extends State<SettlePayment> {
   @override
   Widget build(BuildContext context) {
-    ExpenseItemProvider expenseItemProvider =
-        Provider.of<ExpenseItemProvider>(context, listen: true);
+    ExpenseTrackerProvider expenseItemProvider =
+        Provider.of<ExpenseTrackerProvider>(context, listen: true);
     List<ExpenseItem> expenseItems = expenseItemProvider.expenseItems;
     List<ExpensePayer> expensePayers = expenseItemProvider.expensePayers;
     List<ExpenseBeneficiary> expenseBeneficiaries =
         expenseItemProvider.expenseBeneficiares;
-    Map<int, double> balancePerUser = calculateBalancePerUser(
-        expenseItems: expenseItems,
-        expensePayers: expensePayers,
-        expenseBeneficiares: expenseBeneficiaries);
+    Map<int, double> balancePerUser =
+        calculateBalancePerUserFromAllExpenseItems(
+            expenseItems: expenseItems,
+            expensePayers: expensePayers,
+            expenseBeneficiares: expenseBeneficiaries);
     Map<int, List<MapEntry<int, double>>> recommendedSettlePaymentMap =
         getSettlePayment(balancePerUser);
     List<User> usersInUserGroup =

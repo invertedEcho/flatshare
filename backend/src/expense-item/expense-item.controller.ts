@@ -30,8 +30,8 @@ type CreateExpenseItemBody = {
   expenseBeneficiares: Omit<InsertExpenseBeneficiaryMapping, 'expenseItemId'>[];
 };
 
-@Controller('expense-item')
-export class ExpenseItemController {
+@Controller('expense-tracker')
+export class ExpenseTrackerController {
   @Get()
   async getAllExpenseItems(
     @Query('userGroupId') userGroupId: number,
@@ -81,8 +81,6 @@ export class ExpenseItemController {
         };
       },
     );
-    console.log({ hydratedExpensePayers });
-    console.log({ hydratedExpenseBeneficiares });
 
     await dbAddExpensePayers(hydratedExpensePayers);
     await dbAddExpenseBeneficiares(hydratedExpenseBeneficiares);

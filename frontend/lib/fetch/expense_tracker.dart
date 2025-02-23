@@ -12,7 +12,7 @@ Future<ExpenseItem> postExpenseItem(
     required List<ExpensePayer> expensePayers}) async {
   var apiBaseUrl = getApiBaseUrl();
   final response =
-      await authenticatedClient.post(Uri.parse('$apiBaseUrl/expense-item'),
+      await authenticatedClient.post(Uri.parse('$apiBaseUrl/expense-tracker'),
           body: jsonEncode({
             'expenseItem': expenseItem,
             'expenseBeneficiares': expenseBeneficiaries,
@@ -29,7 +29,7 @@ Future<ExpenseItem> postExpenseItem(
 Future<List<ExpenseItem>> fetchAllExpenseItems(int userGroupId) async {
   var apiBaseUrl = getApiBaseUrl();
   var requestUrl =
-      Uri.parse('$apiBaseUrl/expense-item?userGroupId=$userGroupId');
+      Uri.parse('$apiBaseUrl/expense-tracker?userGroupId=$userGroupId');
   final response = await authenticatedClient.get(requestUrl);
   if (response.statusCode != 200) {
     throw Exception("Failed to get expense items: ${response.statusCode}]");
@@ -44,7 +44,7 @@ Future<List<ExpenseItem>> fetchAllExpenseItems(int userGroupId) async {
 Future<List<ExpensePayer>> fetchAllExpensePayers(int userGroupId) async {
   var apiBaseUrl = getApiBaseUrl();
   var requestUrl = Uri.parse(
-      '$apiBaseUrl/expense-item/expense-payer?userGroupId=$userGroupId');
+      '$apiBaseUrl/expense-tracker/expense-payer?userGroupId=$userGroupId');
   final response = await authenticatedClient.get(requestUrl);
   if (response.statusCode != 200) {
     throw Exception("Failed to get expense payers: ${response.statusCode}]");
@@ -60,7 +60,7 @@ Future<List<ExpenseBeneficiary>> fetchAllExpenseBeneficiares(
     int userGroupId) async {
   var apiBaseUrl = getApiBaseUrl();
   var requestUrl = Uri.parse(
-      '$apiBaseUrl/expense-item/expense-beneficiary?userGroupId=$userGroupId');
+      '$apiBaseUrl/expense-tracker/expense-beneficiary?userGroupId=$userGroupId');
   final response = await authenticatedClient.get(requestUrl);
   if (response.statusCode != 200) {
     throw Exception(

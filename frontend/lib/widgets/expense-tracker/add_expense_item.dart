@@ -46,8 +46,8 @@ class AddExpenseItemState extends State<AddExpenseItem> {
       return;
     }
 
-    ExpenseItemProvider expenseItemProvider =
-        Provider.of<ExpenseItemProvider>(context, listen: false);
+    ExpenseTrackerProvider expenseItemProvider =
+        Provider.of<ExpenseTrackerProvider>(context, listen: false);
     UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
 
@@ -65,7 +65,8 @@ class AddExpenseItemState extends State<AddExpenseItem> {
         userGroupId: userGroup.id,
         title: titleController.text,
         description: descriptionController.text,
-        amount: actualAmountInCent);
+        amount: actualAmountInCent,
+        createdAt: DateTime.now());
 
     List<ExpenseBeneficiary> expenseBeneficiares = [];
 

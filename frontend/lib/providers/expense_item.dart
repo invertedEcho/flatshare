@@ -1,4 +1,4 @@
-import 'package:flatshare/fetch/expense_item.dart';
+import 'package:flatshare/fetch/expense_tracker.dart';
 import 'package:flatshare/models/expense-tracker/expense_beneficiary.dart';
 import 'package:flatshare/models/expense-tracker/expense_item.dart';
 import 'package:flatshare/models/expense-tracker/expense_payer.dart';
@@ -6,7 +6,7 @@ import 'package:flatshare/providers/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ExpenseItemProvider extends ChangeNotifier {
+class ExpenseTrackerProvider extends ChangeNotifier {
   List<ExpenseItem> _expenseItems = [];
   List<ExpenseItem> get expenseItems => _expenseItems;
 

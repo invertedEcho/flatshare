@@ -273,3 +273,14 @@ export type InsertExpenseBeneficiaryMapping =
 export type SelectExpenseBeneficiaryMapping =
   typeof expenseBeneficiaryMappingTable.$inferSelect;
 
+export const expenseSettlementTable = pgTable('expense_settlement', {
+  id: serial('id').primaryKey(),
+  payerUserId: integer('payer_user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  payeeUserId: integer('payee_user_id')
+    .references(() => userTable.id)
+    .notNull(),
+  amount: integer('amount').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
